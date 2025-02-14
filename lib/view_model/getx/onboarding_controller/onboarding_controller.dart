@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:tripto_driver/view/auth_screen/send_otp_page.dart';
 
 import '../../../view/home_page.dart';
 
@@ -30,9 +31,8 @@ class OnboardingController extends GetxController {
 
   void nextPage() {
     if (currentPageIndicator.value == 2) {
-      Get.offAll(const HomePage());
-      Fluttertoast.showToast(msg: 'last');
-    } else {
+      Get.offAll(const SendOtpPage());
+     } else {
       int page = currentPageIndicator.value + 1;
       pageController.jumpToPage(page);
     }
