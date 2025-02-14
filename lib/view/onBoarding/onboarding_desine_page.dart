@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
 import '../../utils/app_sizes/sizes.dart';
+
 
 class OnBoardingPage extends StatelessWidget {
   OnBoardingPage(
@@ -16,13 +16,13 @@ class OnBoardingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final sizes = MediaQuery.of(context).size;
     return Padding(
-      padding: EdgeInsets.all(AppSizes.defaultSpacing),
+      padding: const EdgeInsets.all(AppSizes.defaultSpacing),
       child: Column(
         children: [
           Image.asset(
             onBoardingImage,
-            width: sizes.width * 0.4,
-            height: sizes.height * 0.4,
+            width: sizes.width * 0.4 + 50,
+            height: sizes.height * 0.4 + 50,
           ),
           Text(
             title,
@@ -32,11 +32,7 @@ class OnBoardingPage extends StatelessWidget {
           const SizedBox(
             height: AppSizes.spaceBetweenItems,
           ),
-          // Text(
-          //   subTitle,
-          //   style: Theme.of(context).textTheme.headlineSmall,
-          //   textAlign: TextAlign.center,
-          // ),
+
         ],
       ),
     );
