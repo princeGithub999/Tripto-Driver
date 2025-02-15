@@ -11,18 +11,18 @@ class TextFromFealdCustome {
     errorMaxLines: 3,
     prefixIconColor: AppColors.lightBlue,
     suffixIconColor: AppColors.darkGrey,
-    labelStyle: const TextStyle().copyWith(fontSize: AppSizes.fontSizeMd, color: Colors.red), hintStyle: const TextStyle().copyWith(fontSize: AppSizes.fontSizeLg, color: Colors.black),
+    labelStyle: const TextStyle().copyWith(fontSize: AppSizes.fontSizeMd, color: Colors.grey), hintStyle: const TextStyle().copyWith(fontSize: AppSizes.fontSizeLg, color: Colors.black),
     errorStyle: const TextStyle().copyWith(fontStyle: FontStyle.normal, color: AppColors.error),
     floatingLabelStyle: const TextStyle().copyWith(color: Colors.black.withOpacity(0.8)),
     border: const OutlineInputBorder().copyWith(
         borderRadius: BorderRadius.circular(AppSizes.borderRadiusMd),
-        borderSide: BorderSide(width: 1.5, color: AppColors.lightBlue)),
+        borderSide: BorderSide(width: 1.5, color: AppColors.blue900)),
     enabledBorder: const OutlineInputBorder().copyWith(
         borderRadius: BorderRadius.circular(AppSizes.inputFieldRadius),
-        borderSide: BorderSide(width: 1.5, color: AppColors.lightBlue)),
+        borderSide: BorderSide(width: 1.5, color: AppColors.blue900)),
     focusedBorder: const OutlineInputBorder().copyWith(
         borderRadius: BorderRadius.circular(AppSizes.inputFieldRadius),
-        borderSide: BorderSide(width: 1.5, color: AppColors.lightBlue)),
+        borderSide: BorderSide(width: 1.5, color: AppColors.blue900)),
     errorBorder: const OutlineInputBorder().copyWith(
         borderRadius: BorderRadius.circular(AppSizes.inputFieldRadius),
         borderSide: const BorderSide(width: 1.5, color: AppColors.error)),
