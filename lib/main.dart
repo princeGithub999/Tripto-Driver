@@ -24,7 +24,7 @@ void main() async {
           create: (context) => AuthProviderIn(),
         ),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
