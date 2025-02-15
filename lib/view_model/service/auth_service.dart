@@ -66,7 +66,7 @@ class AuthService {
       completer.complete(false);
     }
 
-    return completer.future; // ✅ Correct way
+    return completer.future;
   }
 
 
