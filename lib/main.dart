@@ -4,8 +4,6 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/firebase_options.dart';
 import 'package:tripto_driver/utils/app_theme/app_theme.dart';
-import 'package:tripto_driver/view/auth_screen/send_otp_page.dart';
-import 'package:tripto_driver/view/auth_screen/verify_otp_page.dart';
 import 'package:tripto_driver/view/screen/splace_screen.dart';
 
 import 'package:tripto_driver/view_model/provider/form_fillup_provider/form_fillup_provider.dart';
@@ -25,17 +23,12 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => PermissionProvider()),
         ChangeNotifierProvider(create: (context) => FormFillupProvider()),
-      ],
-      child: const MyApp(),
-    ),
-
-        ChangeNotifierProvider(create: (context) => PermissionProvider(),),
         ChangeNotifierProvider(create: (context) => AuthProviderIn(),),
 
       ],
-      child:  MyApp(),
+      child: const MyApp(),
 
-    )
+    ),
 
   );
 }
@@ -52,10 +45,7 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
 
-      home:  SplaceScreen(),
-
-      home: const SplaceScreen(),
-
+      home:  const SplaceScreen(),
     );
   }
 }
