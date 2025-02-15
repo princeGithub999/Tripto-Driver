@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
-import 'dart:io';
 
 import '../../../view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 
@@ -48,7 +47,7 @@ class ProfileUpdate extends StatelessWidget {
                 // Submit action here
               } : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: profileProvider.isFormComplete ? AppColors.blue900 : Colors.grey,
+                backgroundColor: profileProvider.isFormComplete ? AppColors.blue900 : AppColors.blue900,
                 minimumSize: Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 shadowColor: Colors.black26,
