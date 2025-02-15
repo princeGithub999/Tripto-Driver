@@ -22,10 +22,10 @@ class OnBoardNextButton extends StatelessWidget {
         onPressed: () => OnboardingController.instance.nextPage(),
         style: ElevatedButton.styleFrom(
             shape: const CircleBorder(),
-            backgroundColor: dark ? AppColors.white : AppColors.white),
+            backgroundColor: dark ? AppColors.blue900 : AppColors.blue900),
         child: Icon(
           Iconsax.arrow_right_3,
-          color: dark ? AppColors.white : AppColors.blue900,
+          color: dark ? AppColors.white : AppColors.white,
         ),
       ),
     );
