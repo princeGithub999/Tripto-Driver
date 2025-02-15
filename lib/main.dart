@@ -25,17 +25,12 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => PermissionProvider()),
         ChangeNotifierProvider(create: (context) => FormFillupProvider()),
-      ],
-      child: const MyApp(),
-    ),
-
-        ChangeNotifierProvider(create: (context) => PermissionProvider(),),
         ChangeNotifierProvider(create: (context) => AuthProviderIn(),),
 
       ],
-      child:  MyApp(),
+      child: const MyApp(),
 
-    )
+    ),
 
   );
 }
@@ -52,10 +47,7 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
 
-      home:  SplaceScreen(),
-
-      home: const SplaceScreen(),
-
+      home:  const SplaceScreen(),
     );
   }
 }

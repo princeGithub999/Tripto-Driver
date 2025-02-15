@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view/auth_screen/verify_otp_page.dart';
-import 'package:tripto_driver/view/home_page.dart';
 import 'package:tripto_driver/view_model/service/auth_service.dart';
+import '../../../view/screen/profile_details_screen/form_fillup_screen.dart';
 
 class AuthProviderIn extends ChangeNotifier {
 
@@ -46,13 +46,12 @@ class AuthProviderIn extends ChangeNotifier {
     try {
       isLoding = true;
       notifyListeners();
-      print('Loading started...');
 
       var success = await authService.signInWithGoogle();
 
       if (success == true) {
         print('Login Success! Navigating to HomePage...');
-        Get.to(() => const HomePage());
+        Get.to(() =>  FormFillupScreen());
       } else {
         print('Login Failed!');
       }
