@@ -3,15 +3,103 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../view/screen/profile_details_screen/aadhaar_pan_details.dart';
 import '../../../view/screen/profile_details_screen/driving_licence_details.dart';
-import '../../../view/screen/profile_details_screen/form_fillup_screen.dart';
+import '../../../view/screen/profile_details_screen/profile_screen.dart';
 import '../../../view/screen/profile_details_screen/vehicle_rc.dart';
 
 class FormFillupProvider with ChangeNotifier {
-  String _selectedDocument = "Driving License";
+  File? _profileImage;
+  String _name = '';
+  String _mobile = '';
+  String _email = '';
+  String _address = '';
+  String _dob = '';
+  String _bankName = '';
+  String _accountNumber = '';
+  String _ifsc = '';
+  String _upi = '';
 
+  // Getters
+  File? get profileImage => _profileImage;
+  String get name => _name;
+  String get mobile => _mobile;
+  String get email => _email;
+  String get address => _address;
+  String get dob => _dob;
+  String get bankName => _bankName;
+  String get accountNumber => _accountNumber;
+  String get ifsc => _ifsc;
+  String get upi => _upi;
+
+  // Image Picker
+  Future<void> pickProfileImage(ImageSource source) async {
+    final pickedFile = await ImagePicker().pickImage(source: source);
+    if (pickedFile != null) {
+      _profileImage = File(pickedFile.path);
+      notifyListeners();
+    }
+  }
+
+  // Setters
+  void updateName(String value) {
+    _name = value;
+    notifyListeners();
+  }
+
+  void updateMobile(String value) {
+    _mobile = value;
+    notifyListeners();
+  }
+
+  void updateEmail(String value) {
+    _email = value;
+    notifyListeners();
+  }
+
+  void updateAddress(String value) {
+    _address = value;
+    notifyListeners();
+  }
+
+  void updateDob(String value) {
+    _dob = value;
+    notifyListeners();
+  }
+
+  void updateBankName(String value) {
+    _bankName = value;
+    notifyListeners();
+  }
+
+  void updateAccountNumber(String value) {
+    _accountNumber = value;
+    notifyListeners();
+  }
+
+  void updateIfsc(String value) {
+    _ifsc = value;
+    notifyListeners();
+  }
+
+  void updateUpi(String value) {
+    _upi = value;
+    notifyListeners();
+  }
+
+  bool get isFormComplete {
+    return _profileImage != null &&
+        _name.isNotEmpty &&
+        _mobile.isNotEmpty &&
+        _email.isNotEmpty &&
+        _address.isNotEmpty &&
+        _dob.isNotEmpty &&
+        _bankName.isNotEmpty &&
+        _accountNumber.isNotEmpty &&
+        _ifsc.isNotEmpty;
+  }
+
+  String _selectedDocument = "Driving License";
   File? _frontImage;
   File? _backImage;
-
   File? _aadharFrontImage;
   File? _aadharBackImage;
   File? _panImage;
@@ -44,7 +132,7 @@ class FormFillupProvider with ChangeNotifier {
     }
   }
 
-  Future<void> adhaarPickImage(bool isAadharFront, bool isAadhar) async {
+  Future<void> pickAadharImage(bool isAadharFront, bool isAadhar) async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       if (isAadhar) {
@@ -79,7 +167,7 @@ class FormFillupProvider with ChangeNotifier {
     return regex.hasMatch(input);
   }
 
-  bool get isFormComplete =>
+  bool get isDocumentFormComplete =>
       (_frontImage != null && _backImage != null && isLicenseNumberValid) ||
           (_aadharFrontImage != null && _aadharBackImage != null && _panImage != null && isAadharNumberValid && isPanNumberValid);
 
@@ -92,7 +180,10 @@ class FormFillupProvider with ChangeNotifier {
         Navigator.push(context, MaterialPageRoute(builder: (context) => DrivingLicenseDetails()));
         break;
       case "Profile Info":
-        Navigator.push(context, MaterialPageRoute(builder: (context) => FormFillupScreen()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) =>  ProfileUpdate()),
+        );
         break;
       case "Vehicle RC":
         Navigator.push(context, MaterialPageRoute(builder: (context) => VehicleRc()));

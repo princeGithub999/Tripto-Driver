@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tripto_driver/utils/constants/colors.dart';
 import '../../../view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 
 class FormFillupScreen extends StatelessWidget {
+  const FormFillupScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +101,7 @@ class FormFillupScreen extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(color: isSelected ? Colors.black : Colors.grey),
+                style: TextStyle(color: isSelected ? AppColors.blue900 : Colors.grey),
               ),
               if (isSelected)
                 const Text(

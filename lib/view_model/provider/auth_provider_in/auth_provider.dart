@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view/auth_screen/verify_otp_page.dart';
-import 'package:tripto_driver/view/home_page.dart';
+import 'package:tripto_driver/view/screen/profile_details_screen/form_fillup_screen.dart';
 import 'package:tripto_driver/view_model/service/auth_service.dart';
 
 class AuthProviderIn extends ChangeNotifier {
@@ -12,7 +12,6 @@ class AuthProviderIn extends ChangeNotifier {
   TextEditingController inputNumber = TextEditingController();
   bool isLoding = false;
   AuthService authService = AuthService();
-
 
 
   Future<void> requestOTP(String phoneNumber)async{
@@ -52,7 +51,7 @@ class AuthProviderIn extends ChangeNotifier {
 
       if (success == true) {
         print('Login Success! Navigating to HomePage...');
-        Get.to(() => HomePage());
+        Get.to(() => FormFillupScreen());
       } else {
         print('Login Failed!');
       }

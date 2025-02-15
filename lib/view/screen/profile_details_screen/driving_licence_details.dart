@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tripto_driver/utils/constants/colors.dart';
 import 'package:tripto_driver/view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 
 class DrivingLicenseDetails extends StatelessWidget {
@@ -76,7 +77,7 @@ class DrivingLicenseDetails extends StatelessWidget {
     return ElevatedButton(
       onPressed: provider.isFormComplete ? () {} : null,
       style: ElevatedButton.styleFrom(
-        backgroundColor: provider.isFormComplete ? Colors.yellow : Colors.grey,
+        backgroundColor: provider.isFormComplete ? AppColors.blue900: Colors.grey,
         minimumSize: const Size(360, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
