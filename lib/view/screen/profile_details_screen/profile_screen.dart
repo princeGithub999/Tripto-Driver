@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tripto_driver/utils/app_sizes/sizes.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
 
 import '../../../view_model/provider/form_fillup_provider/form_fillup_provider.dart';
@@ -11,7 +12,9 @@ class ProfileUpdate extends StatelessWidget {
     final profileProvider = Provider.of<FormFillupProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Update Profile')),
+      appBar: AppBar(
+          backgroundColor: AppColors.blue900,
+          title: Text('Update Profile')),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -43,19 +46,18 @@ class ProfileUpdate extends StatelessWidget {
             buildTextField('UPI ID', profileProvider.upi, profileProvider.updateUpi),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: profileProvider.isFormComplete ? () {
-                // Submit action here
-              } : null,
+              onPressed: () {
+
+              },
               style: ElevatedButton.styleFrom(
-                backgroundColor: profileProvider.isFormComplete ? AppColors.blue900 : AppColors.blue900,
+                backgroundColor:AppColors.blue900,
                 minimumSize: Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 shadowColor: Colors.black26,
                 elevation: 6,
               ),
               child: Text(
                 'Submit Profile',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                style: TextStyle(fontSize: AppSizes.buttomTextSize, fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ),
           ],
@@ -72,7 +74,8 @@ class ProfileUpdate extends StatelessWidget {
         keyboardType: keyboardType,
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          labelStyle: TextStyle(color: Colors.grey),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),
           filled: true,
           fillColor: Colors.grey[200],
         ),
