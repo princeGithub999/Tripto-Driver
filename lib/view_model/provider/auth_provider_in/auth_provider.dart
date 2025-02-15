@@ -52,7 +52,7 @@ class AuthProviderIn extends ChangeNotifier {
 
       if (success == true) {
         print('Login Success! Navigating to HomePage...');
-        Get.to(() => HomePage());
+        Get.to(() => const HomePage());
       } else {
         print('Login Failed!');
       }
