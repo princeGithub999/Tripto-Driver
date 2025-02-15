@@ -2,10 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-
 import '../../utils/constants/app_image.dart';
 import '../../utils/constants/app_string.dart';
-import '../../utils/constants/colors.dart';
 import '../../utils/helpers/helper_functions.dart';
 import '../../view_model/getx/onboarding_controller/onboarding_controller.dart';
 import 'onboarding_desine_page.dart';
