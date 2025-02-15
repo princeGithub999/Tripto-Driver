@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
-import 'dart:io';
 
 import '../../../view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 
