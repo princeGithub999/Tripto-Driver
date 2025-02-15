@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view/auth_screen/send_otp_page.dart';
+import 'package:tripto_driver/view/screen/profile_details_screen/form_fillup_screen.dart';
 
 import '../../../utils/globle_widget/alert_dailog.dart';
 
@@ -33,7 +34,7 @@ class PermissionProvider extends ChangeNotifier {
     }
 
 
-    AppHelperFunctions.navigateToScreen(Get.context!, const SendOtpPage());
+    AppHelperFunctions.navigateToScreen(Get.context!, FormFillupScreen());
   }
 
 
