@@ -53,29 +53,29 @@ class OnBoardingScreen extends StatelessWidget {
             ],
           ),
           OnBoardSkip(),
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: ClipPath(
-                clipper: AquaBlueClipper(),
-                child: Container(
-                    height: MediaQuery.of(context).size.height * 0.55,
-                    color: dark ? AppColors.blue900 : AppColors.blue100),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: ClipPath(
-                clipper: WhiteCurveClipper(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height * 0.50,
-                  color: dark ? AppColors.blue900 : AppColors.blue900,
-                ),
-              ),
-            ),
-          ),
+          // Positioned.fill(
+          //   child: Align(
+          //     alignment: Alignment.bottomCenter,
+          //     child: ClipPath(
+          //       clipper: AquaBlueClipper(),
+          //       child: Container(
+          //           height: MediaQuery.of(context).size.height * 0.55,
+          //           color: dark ? AppColors.blue900 : AppColors.blue100),
+          //     ),
+          //   ),
+          // ),
+          // Positioned.fill(
+          //   child: Align(
+          //     alignment: Alignment.bottomCenter,
+          //     child: ClipPath(
+          //       clipper: WhiteCurveClipper(),
+          //       child: Container(
+          //         height: MediaQuery.of(context).size.height * 0.50,
+          //         color: dark ? AppColors.blue900 : AppColors.blue900,
+          //       ),
+          //     ),
+          //   ),
+          // ),
           OnBoardingDotNavigation(),
           OnboardingGetstarted()
         ],
