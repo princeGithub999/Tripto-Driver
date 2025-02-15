@@ -63,6 +63,7 @@ class AuthService {
       }
     } catch (e) {
       Fluttertoast.showToast(msg: 'Error: $e');
+      print('Error $e');
       completer.complete(false);
     }
 
