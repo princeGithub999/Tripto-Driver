@@ -2,10 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-
 import '../../utils/constants/app_image.dart';
 import '../../utils/constants/app_string.dart';
-import '../../utils/constants/colors.dart';
 import '../../utils/helpers/helper_functions.dart';
 import '../../view_model/getx/onboarding_controller/onboarding_controller.dart';
 import 'onboarding_desine_page.dart';
@@ -53,29 +51,29 @@ class OnBoardingScreen extends StatelessWidget {
             ],
           ),
           OnBoardSkip(),
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: ClipPath(
-                clipper: AquaBlueClipper(),
-                child: Container(
-                    height: MediaQuery.of(context).size.height * 0.55,
-                    color: dark ? AppColors.blue900 : AppColors.blue100),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: ClipPath(
-                clipper: WhiteCurveClipper(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height * 0.50,
-                  color: dark ? AppColors.blue900 : AppColors.blue900,
-                ),
-              ),
-            ),
-          ),
+          // Positioned.fill(
+          //   child: Align(
+          //     alignment: Alignment.bottomCenter,
+          //     child: ClipPath(
+          //       clipper: AquaBlueClipper(),
+          //       child: Container(
+          //           height: MediaQuery.of(context).size.height * 0.55,
+          //           color: dark ? AppColors.blue900 : AppColors.blue100),
+          //     ),
+          //   ),
+          // ),
+          // Positioned.fill(
+          //   child: Align(
+          //     alignment: Alignment.bottomCenter,
+          //     child: ClipPath(
+          //       clipper: WhiteCurveClipper(),
+          //       child: Container(
+          //         height: MediaQuery.of(context).size.height * 0.50,
+          //         color: dark ? AppColors.blue900 : AppColors.blue900,
+          //       ),
+          //     ),
+          //   ),
+          // ),
           OnBoardingDotNavigation(),
           OnboardingGetstarted()
         ],
