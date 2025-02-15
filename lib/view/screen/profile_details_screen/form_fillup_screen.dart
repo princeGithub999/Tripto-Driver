@@ -35,7 +35,7 @@ class FormFillupScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             width: double.infinity,
-            color: Colors.blue.shade600,
+            color: AppColors.blue900,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -65,17 +65,21 @@ class FormFillupScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 30),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.blue900,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-              shadowColor: Colors.black26,
-              minimumSize: Size(double.infinity, 50),
+          Container(
+            width: 300,
+            height: 45,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.blue900,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                shadowColor: Colors.black26,
+                minimumSize: Size(double.infinity, 50),
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, "/register");
+              },
+              child: Text("Submit"),
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, "/register");
-            },
-            child: Text("Submit"),
           ),
         ],
       ),
