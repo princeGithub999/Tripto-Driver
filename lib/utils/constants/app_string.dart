@@ -1,5 +1,5 @@
 class AppString {
-  static const goWithTripto = "Go With Tripto";
+  static const goWithTripto = "Tripto";
 
   static const onboardingTitlePage1 = "join us and start earning by driving with flexibility and security";
   static const onboardingSubTitlePage1 = 'Connect with multiple members in group chats.';
