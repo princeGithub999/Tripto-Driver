@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tripto_driver/utils/constants/colors.dart';
 import '../../utils/app_sizes/sizes.dart';
 import '../../utils/device/device_utility.dart';
 import '../../view_model/getx/onboarding_controller/onboarding_controller.dart';
@@ -17,7 +18,7 @@ class OnBoardSkip extends StatelessWidget {
         onPressed: () {
           OnboardingController.instance.skipPage();
         },
-        child: Text('Skip', style: Theme.of(context).textTheme.titleLarge),
+        child: Text('Skip', style: TextStyle(color: Colors.black,fontSize: 16)),
       ),
     );
   }

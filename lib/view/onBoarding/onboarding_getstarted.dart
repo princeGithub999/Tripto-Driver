@@ -24,11 +24,11 @@ class OnboardingGetstarted extends StatelessWidget {
                 onPressed: () => controller.nextPage(),
                 style: ElevatedButton.styleFrom(
                     backgroundColor:
-                    dark ? AppColors.white : AppColors.white,
+                    dark ? AppColors.blue900 : AppColors.blue900,
                     padding: const EdgeInsets.symmetric(horizontal: 40)),
                 child: const Text(
                   'Get Started',
-                  style: TextStyle(color: AppColors.blue900),
+                  style: TextStyle(color: AppColors.white,fontWeight: FontWeight.bold),
                 ),
               ),
             )

@@ -54,4 +54,5 @@ class AppColors {
   static Color lightBlue = Color(0xFF3AB2E8);
   static Color blue100 = Color(0xFFC4EDFF);
   static Color black700 = Color(0xFF2C2D3A);
+
 }
