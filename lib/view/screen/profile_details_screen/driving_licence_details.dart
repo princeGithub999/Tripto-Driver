@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tripto_driver/utils/app_sizes/sizes.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
 import 'package:tripto_driver/view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 
 class DrivingLicenseDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+
+    var size = MediaQuery.of(context).size;
+
     final provider = Provider.of<FormFillupProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
+         backgroundColor: AppColors.blue900,
         title: const Text('Driving License'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -46,7 +51,7 @@ class DrivingLicenseDetails extends StatelessWidget {
             width: double.infinity,
             height: 150,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
+              border: Border.all(color: AppColors.blue900,width: 2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: provider.frontImage == null && isFront || provider.backImage == null && !isFront
@@ -67,6 +72,7 @@ class DrivingLicenseDetails extends StatelessWidget {
       onChanged: (_) => provider.notifyListeners(),
       decoration: InputDecoration(
         hintText: 'Eg: KA12345677899029',
+        hintStyle: TextStyle(color: Colors.grey),
         border: OutlineInputBorder(),
         errorText: provider.isLicenseNumberValid ? null : 'License number must be 15 characters (A-Z, 0-9 only)',
       ),
@@ -75,13 +81,14 @@ class DrivingLicenseDetails extends StatelessWidget {
 
   Widget _buildSubmitButton(FormFillupProvider provider) {
     return ElevatedButton(
-      onPressed: provider.isFormComplete ? () {} : null,
+      onPressed: () {
+
+      },
       style: ElevatedButton.styleFrom(
-        backgroundColor: provider.isFormComplete ? AppColors.blue900: AppColors.blue900,
-        minimumSize: const Size(360, 50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: AppColors.blue900,
+        minimumSize: Size(double.infinity, 50),
       ),
-      child: const Text('Submit'),
+      child: const Text('Submit',style: TextStyle(color: Colors.white,fontSize: AppSizes.buttomTextSize),),
     );
   }
 }

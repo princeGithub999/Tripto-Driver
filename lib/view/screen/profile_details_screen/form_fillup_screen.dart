@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tripto_driver/utils/app_sizes/sizes.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
 import '../../../view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 
@@ -8,6 +9,7 @@ class FormFillupScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -59,26 +61,23 @@ class FormFillupScreen extends StatelessWidget {
                     _uploadCard(context, provider, "Profile Info"),
                     _uploadCard(context, provider, "Vehicle RC"),
                     _uploadCard(context, provider, "Aadhaar/PAN card"),
+
+                    SizedBox(height: size.height * 0.2 + 60),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.blue900,
+                        shadowColor: Colors.black26,
+                        minimumSize: Size(double.infinity, 50),
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/register");
+                      },
+                      child: Text("Submit",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: AppSizes.buttomTextSize),),
+                    ),
+
                   ],
                 );
               },
-            ),
-          ),
-          SizedBox(height: 30),
-          Container(
-            width: 300,
-            height: 45,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.blue900,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                shadowColor: Colors.black26,
-                minimumSize: Size(double.infinity, 50),
-              ),
-              onPressed: () {
-                Navigator.pushNamed(context, "/register");
-              },
-              child: Text("Submit"),
             ),
           ),
         ],
@@ -95,7 +94,7 @@ class FormFillupScreen extends StatelessWidget {
         elevation: isSelected ? 4 : 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
-          side: isSelected ? BorderSide(color: Colors.blue, width: 2) : BorderSide.none,
+          side: isSelected ? BorderSide(color: AppColors.blue900, width: 2) : BorderSide.none,
         ),
         color: isSelected ? Colors.white : Colors.grey.shade200,
         child: Padding(

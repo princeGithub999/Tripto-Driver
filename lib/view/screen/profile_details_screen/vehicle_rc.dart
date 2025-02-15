@@ -4,19 +4,22 @@ import 'package:provider/provider.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
 import 'package:tripto_driver/view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 
+import '../../../utils/app_sizes/sizes.dart';
+
 class VehicleRc extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<FormFillupProvider>(context);
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.blue900,
         title: const Text('Vehicle RC'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          IconButton(icon: const Icon(Icons.help_outline), onPressed: () {})
+          IconButton(icon: const Icon(Icons.help_outline,color: Colors.white,), onPressed: () {})
         ],
       ),
       body: LayoutBuilder(
@@ -79,7 +82,7 @@ class VehicleRc extends StatelessWidget {
             width: double.infinity,
             height: 150,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
+              border: Border.all(color: AppColors.blue900,width: 1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: (isFront ? provider.frontImage : provider.backImage) == null
@@ -107,15 +110,27 @@ class VehicleRc extends StatelessWidget {
 
   Widget _buildSubmitButton(FormFillupProvider provider) {
     return ElevatedButton(
-      onPressed: provider.isFormComplete ? () {} : null,
       style: ElevatedButton.styleFrom(
-        backgroundColor: provider.isFormComplete ? AppColors.blue900 : AppColors.blue900,
-        minimumSize: const Size(360, 50),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        backgroundColor: AppColors.blue900,
+        shadowColor: Colors.black26,
+        minimumSize: Size(double.infinity, 50),
       ),
-      child: const Text('Submit'),
+      onPressed: () {
+
+      },
+      child: Text("Submit",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: AppSizes.buttomTextSize),),
     );
+    // return ElevatedButton(
+    //   onPressed: () {
+    //
+    //   },
+    //   style: ElevatedButton.styleFrom(
+    //     backgroundColor: AppColors.blue900,
+    //     minimumSize: Size(double.infinity, 50),
+    //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),
+    //     ),
+    //   ),
+    //   child: const Text('Submit'),
+    // );
   }
 }

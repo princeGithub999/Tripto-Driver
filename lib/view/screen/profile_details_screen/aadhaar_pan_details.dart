@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tripto_driver/utils/app_sizes/sizes.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
 import 'package:tripto_driver/view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 import 'dart:io';
@@ -11,6 +12,7 @@ class AdharPanPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.blue900,
         title: const Text('Aadhar & PAN Upload'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -19,7 +21,7 @@ class AdharPanPage extends StatelessWidget {
           },
         ),
         actions: [
-          IconButton(icon: const Icon(Icons.help_outline), onPressed: () {}),
+          IconButton(icon: const Icon(Icons.help_outline,color: Colors.white,), onPressed: () {}),
         ],
       ),
       body: SingleChildScrollView(
@@ -61,7 +63,7 @@ class AdharPanPage extends StatelessWidget {
             width: double.infinity,
             height: 150,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
+              border: Border.all(color: AppColors.blue900,width: 1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: imageFile == null
@@ -127,15 +129,17 @@ class AdharPanPage extends StatelessWidget {
 
   Widget _buildSubmitButton(FormFillupProvider provider) {
     return ElevatedButton(
-      onPressed: provider.isFormComplete ? () {} : null,
+      onPressed: () {
+
+      },
       style: ElevatedButton.styleFrom(
-        backgroundColor: provider.isFormComplete ? AppColors.blue900 : AppColors.blue900,
+        backgroundColor:AppColors.blue900,
         minimumSize: const Size(360, 50),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
       ),
-      child: const Text('Submit'),
+      child: const Text('Submit',style: TextStyle(color: Colors.white,fontSize: AppSizes.buttomTextSize),),
     );
   }
 }
