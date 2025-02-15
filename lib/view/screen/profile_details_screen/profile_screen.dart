@@ -47,7 +47,7 @@ class ProfileUpdate extends StatelessWidget {
                 // Submit action here
               } : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: profileProvider.isFormComplete ? AppColors.blue900 : Colors.grey,
+                backgroundColor: profileProvider.isFormComplete ? AppColors.blue900 : AppColors.blue900,
                 minimumSize: Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 shadowColor: Colors.black26,

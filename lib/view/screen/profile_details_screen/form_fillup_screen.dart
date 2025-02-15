@@ -67,7 +67,7 @@ class FormFillupScreen extends StatelessWidget {
           SizedBox(height: 30),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.yellow,
+              backgroundColor: AppColors.blue900,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
               shadowColor: Colors.black26,
               minimumSize: Size(double.infinity, 50),
@@ -101,7 +101,7 @@ class FormFillupScreen extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(color: isSelected ? AppColors.blue900 : Colors.grey),
+                style: TextStyle(color: isSelected ? AppColors.blue900 : AppColors.blue900),
               ),
               if (isSelected)
                 const Text(

@@ -109,7 +109,7 @@ class VehicleRc extends StatelessWidget {
     return ElevatedButton(
       onPressed: provider.isFormComplete ? () {} : null,
       style: ElevatedButton.styleFrom(
-        backgroundColor: provider.isFormComplete ? AppColors.blue900 : Colors.grey,
+        backgroundColor: provider.isFormComplete ? AppColors.blue900 : AppColors.blue900,
         minimumSize: const Size(360, 50),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
