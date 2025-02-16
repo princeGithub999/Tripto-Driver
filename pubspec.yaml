@@ -51,12 +51,10 @@ dependencies:
   googleapis_auth: ^1.6.0
   firebase_dynamic_links: ^6.1.2
   firebase_analytics: ^11.4.2
-  connectivity_plus: ^3.0.5
   firebase_database: ^11.2.0
   random_string: ^2.3.1
   cloud_firestore: ^5.6.3
   firebase_storage: ^12.4.2
-
 
   #  //map
   google_maps_flutter: ^2.10.0
