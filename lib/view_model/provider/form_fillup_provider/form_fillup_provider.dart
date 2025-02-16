@@ -18,7 +18,7 @@ class FormFillupProvider with ChangeNotifier {
   String _ifsc = '';
   String _upi = '';
 
-  // Getters
+
   File? get profileImage => _profileImage;
   String get name => _name;
   String get mobile => _mobile;
@@ -30,7 +30,7 @@ class FormFillupProvider with ChangeNotifier {
   String get ifsc => _ifsc;
   String get upi => _upi;
 
-  // Image Picker
+
   Future<void> pickProfileImage(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(source: source);
     if (pickedFile != null) {
@@ -39,7 +39,7 @@ class FormFillupProvider with ChangeNotifier {
     }
   }
 
-  // Setters
+
   void updateName(String value) {
     _name = value;
     notifyListeners();
@@ -100,6 +100,8 @@ class FormFillupProvider with ChangeNotifier {
   String _selectedDocument = "Driving License";
   File? _frontImage;
   File? _backImage;
+  String? _frontImageUrl;
+  String? _backImageUrl;
   File? _aadharFrontImage;
   File? _aadharBackImage;
   File? _panImage;
@@ -108,27 +110,61 @@ class FormFillupProvider with ChangeNotifier {
   final TextEditingController _panController = TextEditingController();
   final TextEditingController _licenseController = TextEditingController();
 
-  // Getters
+
   String get selectedDocument => _selectedDocument;
   File? get frontImage => _frontImage;
   File? get backImage => _backImage;
   File? get aadharFrontImage => _aadharFrontImage;
   File? get aadharBackImage => _aadharBackImage;
   File? get panImage => _panImage;
+  String? get frontImageUrl => _frontImageUrl;
+  String? get backImageUrl => _backImageUrl;
 
   TextEditingController get licenseController => _licenseController;
   TextEditingController get aadharController => _aadharController;
   TextEditingController get panController => _panController;
 
+  // Future<void> pickImage(bool isFront) async {
+  //   final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+  //   if (pickedFile != null) {
+  //     if (isFront) {
+  //       _frontImage = File(pickedFile.path);
+  //     } else {
+  //       _backImage = File(pickedFile.path);
+  //     }
+  //     notifyListeners();
+  //   }
+  // }
+
   Future<void> pickImage(bool isFront) async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
       if (isFront) {
-        _frontImage = File(pickedFile.path);
+        _frontImage = imageFile;
+        await uploadImageToFirebase(imageFile, 'front_dl');
       } else {
-        _backImage = File(pickedFile.path);
+        _backImage = imageFile;
+        await uploadImageToFirebase(imageFile, 'back_dl');
       }
       notifyListeners();
+    }
+  }
+
+  Future<void> uploadImageToFirebase(File image, String imageType) async {
+    try {
+      final storageRef = FirebaseStorage.instance.ref().child('drivers/license/$imageType.jpg');
+      await storageRef.putFile(image);
+      String downloadUrl = await storageRef.getDownloadURL();
+
+      if (imageType == 'front_dl') {
+        _frontImageUrl = downloadUrl;
+      } else {
+        _backImageUrl = downloadUrl;
+      }
+      notifyListeners();
+    } catch (e) {
+      print("Error uploading image: $e");
     }
   }
 
@@ -148,7 +184,6 @@ class FormFillupProvider with ChangeNotifier {
     }
   }
 
-  // Validation Getters
   bool get isAadharNumberValid {
     final input = _aadharController.text.trim();
     final regex = RegExp(r'^\d{12}$');
