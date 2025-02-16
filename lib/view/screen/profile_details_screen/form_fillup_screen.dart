@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/utils/app_sizes/sizes.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
+import 'package:tripto_driver/utils/helpers/helper_functions.dart';
+import '../../../button/button_navigation_page.dart';
 import '../../../view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 
 class FormFillupScreen extends StatelessWidget {
@@ -70,8 +72,8 @@ class FormFillupScreen extends StatelessWidget {
                         minimumSize: Size(double.infinity, 50),
                       ),
                       onPressed: () {
-                        Navigator.pushNamed(context, "/register");
-                      },
+                        AppHelperFunctions.navigateToScreen(context,BottomNavigation());
+                       },
                       child: Text("Submit",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: AppSizes.buttomTextSize),),
                     ),
 
