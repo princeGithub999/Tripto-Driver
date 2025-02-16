@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tripto_driver/utils/app_sizes/sizes.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
-import 'package:tripto_driver/view_model/provider/form_fillup_provider/form_fillup_provider.dart';
+import '../../../view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 
 class DrivingLicenseDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
-    var size = MediaQuery.of(context).size;
-
     final provider = Provider.of<FormFillupProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-         backgroundColor: AppColors.blue900,
+        backgroundColor: AppColors.blue900,
         title: const Text('Driving License'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -51,14 +47,17 @@ class DrivingLicenseDetails extends StatelessWidget {
             width: double.infinity,
             height: 150,
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.blue900,width: 2),
+              border: Border.all(color: AppColors.blue900, width: 2),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: provider.frontImage == null && isFront || provider.backImage == null && !isFront
+            child: provider.frontImageUrl == null && isFront || provider.backImageUrl == null && !isFront
                 ? const Center(child: Icon(Icons.cloud_upload, color: Colors.grey, size: 40))
                 : ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.file(isFront ? provider.frontImage! : provider.backImage!, fit: BoxFit.cover),
+              child: Image.network(
+                isFront ? provider.frontImageUrl! : provider.backImageUrl!,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
         ),
@@ -78,17 +77,23 @@ class DrivingLicenseDetails extends StatelessWidget {
       ),
     );
   }
-
+// submit //
   Widget _buildSubmitButton(FormFillupProvider provider) {
     return ElevatedButton(
-      onPressed: () {
-
-      },
+      onPressed: provider.isDocumentFormComplete
+          ? () {
+        print('License Front Image URL: ${provider.frontImageUrl}');
+        print('License Back Image URL: ${provider.backImageUrl}');
+      }
+          : null,
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.blue900,
-        minimumSize: Size(double.infinity, 50),
+        minimumSize: const Size(double.infinity, 50),
       ),
-      child: const Text('Submit',style: TextStyle(color: Colors.white,fontSize: AppSizes.buttomTextSize),),
+      child: const Text(
+        'Submit',
+        style: TextStyle(color: Colors.white, fontSize: 16),
+      ),
     );
   }
 }
