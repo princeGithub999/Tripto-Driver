@@ -16,19 +16,20 @@ class TextFromFealdCustome {
     floatingLabelStyle: const TextStyle().copyWith(color: Colors.black.withOpacity(0.8)),
     border: const OutlineInputBorder().copyWith(
         borderRadius: BorderRadius.circular(AppSizes.borderRadiusMd),
-        borderSide: BorderSide(width: 1.5, color: AppColors.blue900)),
+        borderSide: const BorderSide(width: 1.5, color: AppColors.blue900)),
     enabledBorder: const OutlineInputBorder().copyWith(
         borderRadius: BorderRadius.circular(AppSizes.inputFieldRadius),
-        borderSide: BorderSide(width: 1.5, color: AppColors.blue900)),
+        borderSide: const BorderSide(width: 1.5, color: AppColors.blue900)),
     focusedBorder: const OutlineInputBorder().copyWith(
         borderRadius: BorderRadius.circular(AppSizes.inputFieldRadius),
-        borderSide: BorderSide(width: 1.5, color: AppColors.blue900)),
+        borderSide: const BorderSide(width: 1.5, color: AppColors.blue900)),
     errorBorder: const OutlineInputBorder().copyWith(
         borderRadius: BorderRadius.circular(AppSizes.inputFieldRadius),
         borderSide: const BorderSide(width: 1.5, color: AppColors.error)),
     focusedErrorBorder: const OutlineInputBorder().copyWith(
         borderRadius: BorderRadius.circular(AppSizes.inputFieldRadius),
         borderSide: const BorderSide(width: 2, color: AppColors.error)),
+
   );
 
   static InputDecorationTheme darkInputDecorationTheme = InputDecorationTheme(
