@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,6 +9,9 @@ import '../../../view/screen/profile_details_screen/profile_screen.dart';
 import '../../../view/screen/profile_details_screen/vehicle_rc.dart';
 
 class FormFillupProvider with ChangeNotifier {
+
+  // profile //
+
   File? _profileImage;
   String _name = '';
   String _mobile = '';
@@ -39,6 +43,7 @@ class FormFillupProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
 
 
   void updateName(String value) {
@@ -87,25 +92,45 @@ class FormFillupProvider with ChangeNotifier {
   }
 
   bool get isFormComplete {
-    return _profileImage != null &&
-        _name.isNotEmpty &&
-        _mobile.isNotEmpty &&
-        _email.isNotEmpty &&
-        _address.isNotEmpty &&
-        _dob.isNotEmpty &&
-        _bankName.isNotEmpty &&
-        _accountNumber.isNotEmpty &&
-        _ifsc.isNotEmpty;
+    return _profileImage != null && _name.isNotEmpty && _mobile.isNotEmpty && _email.isNotEmpty;
   }
+
+  Future<void> submitProfile() async {
+    if (!isFormComplete) {
+      print("Please fill all required fields");
+      return;
+    }
+
+    try {
+      String? imageUrl;
+      if (_profileImage != null) {
+        Reference storageRef = FirebaseStorage.instance.ref().child('profile_images/${_mobile}.jpg');
+        UploadTask uploadTask = storageRef.putFile(_profileImage!);
+        TaskSnapshot taskSnapshot = await uploadTask;
+        imageUrl = await taskSnapshot.ref.getDownloadURL();
+      }
+
+      await FirebaseFirestore.instance.collection('drivers').doc(_mobile).set({
+        'name': _name, 'mobile': _mobile, 'email': _email, 'address': _address, 'dob': _dob,
+        'bankName': _bankName, 'accountNumber': _accountNumber, 'ifsc': _ifsc, 'upi': _upi,
+        'profileImage': imageUrl ?? '', 'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      print("Profile successfully updated!");
+    } catch (e) {
+      print("Error updating profile: $e");
+    }
+  }
+
+  //profile work end //
 
   String _selectedDocument = "Driving License";
   File? _frontImage;
   File? _backImage;
   String? _frontImageUrl;
   String? _backImageUrl;
-  File? _aadharFrontImage;
-  File? _aadharBackImage;
-  File? _panImage;
+  File? _aadharFrontImage, _aadharBackImage, _panImage;
+  String? _aadharFrontImageUrl, _aadharBackImageUrl, _panImageUrl;
 
   final TextEditingController _aadharController = TextEditingController();
   final TextEditingController _panController = TextEditingController();
@@ -113,11 +138,18 @@ class FormFillupProvider with ChangeNotifier {
 
 
   String get selectedDocument => _selectedDocument;
+
   File? get frontImage => _frontImage;
   File? get backImage => _backImage;
+
   File? get aadharFrontImage => _aadharFrontImage;
   File? get aadharBackImage => _aadharBackImage;
   File? get panImage => _panImage;
+
+  String? get aadharFrontImageUrl => _aadharFrontImageUrl;
+  String? get aadharBackImageUrl => _aadharBackImageUrl;
+  String? get panImageUrl => _panImageUrl;
+
   String? get frontImageUrl => _frontImageUrl;
   String? get backImageUrl => _backImageUrl;
 
@@ -137,16 +169,101 @@ class FormFillupProvider with ChangeNotifier {
   //   }
   // }
 
+  // adhar pan //
+  Future<String?> uploadFileToFirebase(File image, String fileName) async {
+    try {
+      Reference storageRef = FirebaseStorage.instance.ref().child('documents/$fileName');
+      UploadTask uploadTask = storageRef.putFile(image);
+      TaskSnapshot taskSnapshot = await uploadTask;
+      return await taskSnapshot.ref.getDownloadURL();
+    } catch (e) {
+      print("Error uploading file: $e");
+      return null;
+    }
+  }
+
+  Future<void> pickAndUploadImage(bool isAadharFront, bool isAadhar) async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+      String fileName = isAadhar
+          ? (isAadharFront ? "aadhar_front.jpg" : "aadhar_back.jpg")
+          : "pan_card.jpg";
+
+      String? downloadUrl = await uploadFileToFirebase(imageFile, fileName);
+
+      if (downloadUrl != null) {
+        if (isAadhar) {
+          if (isAadharFront) {
+            _aadharFrontImage = imageFile;
+            _aadharFrontImageUrl = downloadUrl;
+          } else {
+            _aadharBackImage = imageFile;
+            _aadharBackImageUrl = downloadUrl;
+          }
+        } else {
+          _panImage = imageFile;
+          _panImageUrl = downloadUrl;
+        }
+        notifyListeners();
+      }
+    }
+  }
+
+  // rc //
+
+  Future<void> pickRcImage(bool isFront) async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+      if (isFront) {
+        _frontImage = imageFile;
+        _frontImageUrl = await uploadImageRcToFirebase(imageFile, 'front_rc');
+      } else {
+        _backImage = imageFile;
+        _backImageUrl = await uploadImageRcToFirebase(imageFile, 'back_rc');
+      }
+      notifyListeners();
+    }
+  }
+
+  Future<String?> uploadImageRcToFirebase(File image, String imageType) async {
+    try {
+      String filePath = 'vehicle_rc/$imageType.jpg';
+      Reference storageRef = FirebaseStorage.instance.ref().child(filePath);
+      await storageRef.putFile(image);
+      return await storageRef.getDownloadURL();
+    } catch (e) {
+      print("Error uploading image: $e");
+      return null;
+    }
+  }
+
+  Future<void> saveDriverRcDetails(String driverId) async {
+    try {
+      await FirebaseFirestore.instance.collection('drivers').doc(driverId).set({
+        'rcFrontImage': _frontImageUrl,
+        'rcBackImage': _backImageUrl,
+        'uploadedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      print("Error saving RC details: $e");
+    }
+  }
+
+
+  // end rc //
+
   Future<void> pickImage(bool isFront) async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       File imageFile = File(pickedFile.path);
       if (isFront) {
         _frontImage = imageFile;
-        await uploadImageToFirebase(imageFile, 'front_dl');
+        await uploadImageRcToFirebase(imageFile, 'front_dl');
       } else {
         _backImage = imageFile;
-        await uploadImageToFirebase(imageFile, 'back_dl');
+        await uploadImageRcToFirebase(imageFile, 'back_dl');
       }
       notifyListeners();
     }
