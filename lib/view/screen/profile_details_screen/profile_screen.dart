@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tripto_driver/utils/app_sizes/sizes.dart';
-import 'package:tripto_driver/utils/constants/colors.dart';
-
 import '../../../view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 
 class ProfileUpdate extends StatelessWidget {
@@ -13,8 +10,9 @@ class ProfileUpdate extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: AppColors.blue900,
-          title: Text('Update Profile')),
+        backgroundColor: Colors.blue,
+        title: Text('Update Profile'),
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -46,18 +44,21 @@ class ProfileUpdate extends StatelessWidget {
             buildTextField('UPI ID', profileProvider.upi, profileProvider.updateUpi),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-
+              onPressed: () async {
+                await profileProvider.submitProfile();
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Profile updated successfully!"))
+                );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor:AppColors.blue900,
+                backgroundColor: Colors.blue,
                 minimumSize: Size(double.infinity, 50),
                 shadowColor: Colors.black26,
                 elevation: 6,
               ),
               child: Text(
                 'Submit Profile',
-                style: TextStyle(fontSize: AppSizes.buttomTextSize, fontWeight: FontWeight.bold, color: Colors.white),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ),
           ],
@@ -75,7 +76,7 @@ class ProfileUpdate extends StatelessWidget {
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(color: Colors.grey),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           filled: true,
           fillColor: Colors.grey[200],
         ),
