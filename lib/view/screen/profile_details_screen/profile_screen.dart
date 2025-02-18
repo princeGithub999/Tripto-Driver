@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:tripto_driver/utils/validator/validation.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
 import '../../../utils/globle_widget/text_from_page.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:tripto_driver/utils/constants/colors.dart';
+import '../../../view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 
 class ProfileUpdate extends StatelessWidget {
   const ProfileUpdate({super.key});
@@ -15,6 +18,9 @@ class ProfileUpdate extends StatelessWidget {
 
       appBar: AppBar(
         title: const Text('Update Profile'),
+
+        backgroundColor: AppColors.blue900,
+        title: Text('Update Profile'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -81,6 +87,32 @@ class ProfileUpdate extends StatelessWidget {
                   context: context,
                 inputType: TextInputType.streetAddress,
 
+            ),
+            SizedBox(height: 20),
+            buildTextField('Full Name', profileProvider.name, profileProvider.updateName),
+            buildTextField('Mobile', profileProvider.mobile, profileProvider.updateMobile, keyboardType: TextInputType.phone),
+            buildTextField('Email', profileProvider.email, profileProvider.updateEmail, keyboardType: TextInputType.emailAddress),
+            buildTextField('Address', profileProvider.address, profileProvider.updateAddress),
+            buildTextField('Date of Birth', profileProvider.dob, profileProvider.updateDob),
+            buildTextField('Bank Name', profileProvider.bankName, profileProvider.updateBankName),
+            buildTextField('Account Number', profileProvider.accountNumber, profileProvider.updateAccountNumber, keyboardType: TextInputType.number),
+            buildTextField('IFSC Code', profileProvider.ifsc, profileProvider.updateIfsc),
+            buildTextField('UPI ID', profileProvider.upi, profileProvider.updateUpi),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: profileProvider.isFormComplete
+                  ? () async {
+                await profileProvider.submitProfile();
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Profile updated successfully!")),
+                );
+              }
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.blue900,
+                minimumSize: Size(double.infinity, 50),
+                shadowColor: Colors.black26,
+                elevation: 6,
               ),
               const SizedBox(height: 10),
 
@@ -156,3 +188,4 @@ class ProfileUpdate extends StatelessWidget {
 
 
 }
+
