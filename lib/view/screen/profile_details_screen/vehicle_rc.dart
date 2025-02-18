@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:tripto_driver/utils/app_sizes/sizes.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
 import 'package:tripto_driver/view/screen/profile_details_screen/form_fillup_screen.dart';
 import 'package:tripto_driver/view_model/provider/form_fillup_provider/form_fillup_provider.dart';
+import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
 
 class VehicleRc extends StatelessWidget {
+  const VehicleRc({super.key});
+
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<FormFillupProvider>(context);
+    final provider = Provider.of<FromProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
+
         backgroundColor: AppColors.blue900,
         title: const Text('Vehicle RC'),
         leading: IconButton(
@@ -37,7 +43,7 @@ class VehicleRc extends StatelessWidget {
     );
   }
 
-  Widget _buildUploadSection(String title, bool isFront, FormFillupProvider provider) {
+  Widget _buildUploadSection(String title, bool isFront, FromProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -52,7 +58,7 @@ class VehicleRc extends StatelessWidget {
               border: Border.all(color: AppColors.blue900, width: 1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: (isFront ? provider.frontImage : provider.backImage) == null
+            child: (isFront ? provider.frontRcImage : provider.backRcImage) == null
                 ? const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -65,7 +71,7 @@ class VehicleRc extends StatelessWidget {
                 : ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.file(
-                isFront ? provider.frontImage! : provider.backImage!,
+                isFront ? provider.frontRcImage! : provider.backRcImage!,
                 fit: BoxFit.cover,
               ),
             ),
@@ -75,6 +81,20 @@ class VehicleRc extends StatelessWidget {
     );
   }
 
+  Widget _buildSubmitButton(FromProvider provider, BuildContext context) {
+    return ElevatedButton(
+      onPressed: () async {
+
+
+        var check = await provider.checkRcFeald();
+        if(check){
+          Fluttertoast.showToast(msg: 'hello');
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 50),
+      ),
+      child:  const Text('Submit', style: TextStyle(color: Colors.white, fontSize:  AppSizes.buttomTextSize),
   Widget _buildSubmitButton(FormFillupProvider provider, BuildContext context) {
     bool isSubmitEnabled = provider.frontImageUrl != null && provider.backImageUrl != null;
 
@@ -95,6 +115,7 @@ class VehicleRc extends StatelessWidget {
       child: const Text(
         "Submit",
         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+
       ),
     );
   }

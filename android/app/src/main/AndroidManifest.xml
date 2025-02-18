@@ -14,7 +14,7 @@
 
 
     <application
-        android:label="tripto_driver"
+        android:label="TripTo-Driver"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
