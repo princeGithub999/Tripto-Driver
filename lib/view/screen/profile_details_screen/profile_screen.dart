@@ -69,7 +69,7 @@ class ProfileUpdate extends StatelessWidget {
 
   Widget buildTextField(String label, String value, Function(String) onChanged, {TextInputType keyboardType = TextInputType.text}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding:  EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
         onChanged: onChanged,
         keyboardType: keyboardType,
