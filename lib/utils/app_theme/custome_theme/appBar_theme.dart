@@ -9,7 +9,7 @@ class AppbarThemeC {
     elevation: 0,
     centerTitle: false,
     scrolledUnderElevation: 0,
-    backgroundColor: AppColors.lightBlue,
+    backgroundColor: AppColors.blue900,
     surfaceTintColor: Colors.transparent,
     iconTheme:
         const IconThemeData(color: AppColors.white, size: AppSizes.iconMd),

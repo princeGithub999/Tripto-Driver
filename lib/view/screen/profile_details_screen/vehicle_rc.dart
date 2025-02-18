@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:tripto_driver/utils/app_sizes/sizes.dart';
 import 'package:tripto_driver/view_model/provider/form_fillup_provider/form_fillup_provider.dart';
+import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
 
 class VehicleRc extends StatelessWidget {
+  const VehicleRc({super.key});
+
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<FormFillupProvider>(context);
+    final provider = Provider.of<FromProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
         title: const Text('Vehicle RC'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -35,7 +39,7 @@ class VehicleRc extends StatelessWidget {
     );
   }
 
-  Widget _buildUploadSection(String title, bool isFront, FormFillupProvider provider) {
+  Widget _buildUploadSection(String title, bool isFront, FromProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -50,7 +54,7 @@ class VehicleRc extends StatelessWidget {
               border: Border.all(color: Colors.blue, width: 1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: (isFront ? provider.frontImage : provider.backImage) == null
+            child: (isFront ? provider.frontRcImage : provider.backRcImage) == null
                 ? const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -63,7 +67,7 @@ class VehicleRc extends StatelessWidget {
                 : ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.file(
-                isFront ? provider.frontImage! : provider.backImage!,
+                isFront ? provider.frontRcImage! : provider.backRcImage!,
                 fit: BoxFit.cover,
               ),
             ),
@@ -73,27 +77,22 @@ class VehicleRc extends StatelessWidget {
     );
   }
 
-  Widget _buildSubmitButton(FormFillupProvider provider, BuildContext context) {
+  Widget _buildSubmitButton(FromProvider provider, BuildContext context) {
     return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
-        shadowColor: Colors.black26,
-        minimumSize: const Size(double.infinity, 50),
-      ),
       onPressed: () async {
-        if (provider.frontImageUrl != null && provider.backImageUrl != null) {
-          await provider.saveDriverRcDetails('driver123');
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('RC details uploaded successfully!')));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Please upload both images!')));
+
+
+        var check = await provider.checkRcFeald();
+        if(check){
+          Fluttertoast.showToast(msg: 'hello');
         }
       },
-      child: const Text(
-        "Submit",
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 50),
+      ),
+      child:  const Text('Submit', style: TextStyle(color: Colors.white, fontSize:  AppSizes.buttomTextSize),
       ),
     );
   }
 }
+
