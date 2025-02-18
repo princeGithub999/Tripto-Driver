@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
+import 'package:tripto_driver/view/screen/profile_details_screen/form_fillup_screen.dart';
 import '../../../view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 
 class DrivingLicenseDetails extends StatelessWidget {
@@ -28,7 +29,7 @@ class DrivingLicenseDetails extends StatelessWidget {
             const SizedBox(height: 16),
             _buildLicenseInputSection(provider),
             const SizedBox(height: 16),
-            _buildSubmitButton(provider),
+            _buildSubmitButton(provider,context),
           ],
         ),
       ),
@@ -78,12 +79,13 @@ class DrivingLicenseDetails extends StatelessWidget {
     );
   }
 // submit //
-  Widget _buildSubmitButton(FormFillupProvider provider) {
+  Widget _buildSubmitButton(FormFillupProvider provider,BuildContext context) {
     return ElevatedButton(
       onPressed: provider.isDocumentFormComplete
           ? () {
         print('License Front Image URL: ${provider.frontImageUrl}');
         print('License Back Image URL: ${provider.backImageUrl}');
+        Navigator.push(context, MaterialPageRoute(builder: (context) => FormFillupScreen(),));
       }
           : null,
       style: ElevatedButton.styleFrom(

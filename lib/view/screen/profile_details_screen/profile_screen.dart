@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tripto_driver/utils/constants/colors.dart';
 import '../../../view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 
 class ProfileUpdate extends StatelessWidget {
@@ -10,7 +11,7 @@ class ProfileUpdate extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: AppColors.blue900,
         title: Text('Update Profile'),
       ),
       body: SingleChildScrollView(
@@ -44,14 +45,16 @@ class ProfileUpdate extends StatelessWidget {
             buildTextField('UPI ID', profileProvider.upi, profileProvider.updateUpi),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () async {
+              onPressed: profileProvider.isFormComplete
+                  ? () async {
                 await profileProvider.submitProfile();
                 ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Profile updated successfully!"))
+                    SnackBar(content: Text("Profile updated successfully!")),
                 );
-              },
+              }
+                  : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: AppColors.blue900,
                 minimumSize: Size(double.infinity, 50),
                 shadowColor: Colors.black26,
                 elevation: 6,
@@ -84,3 +87,4 @@ class ProfileUpdate extends StatelessWidget {
     );
   }
 }
+
