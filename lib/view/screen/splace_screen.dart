@@ -31,7 +31,7 @@ class _SplaceScreenState extends State<SplaceScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(AppString.goWithTripto,style: GoogleFonts.montserrat(fontSize: 80,fontWeight: FontWeight.bold,letterSpacing: -5,color: AppColors.blue900)),
-                Image.asset('assets/images/splace_image.jpg',width: sizes.width * 0.6),
+                Image.asset('assets/images/splace_image.jpg',width: sizes.width * 0.9 + 20),
 
               ],
             ),

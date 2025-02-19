@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:provider/provider.dart';
+import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 
 import '../../view/onBoarding/on_boarding_screen.dart';
 
@@ -36,7 +38,7 @@ class AppHelperFunctions {
 
     Timer(
       Duration(seconds: 3), () {
-        navigateToScreenBeforeEndPage(context, const OnBoardingScreen());
+     Provider.of<AuthProviderIn>(context,listen: false).checkLoginStatus();
        },
     );
   }

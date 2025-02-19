@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tripto_driver/view/screen/earning_acc_details.dart';
-import 'package:tripto_driver/view/screen/profile_details_screen/rating_screen.dart';
 import '../view/screen/map_screen.dart';
 import '../view/screen/profile_details.dart';
+import '../view/screen/profile_details_screen/rating_screen.dart';
 
 
 class BottomNavigation extends StatefulWidget {
