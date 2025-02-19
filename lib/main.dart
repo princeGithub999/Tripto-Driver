@@ -15,7 +15,6 @@ import 'button/button_navigation_page.dart';
 
 void main() async{
 
-void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -47,7 +46,7 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
 
       darkTheme: AppTheme.darkTheme,
-      home: const BottomNavigation()
+      home: SplaceScreen()
     );
   }
 }
