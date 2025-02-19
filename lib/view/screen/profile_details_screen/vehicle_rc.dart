@@ -13,7 +13,7 @@ class VehicleRc extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title:  Text('Vehicle RC'),
+        title:  const Text('Vehicle RC'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
