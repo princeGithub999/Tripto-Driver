@@ -9,7 +9,7 @@ import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view/auth_screen/verify_otp_page.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
 import 'package:tripto_driver/view_model/service/auth_service.dart';
-import '../../../button/button_navigation_page.dart';
+import '../../../view/button_navigation/button_navigation.dart';
 import '../../../view/screen/profile_details_screen/form_fillup_screen.dart';
 
 class AuthProviderIn extends ChangeNotifier {
