@@ -182,7 +182,7 @@ class FromProvider extends ChangeNotifier{
     var image = await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if(image != null){
-        driverImage = File(image.path);
+      driverImage = File(image.path);
 
     }else{
       Fluttertoast.showToast(msg: 'image uri null');
@@ -247,15 +247,15 @@ class FromProvider extends ChangeNotifier{
           backDrivingLicenceImage != null &&
           dlNumberContro.text.isNotEmpty &&
           driverName.text.isNotEmpty &&
-   driverPhone.text.isNotEmpty &&
-   driverEmail.text.isNotEmpty &&
-   driverAddress.text.isNotEmpty &&
-   driverDateOfBirth.text.isNotEmpty &&
-   driverBankName.text.isNotEmpty &&
-   driverAccountNumber.text.isNotEmpty &&
-   driverIFSCCode.text.isNotEmpty &&
-   driverUPIID.text.isNotEmpty
-      );
+          driverPhone.text.isNotEmpty &&
+          driverEmail.text.isNotEmpty &&
+          driverAddress.text.isNotEmpty &&
+          driverDateOfBirth.text.isNotEmpty &&
+          driverBankName.text.isNotEmpty &&
+          driverAccountNumber.text.isNotEmpty &&
+          driverIFSCCode.text.isNotEmpty &&
+          driverUPIID.text.isNotEmpty
+          );
 
 
 }
