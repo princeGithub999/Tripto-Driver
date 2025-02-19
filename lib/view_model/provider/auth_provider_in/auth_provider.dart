@@ -9,7 +9,8 @@ import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view/auth_screen/verify_otp_page.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
 import 'package:tripto_driver/view_model/service/auth_service.dart';
-import '../../../view/button_navigation/button_navigation.dart';
+import '../../../button/button_navigation_page.dart';
+import '../../../view/onBoarding/on_boarding_screen.dart';
 import '../../../view/screen/profile_details_screen/form_fillup_screen.dart';
 
 class AuthProviderIn extends ChangeNotifier {
@@ -149,6 +150,17 @@ class AuthProviderIn extends ChangeNotifier {
     }
   }
 
+  Future<void> checkLoginStatus()async{
+
+    var id =  authService.crruntUserId;
+    if(id.isNotEmpty){
+      AppHelperFunctions.navigateToScreen(Get.context!, BottomNavigation());
+    }else{
+      AppHelperFunctions.navigateToScreen(Get.context!, OnBoardingScreen());
+
+    }
+
+  }
 
   // Future<void> uploadAllImages() async {
   //   if (fromProvider.frontDrivingLicenceImage != null) {
