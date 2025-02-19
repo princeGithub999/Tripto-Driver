@@ -1,48 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tripto_driver/utils/app_sizes/sizes.dart';
+import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
+
 import 'package:tripto_driver/utils/constants/colors.dart';
-import 'package:tripto_driver/view_model/provider/form_fillup_provider/form_fillup_provider.dart';
+import 'package:tripto_driver/view/screen/profile_details_screen/form_fillup_screen.dart';
+import '../../../view_model/provider/form_fillup_provider/form_fillup_provider.dart'
 import 'dart:io';
 
 class AdharPanPage extends StatelessWidget {
+  const AdharPanPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    var provider = Provider.of<FormFillupProvider>(context);
+    var provider = Provider.of<FromProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.blue900,
         title: const Text('Aadhar & PAN Upload'),
+        backgroundColor: AppColors.blue900,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(icon: const Icon(Icons.help_outline,color: Colors.white,), onPressed: () {}),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildUploadSection(
-                context, 'Front side of your Aadhar Card', true, true, provider.aadharFrontImage),
+            _buildUploadSection(context, 'Front side of Aadhar Card', true, true, provider.frontAadharCardImage),
             const SizedBox(height: 16),
-            _buildUploadSection(
-                context, 'Back side of your Aadhar Card', false, true, provider.aadharBackImage),
+            _buildUploadSection(context, 'Back side of Aadhar Card', false, true, provider.backAadharCardImage),
             const SizedBox(height: 16),
-            _buildAadharInputSection(provider),
+            _buildUploadSection(context, 'Upload PAN Card', false, false, provider.penCardImage),
             const SizedBox(height: 16),
-            _buildUploadSection(
-                context, 'Upload PAN Card', false, false, provider.panImage),
-            const SizedBox(height: 16),
-            _buildPanInputSection(provider),
-            const SizedBox(height: 16),
-            _buildSubmitButton(provider),
+            _buildSubmitButton(provider,context),
           ],
         ),
       ),
@@ -50,7 +42,7 @@ class AdharPanPage extends StatelessWidget {
   }
 
   Widget _buildUploadSection(BuildContext context, String title, bool isFront, bool isAadhar, File? imageFile) {
-    var provider = Provider.of<FormFillupProvider>(context, listen: false);
+    var provider = Provider.of<FromProvider>(context, listen: false);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,12 +50,12 @@ class AdharPanPage extends StatelessWidget {
         Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         GestureDetector(
-          onTap: () => provider.pickAadharImage(isFront,isAadhar),
+          onTap: () => provider.pickAadharCardImage(isFront, isAadhar),
           child: Container(
             width: double.infinity,
             height: 150,
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.blue900,width: 1),
+              border: Border.all(color: AppColors.blue900, width: 1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: imageFile == null
@@ -86,60 +78,41 @@ class AdharPanPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAadharInputSection(FormFillupProvider provider) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Enter Aadhar Number', style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        TextField(
-          controller: provider.licenseController,
-          keyboardType: TextInputType.number,
-          maxLength: 12,
-          decoration: InputDecoration(
-            hintText: 'Enter 12-digit Aadhar Number',
-            border: OutlineInputBorder(),
-            errorText: provider.isLicenseNumberValid ? null : 'Aadhar number must be 12 digits',
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPanInputSection(FormFillupProvider provider) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Enter PAN Number', style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        TextField(
-          controller: provider.licenseController,
-          keyboardType: TextInputType.text,
-          textCapitalization: TextCapitalization.characters,
-          maxLength: 10,
-          decoration: InputDecoration(
-            hintText: 'Enter PAN (ABCDE1234F)',
-            border: OutlineInputBorder(),
-            errorText: provider.isLicenseNumberValid ? null : 'Invalid PAN format',
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSubmitButton(FormFillupProvider provider) {
+  Widget _buildSubmitButton(FromProvider provider) {
     return ElevatedButton(
       onPressed: () {
-
+       
+        provider.checkAadharCardImage();
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor:AppColors.blue900,
-        minimumSize: const Size(360, 50),
+  Widget _buildSubmitButton(FormFillupProvider provider,BuildContext context) {
+
+    bool isSubmitEnabled = provider.aadharFrontImage != null &&
+        provider.aadharBackImage != null &&
+        provider.panImage != null;
+
+    return ElevatedButton(
+      onPressed: isSubmitEnabled
+          ? () {
+        if (provider.aadharFrontImageUrl != null &&
+            provider.aadharBackImageUrl != null &&
+            provider.panImageUrl != null) {
+
+          print("All documents uploaded successfully!");
+          Navigator.push(context, MaterialPageRoute(builder: (context) => FormFillupScreen(),));
+        } else {
+          print("Please upload all documents.");
+        }
+      }
+          : null,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.blue900,
+        minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
       ),
-      child: const Text('Submit',style: TextStyle(color: Colors.white,fontSize: AppSizes.buttomTextSize),),
+      child: const Text('Submit', style: TextStyle(color: Colors.white, fontSize: 16)),
     );
   }
 }

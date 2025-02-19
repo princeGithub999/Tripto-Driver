@@ -4,13 +4,11 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/firebase_options.dart';
 import 'package:tripto_driver/utils/app_theme/app_theme.dart';
-import 'package:tripto_driver/view/screen/map_screen.dart';
 import 'package:tripto_driver/view/screen/splace_screen.dart';
-import 'package:tripto_driver/view_model/provider/form_fillup_provider/form_fillup_provider.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
+import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
 import 'package:tripto_driver/view_model/provider/permission_handler/permission_provider.dart';
 
-import 'button/button_navigation_page.dart';
 
 
 void main() async{
@@ -25,10 +23,11 @@ void main() async{
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => PermissionProvider()),
-        ChangeNotifierProvider(create: (context) => FormFillupProvider()),
-        ChangeNotifierProvider(
+         ChangeNotifierProvider(
           create: (context) => AuthProviderIn(),
         ),
+        ChangeNotifierProvider(create: (context) => FromProvider(),),
+
       ],
       child: const MyApp(),
     ),

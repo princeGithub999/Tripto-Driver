@@ -1,17 +1,22 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:tripto_driver/utils/app_sizes/sizes.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
+import 'package:tripto_driver/view/screen/profile_details_screen/form_fillup_screen.dart';
 import 'package:tripto_driver/view_model/provider/form_fillup_provider/form_fillup_provider.dart';
-
-import '../../../utils/app_sizes/sizes.dart';
+import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
 
 class VehicleRc extends StatelessWidget {
+  const VehicleRc({super.key});
+
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<FormFillupProvider>(context);
+    final provider = Provider.of<FromProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
+
         backgroundColor: AppColors.blue900,
         title: const Text('Vehicle RC'),
         leading: IconButton(
@@ -19,73 +24,41 @@ class VehicleRc extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          IconButton(icon: const Icon(Icons.help_outline,color: Colors.white,), onPressed: () {})
+          IconButton(icon: const Icon(Icons.help_outline, color: Colors.white), onPressed: () {})
         ],
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          bool isPortrait = constraints.maxWidth < 600;
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: isPortrait
-                ? _buildPortraitLayout(provider)
-                : _buildLandscapeLayout(provider),
-          );
-        },
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildUploadSection('Front side of your RC', true, provider),
+            const SizedBox(height: 16),
+            _buildUploadSection('Back side of your RC', false, provider),
+            const SizedBox(height: 16),
+            _buildSubmitButton(provider, context),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildPortraitLayout(FormFillupProvider provider) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildUploadSection('Front side of your RC', true, provider),
-        const SizedBox(height: 16),
-        _buildUploadSection('Back side of your RC', false, provider),
-        const SizedBox(height: 16),
-        _buildSubmitButton(provider),
-      ],
-    );
-  }
-
-  Widget _buildLandscapeLayout(FormFillupProvider provider) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            children: [
-              _buildUploadSection('Front side of your RC', true, provider),
-              const SizedBox(height: 16),
-              _buildUploadSection('Back side of your RC', false, provider),
-            ],
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: _buildSubmitButton(provider),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUploadSection(String title, bool isFront, FormFillupProvider provider) {
+  Widget _buildUploadSection(String title, bool isFront, FromProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         GestureDetector(
-          onTap: () => provider.pickImage(isFront),
+          onTap: () => provider.pickRcImage(isFront),
           child: Container(
             width: double.infinity,
             height: 150,
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.blue900,width: 1),
+              border: Border.all(color: AppColors.blue900, width: 1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: (isFront ? provider.frontImage : provider.backImage) == null
+            child: (isFront ? provider.frontRcImage : provider.backRcImage) == null
                 ? const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -98,7 +71,7 @@ class VehicleRc extends StatelessWidget {
                 : ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.file(
-                isFront ? provider.frontImage! : provider.backImage!,
+                isFront ? provider.frontRcImage! : provider.backRcImage!,
                 fit: BoxFit.cover,
               ),
             ),
@@ -108,29 +81,43 @@ class VehicleRc extends StatelessWidget {
     );
   }
 
-  Widget _buildSubmitButton(FormFillupProvider provider) {
+  Widget _buildSubmitButton(FromProvider provider, BuildContext context) {
+    return ElevatedButton(
+      onPressed: () async {
+
+
+        var check = await provider.checkRcFeald();
+        if(check){
+          Fluttertoast.showToast(msg: 'hello');
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 50),
+      ),
+      child:  const Text('Submit', style: TextStyle(color: Colors.white, fontSize:  AppSizes.buttomTextSize),
+  Widget _buildSubmitButton(FormFillupProvider provider, BuildContext context) {
+    bool isSubmitEnabled = provider.frontImageUrl != null && provider.backImageUrl != null;
+
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.blue900,
         shadowColor: Colors.black26,
-        minimumSize: Size(double.infinity, 50),
+        minimumSize: const Size(double.infinity, 50),
       ),
-      onPressed: () {
+      onPressed: isSubmitEnabled
+          ? () async {
+        await provider.saveDriverRcDetails('driver123');
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('RC details uploaded successfully!')));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => FormFillupScreen(),));
+      }
+          : null,
+      child: const Text(
+        "Submit",
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
 
-      },
-      child: Text("Submit",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: AppSizes.buttomTextSize),),
+      ),
     );
-    // return ElevatedButton(
-    //   onPressed: () {
-    //
-    //   },
-    //   style: ElevatedButton.styleFrom(
-    //     backgroundColor: AppColors.blue900,
-    //     minimumSize: Size(double.infinity, 50),
-    //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),
-    //     ),
-    //   ),
-    //   child: const Text('Submit'),
-    // );
   }
 }
+

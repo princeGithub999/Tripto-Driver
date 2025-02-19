@@ -11,7 +11,7 @@ class ElevatedButtonThemes {
     shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(5),
         side: BorderSide(color: AppColors.blue900)),
-    backgroundColor: AppColors.lightBlue,
+    backgroundColor: AppColors.blue900,
     textStyle: const TextStyle(color: AppColors.blackMe),
   ));
 
