@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tripto_driver/view/screen/earning_acc_details.dart';
+import 'package:tripto_driver/view/screen/profile_details_screen/rating_screen.dart';
 import '../view/screen/map_screen.dart';
 import '../view/screen/profile_details.dart';
 
@@ -16,8 +17,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
   var listPage = [
     const MapScreen(),
     const EarningAccDetails(),
-    const ProfileDetails()
-
+    const RatingScreen(),
+    ProfileDetailsScreen()
   ];
 
   @override
@@ -40,6 +41,11 @@ class _BottomNavigationState extends State<BottomNavigation> {
               icon: Icon(Icons.account_balance),
               label: "Account"
           ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.star),
+              label: "Rating"
+          ),
+
           BottomNavigationBarItem(
               icon: Icon(Icons.person),
               label: "Profile"
