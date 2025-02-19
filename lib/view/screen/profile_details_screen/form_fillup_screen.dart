@@ -120,32 +120,32 @@ class FormFillupScreen extends StatelessWidget {
     bool isSelected = title == provider.selectedDocument;
 
     return GestureDetector(
-      onTap: () => provider.selectDocument(title, context),
-      child: Card(
-        elevation: isSelected ? 4 : 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: isSelected ? const BorderSide(color: AppColors.blue900, width: 2) : BorderSide.none,
-        ),
-        color: isSelected ? Colors.white : Colors.grey.shade200,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(color: isSelected ? AppColors.blue900 : AppColors.blue900),
+        onTap: () => provider.selectDocument(title, context),
+        child: Card(
+            elevation: isSelected ? 4 : 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+              side: isSelected ? const BorderSide(color: AppColors.blue900, width: 2) : BorderSide.none,
+            ),
+            color: isSelected ? Colors.white : Colors.grey.shade200,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(color: isSelected ? AppColors.blue900 : AppColors.blue900),
+                  ),
+                  if (isSelected)
+                    const Text(
+                      "Upload Now",
+                      style: TextStyle(color: Colors.orange),
+                    ),
+                ],
               ),
-              if (isSelected)
-                const Text(
-                  "Upload Now",
-                  style: TextStyle(color: Colors.orange),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+            ),
+            ),
+        );
+    }
 }
