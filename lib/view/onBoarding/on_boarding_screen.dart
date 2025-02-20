@@ -30,7 +30,7 @@ class OnBoardingScreen extends StatelessWidget {
             children: [
               OnBoardingPage(
                 title: AppString.onboardingTitlePage1,
-                subTitle:AppString.onboardingSubTitlePage2,
+                subTitle:AppString.onboardingSubTitlePage1,
                 onBoardingImage: AppImage.onboardingImagePage1,
               ),
               OnBoardingPage(
