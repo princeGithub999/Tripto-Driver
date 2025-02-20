@@ -6,8 +6,7 @@ import 'package:tripto_driver/utils/constants/colors.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
-
-
+import 'package:tripto_driver/view/screen/profile_details_screen/select_car.dart';
 
 class FormFillupScreen extends StatelessWidget {
   const FormFillupScreen({super.key});
@@ -25,7 +24,8 @@ class FormFillupScreen extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        title: const Text("Help",
+        title: const Text(
+          "Help",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -67,6 +67,7 @@ class FormFillupScreen extends StatelessWidget {
                         _uploadCard(context, provider, "Profile Info"),
                         _uploadCard(context, provider, "Vehicle RC"),
                         _uploadCard(context, provider, "Aadhaar/PAN card"),
+                        _selectCarCard(context),
 
                         SizedBox(height: size.height * 0.2 + 60),
                         Consumer<FromProvider>(
@@ -78,32 +79,37 @@ class FormFillupScreen extends StatelessWidget {
                                 minimumSize: const Size(double.infinity, 50),
                               ),
                               onPressed: () {
-
-                                if(value.isDocumentFormComplete){
+                                if (value.isDocumentFormComplete) {
                                   var data = DriverDataModel(
-                                      driverName: value.driverBankName.text,
-                                      driverPhoneNumber: int.parse(value.driverPhone.text),
-                                      driverEmail: value.driverEmail.text,
-                                      driverAddress: value.driverAddress.text,
-                                      driverDateOfBirth: value.driverDateOfBirth.text,
-                                      driverBankName: value.driverBankName.text,
-                                      driverAccountNumber: value.driverAccountNumber.text,
-                                      driverIfscCode: value.driverIFSCCode.text,
-                                      driverUpiCode: value.driverUPIID.text,
-                                      dlNumber: value.dlNumberContro.text);
+                                    driverName: value.driverBankName.text,
+                                    driverPhoneNumber: int.parse(value.driverPhone.text),
+                                    driverEmail: value.driverEmail.text,
+                                    driverAddress: value.driverAddress.text,
+                                    driverDateOfBirth: value.driverDateOfBirth.text,
+                                    driverBankName: value.driverBankName.text,
+                                    driverAccountNumber: value.driverAccountNumber.text,
+                                    driverIfscCode: value.driverIFSCCode.text,
+                                    driverUpiCode: value.driverUPIID.text,
+                                    dlNumber: value.dlNumberContro.text,
+                                  );
                                   authProvider.saveProfileData(data);
-                                }else{
+                                } else {
                                   AppHelperFunctions.showSnackBar('Please fill in all required fields!');
                                 }
-
                               },
-                              child: authProvider.isLoding ? CircularProgressIndicator(backgroundColor: Colors.white,
-
-                              ): const Text("Submit",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: AppSizes.buttomTextSize),),
+                              child: authProvider.isLoding
+                                  ? CircularProgressIndicator(backgroundColor: Colors.white)
+                                  : const Text(
+                                "Submit",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: AppSizes.buttomTextSize,
+                                ),
+                              ),
                             );
                           },
                         ),
-
                       ],
                     );
                   },
@@ -120,32 +126,75 @@ class FormFillupScreen extends StatelessWidget {
     bool isSelected = title == provider.selectedDocument;
 
     return GestureDetector(
-        onTap: () => provider.selectDocument(title, context),
-        child: Card(
-            elevation: isSelected ? 4 : 2,
+      onTap: () => provider.selectDocument(title, context),
+      child: Card(
+        elevation: isSelected ? 4 : 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+          side: isSelected ? const BorderSide(color: AppColors.blue900, width: 2) : BorderSide.none,
+        ),
+        color: isSelected ? Colors.white : Colors.grey.shade200,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(color: AppColors.blue900),
+              ),
+              if (isSelected)
+                const Text(
+                  "Upload Now",
+                  style: TextStyle(color: Colors.orange),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _selectCarCard(BuildContext context) {
+    return Consumer<FromProvider>(
+      builder: (context, carProvider, child) {
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SelectCar()),
+            );
+          },
+          child: Card(
+            elevation: 2,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
-              side: isSelected ? const BorderSide(color: AppColors.blue900, width: 2) : BorderSide.none,
+              side: BorderSide(
+                color: carProvider?.selectedCar != null ? AppColors.blue900 : Colors.grey,
+                width: 2,
+              ),
             ),
-            color: isSelected ? Colors.white : Colors.grey.shade200,
+            color: Colors.white,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    title,
-                    style: TextStyle(color: isSelected ? AppColors.blue900 : AppColors.blue900),
-                  ),
-                  if (isSelected)
-                    const Text(
-                      "Upload Now",
-                      style: TextStyle(color: Colors.orange),
+                    carProvider.selectedCar ?? "Select Your Car",
+                    style: TextStyle(
+                      color: carProvider.selectedCar != null ? AppColors.blue900 : Colors.black54,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
+                  ),
+                  const Icon(Icons.directions_car, color: Colors.blue, size: 24),
                 ],
               ),
             ),
-            ),
+          ),
         );
-    }
+      },
+    );
+  }
 }

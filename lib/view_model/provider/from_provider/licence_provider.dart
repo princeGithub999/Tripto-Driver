@@ -13,6 +13,26 @@ import '../../../view/screen/profile_details_screen/vehicle_rc.dart';
 
 class FromProvider extends ChangeNotifier{
 
+  String? selectedCar;
+  List<String> carList = ['CAR', 'CNG CAR', 'AUTO', 'CNG AUTO','BIKE'];
+
+  void selectCar(String car) {
+    selectedCar = car;
+    notifyListeners();
+  }
+
+  Future<void> saveCarToDatabase() async {
+    if (selectedCar == null) {
+      Fluttertoast.showToast(msg: 'Please select a car');
+      return;
+    }
+
+    // Database save logic (yahan aap Firebase ya local DB ka code likh sakte hain)
+    Fluttertoast.showToast(msg: 'Car "$selectedCar" saved to database');
+
+    notifyListeners();
+  }
+
   TextEditingController dlNumberContro = TextEditingController();
   TextEditingController driverName = TextEditingController();
   TextEditingController driverPhone = TextEditingController();
@@ -153,7 +173,11 @@ class FromProvider extends ChangeNotifier{
     }
 
     notifyListeners();
+
   }
+
+
+
   Future<bool> checkAadharCardImage() async {
     if (frontAadharCardImage == null && backAadharCardImage == null && penCardImage == null) {
       AppHelperFunctions.showSnackBar('Please upload Front, Back of Aadhar and PAN Card.');

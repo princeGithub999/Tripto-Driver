@@ -79,8 +79,6 @@ class VehicleRc extends StatelessWidget {
   Widget _buildSubmitButton(FromProvider provider, BuildContext context) {
     return ElevatedButton(
         onPressed: () async {
-
-
           var check = await provider.checkRcFeald();
           if(check){
             Fluttertoast.showToast(msg: 'hello');
