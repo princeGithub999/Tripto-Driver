@@ -76,6 +76,8 @@ class AuthService {
     return completer.future;
   }
 
+
+
   Future<void> saveDriverData(String currentUserID, DriverDataModel driverData) async {
     await db
         .collection('DriverData')
