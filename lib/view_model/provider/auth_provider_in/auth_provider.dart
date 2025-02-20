@@ -21,6 +21,8 @@ class AuthProviderIn extends ChangeNotifier {
   FromProvider fromProvider = Provider.of(Get.context!, listen: false);
 
 
+
+
   Future<void> requestOTP(String phoneNumber)async{
 
     try{
@@ -151,13 +153,13 @@ class AuthProviderIn extends ChangeNotifier {
   Future<void> checkLoginStatus(BuildContext context)async{
 
     var id =  authService.crruntUserId;
-    if(id!= null && id.isNotEmpty){
+    if(id != null && id.isNotEmpty){
       AppHelperFunctions.navigateToScreen(context, BottomNavigation());
     }else{
       AppHelperFunctions.navigateToScreen(context, OnBoardingScreen());
-    }
-  }
 
+    }
+    }
   // Future<void> uploadAllImages() async {
   //   if (fromProvider.frontDrivingLicenceImage != null) {
   //     String? frontDlUrl = await authService.uploadImageToFirebase(fromProvider.frontDrivingLicenceImage!, "driving_license/front.jpg");

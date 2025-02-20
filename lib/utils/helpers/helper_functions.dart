@@ -5,8 +5,6 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 
-import '../../view/onBoarding/on_boarding_screen.dart';
-
 
 class AppHelperFunctions {
   static void showSnackBar(String message) {
