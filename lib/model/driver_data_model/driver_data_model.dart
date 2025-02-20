@@ -5,6 +5,7 @@ DriverDataModel welcomeFromJson(String str) => DriverDataModel.fromJson(json.dec
 String welcomeToJson(DriverDataModel data) => json.encode(data.toJson());
 
 class DriverDataModel {
+
   String? driverID;
   String driverName;
   int driverPhoneNumber;
