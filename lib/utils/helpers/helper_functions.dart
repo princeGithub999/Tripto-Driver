@@ -38,7 +38,7 @@ class AppHelperFunctions {
 
     Timer(
       Duration(seconds: 3), () {
-     Provider.of<AuthProviderIn>(context,listen: false).checkLoginStatus();
+     Provider.of<AuthProviderIn>(context,listen: false).checkLoginStatus(context);
        },
     );
   }

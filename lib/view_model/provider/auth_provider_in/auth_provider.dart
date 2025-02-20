@@ -21,8 +21,6 @@ class AuthProviderIn extends ChangeNotifier {
   FromProvider fromProvider = Provider.of(Get.context!, listen: false);
 
 
-
-
   Future<void> requestOTP(String phoneNumber)async{
 
     try{
@@ -150,16 +148,14 @@ class AuthProviderIn extends ChangeNotifier {
     }
   }
 
-  Future<void> checkLoginStatus()async{
+  Future<void> checkLoginStatus(BuildContext context)async{
 
     var id =  authService.crruntUserId;
-    if(id.isNotEmpty){
-      AppHelperFunctions.navigateToScreen(Get.context!, BottomNavigation());
+    if(id!= null && id.isNotEmpty){
+      AppHelperFunctions.navigateToScreen(context, BottomNavigation());
     }else{
-      AppHelperFunctions.navigateToScreen(Get.context!, OnBoardingScreen());
-
+      AppHelperFunctions.navigateToScreen(context, OnBoardingScreen());
     }
-
   }
 
   // Future<void> uploadAllImages() async {
