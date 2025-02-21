@@ -77,8 +77,6 @@ class AuthProviderIn extends ChangeNotifier {
   Future<void> saveProfileData(DriverDataModel driverData) async {
     var driverId = FirebaseAuth.instance.currentUser!.uid;
 
-
-
     try {
       isLoding = true;
       notifyListeners();
