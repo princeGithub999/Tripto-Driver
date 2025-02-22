@@ -13,7 +13,7 @@ class VehicleRc extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title:  const Text('Vehicle RC'),
+        title: const Text('Vehicle RC'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -23,7 +23,7 @@ class VehicleRc extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding:  EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -79,8 +79,6 @@ class VehicleRc extends StatelessWidget {
   Widget _buildSubmitButton(FromProvider provider, BuildContext context) {
     return ElevatedButton(
         onPressed: () async {
-
-
           var check = await provider.checkRcFeald();
           if(check){
             Fluttertoast.showToast(msg: 'hello');
