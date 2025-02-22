@@ -152,46 +152,14 @@ class AuthProviderIn extends ChangeNotifier {
 
   Future<void> checkLoginStatus(BuildContext context)async{
 
-    var id =  authService.crruntUserId;
-    if(id != null && id.isNotEmpty){
+    var currentUser =  FirebaseAuth.instance.currentUser;
+    if(currentUser != null){
       AppHelperFunctions.navigateToScreen(context, BottomNavigation());
     }else{
       AppHelperFunctions.navigateToScreen(context, OnBoardingScreen());
 
     }
     }
-  // Future<void> uploadAllImages() async {
-  //   if (fromProvider.frontDrivingLicenceImage != null) {
-  //     String? frontDlUrl = await authService.uploadImageToFirebase(fromProvider.frontDrivingLicenceImage!, "driving_license/front.jpg");
-  //    }
-  //   if (fromProvider.backDrivingLicenceImage != null) {
-  //     String? backDlUrl = await authService.uploadImageToFirebase(fromProvider.backDrivingLicenceImage!, "driving_license/back.jpg");
-  //   }
-  //   if (fromProvider.frontRcImage != null) {
-  //     String? frontRcUrl = await authService.uploadImageToFirebase(fromProvider.frontRcImage!, "vehicle_rc/front.jpg");
-  //     print("Front RC URL: $frontRcUrl");
-  //   }
-  //   if (fromProvider.backRcImage != null) {
-  //     String? backRcUrl = await authService.uploadImageToFirebase(fromProvider.backRcImage!, "vehicle_rc/back.jpg");
-  //     print("Back RC URL: $backRcUrl");
-  //   }
-  //   if (fromProvider.frontAadharCardImage != null) {
-  //     String? frontAadharUrl = await authService.uploadImageToFirebase(fromProvider.frontAadharCardImage!, "aadhar/front.jpg");
-  //     print("Front Aadhar URL: $frontAadharUrl");
-  //   }
-  //   if (fromProvider.backAadharCardImage != null) {
-  //     String? backAadharUrl = await authService.uploadImageToFirebase(fromProvider.backAadharCardImage!, "aadhar/back.jpg");
-  //     print("Back Aadhar URL: $backAadharUrl");
-  //   }
-  //   if (fromProvider.penCardImage != null) {
-  //     String? panUrl = await authService.uploadImageToFirebase(fromProvider.penCardImage!, "pan_card.jpg");
-  //     print("PAN Card URL: $panUrl");
-  //   }
-  //   if (fromProvider.driverImage != null) {
-  //     String? driverImgUrl = await authService.uploadImageToFirebase(fromProvider.driverImage!, "driver_image.jpg");
-  //     print("Driver Image URL: $driverImgUrl");
-  //   }
-  // }
 
 
 }
