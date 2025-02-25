@@ -1,100 +1,201 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:location/location.dart';
 
-class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+import '../../../view_model/service/location_service.dart';
+
+class DriverMapScreen extends StatefulWidget {
+  final LatLng pickUpLatLng;
+  final LatLng dropLatLng;
+
+  const DriverMapScreen({super.key, required this.pickUpLatLng, required this.dropLatLng});
 
   @override
-  State<MapScreen> createState() => _MapScreenState();
+  State<DriverMapScreen> createState() => _DriverMapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
-  final Completer<GoogleMapController> _controller = Completer();
-  LatLng? _currentPosition;
-  StreamSubscription<Position>? _positionStream;
+class _DriverMapScreenState extends State<DriverMapScreen> {
+  GoogleMapController? mapController;
+  Set<Marker> markers = {};
+  Set<Polyline> polylines = {};
+  String distanceText = "";
+  String durationText = "";
   bool isOnline = false;
-
-  static const CameraPosition _initialPosition = CameraPosition(
-    target: LatLng(25.9753007, 84.9217521),
-    zoom: 15,
-  );
+  LatLng? currentLocation;
 
   @override
   void initState() {
     super.initState();
-    _checkLocationPermission();
+    _setMarkersAndRoute();
   }
 
-  Future<void> _checkLocationPermission() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        Fluttertoast.showToast(msg: "Location permissions are denied.");
-        return;
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      Fluttertoast.showToast(msg: "Location permissions are permanently denied. Open settings.");
-      await Geolocator.openAppSettings();
-      return;
-    }
-  }
-
-  void _trackLiveLocation() {
-    _positionStream = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
-    ).listen((Position position) async {
-      setState(() {
-        _currentPosition = LatLng(position.latitude, position.longitude);
-      });
-      GoogleMapController controller = await _controller.future;
-      controller.animateCamera(CameraUpdate.newLatLng(_currentPosition!));
-    });
-  }
-
-  void _toggleOnlineStatus(bool value) async {
+  Future<void> _setMarkersAndRoute() async {
     setState(() {
-      isOnline = value;
+      markers.add(Marker(
+        markerId: const MarkerId("pickup"),
+        position: widget.pickUpLatLng,
+        infoWindow: const InfoWindow(title: "User Pickup Location"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      ));
+
+      markers.add(Marker(
+        markerId: const MarkerId("drop"),
+        position: widget.dropLatLng,
+        infoWindow: const InfoWindow(title: "User Destination"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      ));
     });
-    Fluttertoast.showToast(msg: isOnline ? "You are Online" : "You are Offline");
+
+    final result = await LocationServices.getRouteAndDistance(widget.pickUpLatLng, widget.dropLatLng);
+
+    if (result.isNotEmpty) {
+      setState(() {
+        distanceText = result["distance"];
+        durationText = result["duration"];
+        polylines.add(Polyline(
+          polylineId: const PolylineId("route"),
+          points: result["polyline"],
+          width: 5,
+          color: Colors.blue,
+        ));
+      });
+
+      _moveCameraToRoute();
+    }
+  }
+
+  void _moveCameraToRoute() {
+    mapController?.animateCamera(CameraUpdate.newLatLngBounds(
+      LatLngBounds(
+        southwest: LatLng(
+          widget.pickUpLatLng.latitude < widget.dropLatLng.latitude
+              ? widget.pickUpLatLng.latitude
+              : widget.dropLatLng.latitude,
+          widget.pickUpLatLng.longitude < widget.dropLatLng.longitude
+              ? widget.pickUpLatLng.longitude
+              : widget.dropLatLng.longitude,
+        ),
+        northeast: LatLng(
+          widget.pickUpLatLng.latitude > widget.dropLatLng.latitude
+              ? widget.pickUpLatLng.latitude
+              : widget.dropLatLng.latitude,
+          widget.pickUpLatLng.longitude > widget.dropLatLng.longitude
+              ? widget.pickUpLatLng.longitude
+              : widget.dropLatLng.longitude,
+        ),
+      ),
+      100,
+    ));
+  }
+
+  Future<void> _toggleOnlineStatus(bool status) async {
+    setState(() {
+      isOnline = status;
+    });
+
+    Fluttertoast.showToast(
+      msg: isOnline ? "You are online" : "You are offline",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+    );
 
     if (isOnline) {
-      _trackLiveLocation();
-    } else {
-      _positionStream?.cancel();
+      _getCurrentLocation();
+      _fetchFirebaseData();
     }
   }
 
-  @override
-  void dispose() {
-    _positionStream?.cancel();
-    super.dispose();
+  Future<void> _getCurrentLocation() async {
+    Location location = Location();
+    var locationData = await location.getLocation();
+
+    setState(() {
+      currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
+      markers.add(Marker(
+        markerId: const MarkerId("current_location"),
+        position: currentLocation!,
+        infoWindow: const InfoWindow(title: "Your Current Location"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      ));
+    });
+
+    if (mapController != null) {
+      mapController!.animateCamera(
+        CameraUpdate.newLatLngZoom(currentLocation!, 14),
+      );
+    }
+  }
+
+  void _fetchFirebaseData() {
+    DatabaseReference databaseRef = FirebaseDatabase.instance.ref("drivers");
+    databaseRef.onValue.listen((event) {
+      if (event.snapshot.exists) {
+        var data = event.snapshot.value;
+        print("Firebase Data: $data");
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text("Driver Map")),
       body: Stack(
         children: [
           GoogleMap(
-            initialCameraPosition: _initialPosition,
-            mapType: MapType.normal,
-            myLocationEnabled: true,
-            onMapCreated: (GoogleMapController controller) {
-              _controller.complete(controller);
+            initialCameraPosition: CameraPosition(
+              target: widget.pickUpLatLng,
+              zoom: 12,
+            ),
+            onMapCreated: (controller) {
+              setState(() {
+                mapController = controller;
+              });
             },
+            markers: markers,
+            polylines: polylines,
           ),
+          // Distance and ETA display (Top Center)
           Positioned(
             top: 30,
             left: 10,
+            right: 10,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                "Distance: $distanceText, ETA: $durationText",
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          // Online/Offline color indicator (Top Right Corner)
+          Positioned(
+            top: 30,
+            right: 10,
+            child: Container(
+              width: 15,
+              height: 15,
+              decoration: BoxDecoration(
+                color: isOnline ? Colors.green : Colors.red,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          // Online/Offline switch (Bottom Left)
+          Positioned(
+            bottom: 20,
+            left: 20,
             child: CupertinoSwitch(
               value: isOnline,
               onChanged: _toggleOnlineStatus,
+              activeColor: Colors.green,
             ),
           ),
         ],
