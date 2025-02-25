@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tripto_driver/utils/constants/colors.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
 import 'dart:io';
 
@@ -50,7 +51,7 @@ class AdharPanPage extends StatelessWidget {
             width: double.infinity,
             height: 150,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.blue, width: 1),
+              border: Border.all(color: AppColors.blue900, width: 2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: imageFile == null
@@ -76,6 +77,7 @@ class AdharPanPage extends StatelessWidget {
   Widget _buildSubmitButton(FromProvider provider) {
     return ElevatedButton(
         onPressed: () {
+
           // if (provider.aadharFrontImageUrl != null &&
           //     provider.aadharBackImageUrl != null &&
           //     provider.panImageUrl != null) {

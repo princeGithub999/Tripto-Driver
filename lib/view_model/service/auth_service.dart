@@ -9,7 +9,7 @@ import 'package:tripto_driver/model/driver_data_model/driver_data_model.dart';
 
 class AuthService {
 
-  var crruntUserId = FirebaseAuth.instance.currentUser!.uid;
+  var crruntUserId = FirebaseAuth.instance.currentUser?.uid;
   final FirebaseAuth auth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
   final FirebaseFirestore db = FirebaseFirestore.instance;
@@ -75,6 +75,8 @@ class AuthService {
 
     return completer.future;
   }
+
+
 
   Future<void> saveDriverData(String currentUserID, DriverDataModel driverData) async {
     await db
