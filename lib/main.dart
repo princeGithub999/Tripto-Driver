@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -10,26 +11,24 @@ import 'package:tripto_driver/view_model/provider/from_provider/licence_provider
 import 'package:tripto_driver/view_model/provider/map_provider/map_provider.dart';
 import 'package:tripto_driver/view_model/provider/permission_handler/permission_provider.dart';
 
-
-
-void main() async{
-
-
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+  // Initialize Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Enable Firebase Database persistence (Must be set after Firebase initialization)
+  FirebaseDatabase database = FirebaseDatabase.instance;
+  database.setPersistenceEnabled(true);
+  database.setPersistenceCacheSizeBytes(10000000);
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => PermissionProvider()),
-         ChangeNotifierProvider(
-          create: (context) => AuthProviderIn(),
-        ),
-        ChangeNotifierProvider(create: (context) => FromProvider(),),
-        ChangeNotifierProvider(create: (context) => MapProvider(),),
-
+        ChangeNotifierProvider(create: (context) => AuthProviderIn()),
+        ChangeNotifierProvider(create: (context) => FromProvider()),
+        ChangeNotifierProvider(create: (context) => MapProvider()),
       ],
       child: const MyApp(),
     ),
@@ -38,16 +37,16 @@ void main() async{
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Tripto Driver',
       themeMode: ThemeMode.system,
       theme: AppTheme.lightTheme,
-
       darkTheme: AppTheme.darkTheme,
-      home: SplaceScreen()
+      home: SplaceScreen(),
     );
   }
 }

@@ -10,8 +10,17 @@ import '../../../view_model/service/location_service.dart';
 class DriverMapScreen extends StatefulWidget {
   final LatLng pickUpLatLng;
   final LatLng dropLatLng;
+  final String driverId;
+  final String driverName;
 
-  const DriverMapScreen({super.key, required this.pickUpLatLng, required this.dropLatLng});
+
+  const DriverMapScreen({
+    super.key,
+    required this.pickUpLatLng,
+    required this.dropLatLng,
+    required this.driverId,
+    required this.driverName,
+  });
 
   @override
   State<DriverMapScreen> createState() => _DriverMapScreenState();
@@ -25,13 +34,100 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
   String durationText = "";
   bool isOnline = false;
   LatLng? currentLocation;
+  late DatabaseReference driverRef; // Firebase reference for the driver
+  Location location = Location();
 
   @override
   void initState() {
     super.initState();
+    driverRef = FirebaseDatabase.instance.ref("drivers/${widget.driverId}"); // Firebase reference for this driver
     _setMarkersAndRoute();
+    _listenToOnlineStatus();
   }
 
+  /// **Listen to driver's online status from Firebase in real-time**
+  void _listenToOnlineStatus() {
+    driverRef.child("isOnline").onValue.listen((event) {
+      if (event.snapshot.exists) {
+        bool status = event.snapshot.value as bool;
+        setState(() {
+          isOnline = status;
+        });
+      }
+    });
+  }
+
+  /// **Toggle the online status and update Firebase**
+  Future<void> _toggleOnlineStatus(bool status) async {
+    setState(() {
+      isOnline = status;
+    });
+
+    await driverRef.update({"isOnline": isOnline});
+
+    Fluttertoast.showToast(
+      msg: isOnline ? "You are now Online" : "You are now Offline",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+    );
+
+    if (isOnline) {
+      _getCurrentLocation();
+      _trackLiveLocation(); // Start tracking live location
+    }
+  }
+
+  /// **Get the driver's current location and update Firebase**
+  Future<void> _getCurrentLocation() async {
+    var locationData = await location.getLocation();
+
+    setState(() {
+      currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
+      markers.add(Marker(
+        markerId: const MarkerId("current_location"),
+        position: currentLocation!,
+        infoWindow: const InfoWindow(title: "Your Current Location"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      ));
+    });
+
+    await driverRef.update({
+      "latitude": locationData.latitude,
+      "longitude": locationData.longitude,
+    });
+
+    if (mapController != null) {
+      mapController!.animateCamera(
+        CameraUpdate.newLatLngZoom(currentLocation!, 14),
+      );
+    }
+  }
+
+  /// **Track live location updates and update Firebase**
+  void _trackLiveLocation() {
+    location.onLocationChanged.listen((locationData) {
+      if (isOnline) {
+        setState(() {
+          currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
+          markers.removeWhere((marker) => marker.markerId.value == "current_location");
+          markers.add(Marker(
+            markerId: const MarkerId("current_location"),
+            position: currentLocation!,
+            infoWindow: const InfoWindow(title: "Your Live Location"),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          ));
+        });
+
+        // Update location in Firebase
+        driverRef.update({
+          "latitude": locationData.latitude,
+          "longitude": locationData.longitude,
+        });
+      }
+    });
+  }
+
+  /// **Fetch the route and update markers**
   Future<void> _setMarkersAndRoute() async {
     setState(() {
       markers.add(Marker(
@@ -67,6 +163,7 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
     }
   }
 
+  /// **Move camera to fit the route**
   void _moveCameraToRoute() {
     mapController?.animateCamera(CameraUpdate.newLatLngBounds(
       LatLngBounds(
@@ -89,54 +186,6 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
       ),
       100,
     ));
-  }
-
-  Future<void> _toggleOnlineStatus(bool status) async {
-    setState(() {
-      isOnline = status;
-    });
-
-    Fluttertoast.showToast(
-      msg: isOnline ? "You are online" : "You are offline",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-    );
-
-    if (isOnline) {
-      _getCurrentLocation();
-      _fetchFirebaseData();
-    }
-  }
-
-  Future<void> _getCurrentLocation() async {
-    Location location = Location();
-    var locationData = await location.getLocation();
-
-    setState(() {
-      currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
-      markers.add(Marker(
-        markerId: const MarkerId("current_location"),
-        position: currentLocation!,
-        infoWindow: const InfoWindow(title: "Your Current Location"),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-      ));
-    });
-
-    if (mapController != null) {
-      mapController!.animateCamera(
-        CameraUpdate.newLatLngZoom(currentLocation!, 14),
-      );
-    }
-  }
-
-  void _fetchFirebaseData() {
-    DatabaseReference databaseRef = FirebaseDatabase.instance.ref("drivers");
-    databaseRef.onValue.listen((event) {
-      if (event.snapshot.exists) {
-        var data = event.snapshot.value;
-        print("Firebase Data: $data");
-      }
-    });
   }
 
   @override
@@ -179,13 +228,26 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
           Positioned(
             top: 30,
             right: 10,
-            child: Container(
-              width: 15,
-              height: 15,
-              decoration: BoxDecoration(
-                color: isOnline ? Colors.green : Colors.red,
-                shape: BoxShape.circle,
-              ),
+            child: Row(
+              children: [
+                Container(
+                  width: 15,
+                  height: 15,
+                  decoration: BoxDecoration(
+                    color: isOnline ? Colors.green : Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  isOnline ? "Online" : "Offline",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isOnline ? Colors.green : Colors.red,
+                  ),
+                ),
+              ],
             ),
           ),
           // Online/Offline switch (Bottom Left)
