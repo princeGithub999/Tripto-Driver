@@ -1,93 +1,197 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-class DriverHomeScreen extends StatefulWidget {
-  final String driverId; // Driver ka Unique ID
-
-  DriverHomeScreen({required this.driverId});
+class RatingScreen extends StatefulWidget {
+  const RatingScreen({super.key});
 
   @override
-  _DriverHomeScreenState createState() => _DriverHomeScreenState();
+  State<RatingScreen> createState() => _RatingScreenState();
 }
 
-class _DriverHomeScreenState extends State<DriverHomeScreen> {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+class _RatingScreenState extends State<RatingScreen> {
+  double _rating = 0;
+  final TextEditingController _feedbackController = TextEditingController();
+  final List<Map<String, dynamic>> _reviews = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _listenForRideRequests();
-  }
-
-  // 🔥 Firestore me naye Ride Requests suno
-  void _listenForRideRequests() {
-    _db
-        .collection('rides')
-        .where('status', isEqualTo: 'pending')
-        .snapshots()
-        .listen((snapshot) {
-      if (snapshot.docs.isNotEmpty) {
-        _showRideRequestDialog(snapshot.docs.first);
-      }
-    });
-  }
-
-  // ✅ Accept Ride
-  void _acceptRide(String rideId) async {
-    await _db.collection('rides').doc(rideId).update({
-      'driver_id': widget.driverId,
-      'status': 'accepted',
-    });
-    Navigator.pop(context); // Dialog Close
-  }
-
-  // ❌ Cancel Ride
-  void _cancelRide(String rideId) async {
-    await _db.collection('rides').doc(rideId).update({
-      'status': 'cancelled',
-    });
-    Navigator.pop(context); // Dialog Close
-  }
-
-  // 📌 Alert Dialog for New Ride Request
-  void _showRideRequestDialog(DocumentSnapshot ride) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // Dialog dismiss nahi hoga bina action ke
-      builder: (context) {
-        return AlertDialog(
-          title: Text("New Ride Request 🚖"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Pickup: ${ride['pickup_location']['lat']}, ${ride['pickup_location']['lng']}"),
-              Text("Drop: ${ride['drop_location']['lat']}, ${ride['drop_location']['lng']}"),
-              SizedBox(height: 10),
-              Text("Do you want to accept this ride?", style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
-          ),
+  void _submitRating() {
+    if (_rating == 0) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Error'),
+          content: const Text('Please select a rating before submitting.'),
           actions: [
             TextButton(
-              onPressed: () => _cancelRide(ride.id),
-              child: Text("Reject", style: TextStyle(color: Colors.red)),
-            ),
-            ElevatedButton(
-              onPressed: () => _acceptRide(ride.id),
-              child: Text("Accept"),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            ),
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('OK'),
+            )
           ],
-        );
-      },
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _reviews.add({
+        'rating': _rating,
+        'feedback': _feedbackController.text,
+        'date': DateTime.now().toString().substring(0, 10),
+      });
+      _rating = 0;
+      _feedbackController.clear();
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Thank you for your feedback!'),
+        duration: Duration(seconds: 2),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text("Driver Home")),
-        body: Center(child: Text("Waiting for Ride Requests... 🚖")),
+      appBar: AppBar(
+        title: const Text('Rate Our App'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.thumb_up_alt),
+            onPressed: () {
+              // Add share app functionality
+            },
+          )
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Rating Section
+            Card(
+              elevation: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    const Text(
+                      'How would you rate our app?',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    RatingBar.builder(
+                      initialRating: _rating,
+                      minRating: 1,
+                      direction: Axis.horizontal,
+                      allowHalfRating: true,
+                      itemCount: 5,
+                      itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      itemBuilder: (context, _) => const Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      ),
+                      onRatingUpdate: (rating) {
+                        setState(() {
+                          _rating = rating;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: _feedbackController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: 'Additional Feedback (optional)',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        hintText: 'Tell us what you like or how we can improve...',
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.send),
+                      label: const Text('Submit Review'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
+                      onPressed: _submitRating,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Previous Reviews
+            const Padding(
+              padding: EdgeInsets.only(top: 20, bottom: 10),
+              child: Text(
+                'Recent Reviews:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _reviews.length,
+                itemBuilder: (context, index) {
+                  final review = _reviews.reversed.toList()[index];
+                  return ReviewTile(
+                    rating: review['rating'],
+                    feedback: review['feedback'],
+                    date: review['date'],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ReviewTile extends StatelessWidget {
+  final double rating;
+  final String feedback;
+  final String date;
+
+  const ReviewTile({
+    super.key,
+    required this.rating,
+    required this.feedback,
+    required this.date,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+        margin: const EdgeInsets.only(bottom: 10),
+        child: ListTile(
+            contentPadding: const EdgeInsets.all(16),
+            leading: CircleAvatar(
+              backgroundColor: Colors.amber.withOpacity(0.2),
+              child: Text(
+                rating.toStringAsFixed(1),
+                style: const TextStyle(color: Colors.amber),
+              ),
+            ),
+            title: Text(feedback.isNotEmpty ? feedback : 'No feedback provided'),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Row(
+                children: [
+                  Icon(Icons.star, color: Colors.amber, size: 16),
+                  Text(' $rating • $date'),
+                ],
+              ),
+            ),
+        ),
         );
     }
 }
