@@ -3,14 +3,15 @@ import 'package:provider/provider.dart';
 
 import '../../view_model/provider/from_provider/licence_provider.dart';
 
-
 class ProfileDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+
     final profileProvider = Provider.of<FromProvider>(context);
 
     return Scaffold(
       appBar: AppBar(title: Text('Profile Details')),
+
       // body: Padding(
       //   padding: EdgeInsets.all(16.0),
       //   child: Column(
@@ -32,6 +33,7 @@ class ProfileDetailsScreen extends StatelessWidget {
       //     ],
       //   ),
       // ),
+
     );
   }
 
