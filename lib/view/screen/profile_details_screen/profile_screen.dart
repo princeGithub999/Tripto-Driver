@@ -134,7 +134,7 @@ class ProfileUpdate extends StatelessWidget {
                   shadowColor: Colors.black26,
                   elevation: 6,
                 ),
-                child: Text(
+                child:const Text(
                   'Submit Profile',
                   style: TextStyle(
                       fontSize: 18,
