@@ -26,9 +26,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
     super.initState();
     listPage = [
       DriverMapScreen(pickUpLatLng: defaultPickup, dropLatLng: defaultDrop, driverId: '', driverName: '',),
-      const EarningAccDetails(),
+      RatingScreen(),
       DriverHomeScreen(driverId: '',),
-      ProfileDetailsScreen()
+      ProfileScreen()
     ];
   }
 
@@ -45,8 +45,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.account_balance), label: "Account"),
           BottomNavigationBarItem(icon: Icon(Icons.star), label: "Rating"),
+          BottomNavigationBarItem(icon: Icon(Icons.account_balance), label: "Account"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
         currentIndex: _selectIndex,
