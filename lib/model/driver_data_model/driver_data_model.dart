@@ -25,6 +25,7 @@ class DriverDataModel {
   String? frontAadharCardImage;
   String? backAadharCardImage;
   String? penCardImage;
+  String? carName;
 
   DriverDataModel({
      this.driverID,
@@ -46,6 +47,7 @@ class DriverDataModel {
      this.frontAadharCardImage,
      this.backAadharCardImage,
      this.penCardImage,
+     this.carName
   });
 
   factory DriverDataModel.fromJson(Map<String, dynamic> json) => DriverDataModel(
@@ -68,6 +70,7 @@ class DriverDataModel {
     frontAadharCardImage: json["frontAadharCardImage"],
     backAadharCardImage: json["backAadharCardImage"],
     penCardImage: json["penCardImage"],
+    carName: json['carName']
   );
 
   Map<String, dynamic> toJson() => {
@@ -90,5 +93,6 @@ class DriverDataModel {
     "frontAadharCardImage": frontAadharCardImage,
     "backAadharCardImage": backAadharCardImage,
     "penCardImage": penCardImage,
+    "carName" : carName
   };
 }

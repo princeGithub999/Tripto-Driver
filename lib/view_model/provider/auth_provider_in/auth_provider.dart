@@ -80,7 +80,6 @@ class AuthProviderIn extends ChangeNotifier {
     try {
       isLoding = true;
       notifyListeners();
-      // Images ko upload karne se pehle null check karna zaroori hai
       String? frontDlUrl = fromProvider.frontDrivingLicenceImage != null
           ? await authService.uploadImageToFirebase(fromProvider.frontDrivingLicenceImage!, "driving_license/front.jpg")
           : null;
@@ -134,6 +133,7 @@ class AuthProviderIn extends ChangeNotifier {
         frontAadharCardImage: frontAadharUrl ?? "",
         backAadharCardImage: backAadharUrl ?? "",
         penCardImage: panUrl ?? "",
+        carName: fromProvider.selectedCar,
       );
 
       await authService.saveDriverData(driverId, data);
