@@ -5,7 +5,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:location/location.dart';
 
-import '../../../view_model/service/location_service.dart';
 
 class DriverMapScreen extends StatefulWidget {
   final LatLng pickUpLatLng;
