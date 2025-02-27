@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/model/driver_data_model/driver_data_model.dart';
 import 'package:tripto_driver/utils/app_sizes/sizes.dart';
@@ -14,6 +15,8 @@ class FormFillupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    FromProvider fromProvider = Provider.of(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -79,9 +82,12 @@ class FormFillupScreen extends StatelessWidget {
                                 minimumSize: const Size(double.infinity, 50),
                               ),
                               onPressed: () {
+
+                                Fluttertoast.showToast(msg: 'clcik');
+
                                 if (value.isDocumentFormComplete) {
                                   var data = DriverDataModel(
-                                    driverName: value.driverBankName.text,
+                                    driverName: value.driverName.text,
                                     driverPhoneNumber: int.parse(value.driverPhone.text),
                                     driverEmail: value.driverEmail.text,
                                     driverAddress: value.driverAddress.text,
@@ -91,6 +97,7 @@ class FormFillupScreen extends StatelessWidget {
                                     driverIfscCode: value.driverIFSCCode.text,
                                     driverUpiCode: value.driverUPIID.text,
                                     dlNumber: value.dlNumberContro.text,
+                                    carName: fromProvider.selectedCar
                                   );
                                   authProvider.saveProfileData(data);
                                 } else {
@@ -98,7 +105,7 @@ class FormFillupScreen extends StatelessWidget {
                                 }
                               },
                               child: authProvider.isLoding
-                                  ? CircularProgressIndicator(backgroundColor: Colors.white)
+                                  ? const CircularProgressIndicator(backgroundColor: Colors.white)
                                   : const Text(
                                 "Submit",
                                 style: TextStyle(
@@ -170,7 +177,7 @@ class FormFillupScreen extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
               side: BorderSide(
-                color: carProvider?.selectedCar != null ? AppColors.blue900 : Colors.grey,
+                color: carProvider.selectedCar != null ? AppColors.blue900 : Colors.grey,
                 width: 2,
               ),
             ),
