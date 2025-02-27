@@ -39,7 +39,7 @@ class SelectCar extends StatelessWidget {
               onPressed: () async {
                 await carProvider.saveCarToDatabase();
               },
-              child: const Text('Save Car Selection'),
+              child: const Text('Save Car Selection',style: TextStyle(color: Colors.white),),
             ),
           ],
         ),

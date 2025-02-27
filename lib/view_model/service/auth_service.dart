@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -13,6 +14,7 @@ class AuthService {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
   final FirebaseFirestore db = FirebaseFirestore.instance;
+  final FirebaseDatabase realTimeDb = FirebaseDatabase.instance;
 
   Future<bool?> requestOTP(String phoneNumber)async{
 
@@ -68,8 +70,8 @@ class AuthService {
         completer.complete(false);
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: 'Error: $e');
-      print('Error $e');
+      Fluttertoast.showToast(msg: 'Error auth: $e');
+      print('Error auth $e');
       completer.complete(false);
     }
 
@@ -83,11 +85,14 @@ class AuthService {
         .collection('DriverData')
         .doc(currentUserID)
         .set(driverData.toJson());
+
+
+
   }
 
   Future<String?> uploadImageToFirebase(File imageFile, String path) async {
     try {
-      final Reference storageRef = FirebaseStorage.instance.ref().child(path);
+      final Reference storageRef = FirebaseStorage.instance.ref('DriverDocumentImage').child(path);
       final UploadTask uploadTask = storageRef.putFile(imageFile);
       final TaskSnapshot snapshot = await uploadTask;
       final String downloadUrl = await snapshot.ref.getDownloadURL();
@@ -95,6 +100,16 @@ class AuthService {
     } catch (e) {
       print("Error uploading image: $e");
       return null;
+    }
+  }
+
+  Future<void> saveDriverDataInRealTime(DriverDataModel driverData)async{
+
+    try{
+      realTimeDb.ref('DriverData').child(driverData.driverID!).set(driverData.toJson());
+      Fluttertoast.showToast(msg: 'Save real time data');
+    }catch(e){
+      Fluttertoast.showToast(msg: 'Error $e');
     }
   }
 
