@@ -41,7 +41,7 @@ class ProfileUpdate extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               TextFromPage.buildTextField(
                   controller: formProvider.driverName,
                   hintText: 'Full Name',
