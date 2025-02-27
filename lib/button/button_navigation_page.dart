@@ -18,7 +18,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
     const MapScreen(),
     const EarningAccDetails(),
     const RatingScreen(),
-    ProfileDetailsScreen()
+    ProfileScreen()
   ];
 
   @override
@@ -50,6 +50,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
               icon: Icon(Icons.person),
               label: "Profile"
           ),
+
         ],
         currentIndex: _selectIndex,
         unselectedItemColor: Colors.grey,

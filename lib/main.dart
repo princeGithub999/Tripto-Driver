@@ -10,10 +10,7 @@ import 'package:tripto_driver/view_model/provider/from_provider/licence_provider
 import 'package:tripto_driver/view_model/provider/map_provider/map_provider.dart';
 import 'package:tripto_driver/view_model/provider/permission_handler/permission_provider.dart';
 
-
-
 void main() async{
-
 
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
