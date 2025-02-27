@@ -10,16 +10,13 @@ import '../../../view_model/service/location_service.dart';
 class DriverMapScreen extends StatefulWidget {
   final LatLng pickUpLatLng;
   final LatLng dropLatLng;
-  final String driverId;
-  final String driverName;
-
+  final String driverId; // Added driverId to track the specific driver in Firebase
 
   const DriverMapScreen({
     super.key,
     required this.pickUpLatLng,
     required this.dropLatLng,
-    required this.driverId,
-    required this.driverName,
+    required this.driverId, // Required parameter for Firebase tracking
   });
 
   @override
@@ -36,45 +33,26 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
   LatLng? currentLocation;
   late DatabaseReference driverRef; // Firebase reference for the driver
   Location location = Location();
-  String driverID = "";
-  String driverName = "";
 
   @override
   void initState() {
     super.initState();
-    driverRef = FirebaseDatabase.instance.ref("DriverData").child(widget.driverId); // Firebase reference for this driver
+    driverRef = FirebaseDatabase.instance.ref("drivers/${widget.driverId}"); // Firebase reference for this driver
     _setMarkersAndRoute();
     _listenToOnlineStatus();
   }
 
   /// **Listen to driver's online status from Firebase in real-time**
-  // void _listenToOnlineStatus() {
-  //   driverRef.child("isOnline").onValue.listen((event) {
-  //     if (event.snapshot.exists) {
-  //       bool status = event.snapshot.value as bool;
-  //       setState(() {
-  //         isOnline = status;
-  //       });
-  //     }
-  //   });
-  // }
   void _listenToOnlineStatus() {
-    driverRef.onValue.listen((event) {
+    driverRef.child("isOnline").onValue.listen((event) {
       if (event.snapshot.exists) {
-        final data = event.snapshot.value as Map<dynamic, dynamic>;
-
+        bool status = event.snapshot.value as bool;
         setState(() {
-          // Update online status
-          isOnline = data["isOnline"] ?? false;
-
-          // Fetch real-time user ID & name if a ride is assigned
-          driverID = data["currentRide"]?["driverId"] ?? "";
-          driverName = data["currentRide"]?["driverName"] ?? "";
+          isOnline = status;
         });
       }
     });
   }
-
 
   /// **Toggle the online status and update Firebase**
   Future<void> _toggleOnlineStatus(bool status) async {
