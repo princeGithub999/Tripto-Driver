@@ -25,7 +25,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
   void initState() {
     super.initState();
     listPage = [
-      DriverMapScreen(pickUpLatLng: defaultPickup, dropLatLng: defaultDrop, driverId: '', driverName: '',),
+      DriverMapScreen(pickUpLatLng: defaultPickup, dropLatLng: defaultDrop, driverId: '', ),
       RatingScreen(),
       DriverHomeScreen(driverId: '',),
       ProfileScreen()
