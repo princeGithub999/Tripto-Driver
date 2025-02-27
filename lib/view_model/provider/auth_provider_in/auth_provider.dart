@@ -9,9 +9,10 @@ import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view/auth_screen/verify_otp_page.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
 import 'package:tripto_driver/view_model/service/auth_service.dart';
-import '../../../button/button_navigation_page.dart';
+import '../../../view/button_navigation/button_navigation.dart';
 import '../../../view/onBoarding/on_boarding_screen.dart';
 import '../../../view/screen/profile_details_screen/form_fillup_screen.dart';
+import '../../service/notifaction_service.dart';
 
 class AuthProviderIn extends ChangeNotifier {
 
@@ -19,7 +20,7 @@ class AuthProviderIn extends ChangeNotifier {
   bool isLoding = false;
   AuthService authService = AuthService();
   FromProvider fromProvider = Provider.of(Get.context!, listen: false);
-
+  NotificationService notificationService = NotificationService();
 
 
 
@@ -75,45 +76,54 @@ class AuthProviderIn extends ChangeNotifier {
 
 
   Future<void> saveProfileData(DriverDataModel driverData) async {
-    var driverId = FirebaseAuth.instance.currentUser!.uid;
+    var driverId = FirebaseAuth.instance.currentUser?.uid;
+    if (driverId == null) {
+      AppHelperFunctions.showSnackBar("User not logged in!");
+      return;
+    }
+
+    String? token = await notificationService.getDeviceToken();
 
     try {
       isLoding = true;
       notifyListeners();
-      // Images ko upload karne se pehle null check karna zaroori hai
+
+      // Image uploads with null safety checks
       String? frontDlUrl = fromProvider.frontDrivingLicenceImage != null
-          ? await authService.uploadImageToFirebase(fromProvider.frontDrivingLicenceImage!, "driving_license/front.jpg")
+          ? await authService.uploadImageToFirebase(fromProvider.frontDrivingLicenceImage!, "driving_license/front_$driverId.jpg")
           : null;
 
       String? backDlUrl = fromProvider.backDrivingLicenceImage != null
-          ? await authService.uploadImageToFirebase(fromProvider.backDrivingLicenceImage!, "driving_license/back.jpg")
+          ? await authService.uploadImageToFirebase(fromProvider.backDrivingLicenceImage!, "driving_license/back_$driverId.jpg")
           : null;
 
+
+
       String? frontRcUrl = fromProvider.frontRcImage != null
-          ? await authService.uploadImageToFirebase(fromProvider.frontRcImage!, "vehicle_rc/front.jpg")
+          ? await authService.uploadImageToFirebase(fromProvider.frontRcImage!, "vehicle_rc/front_$driverId.jpg")
           : null;
 
       String? backRcUrl = fromProvider.backRcImage != null
-          ? await authService.uploadImageToFirebase(fromProvider.backRcImage!, "vehicle_rc/back.jpg")
+          ? await authService.uploadImageToFirebase(fromProvider.backRcImage!, "vehicle_rc/back_$driverId.jpg")
           : null;
 
       String? frontAadharUrl = fromProvider.frontAadharCardImage != null
-          ? await authService.uploadImageToFirebase(fromProvider.frontAadharCardImage!, "aadhar/front.jpg")
+          ? await authService.uploadImageToFirebase(fromProvider.frontAadharCardImage!, "aadhar/front_$driverId.jpg")
           : null;
 
       String? backAadharUrl = fromProvider.backAadharCardImage != null
-          ? await authService.uploadImageToFirebase(fromProvider.backAadharCardImage!, "aadhar/back.jpg")
+          ? await authService.uploadImageToFirebase(fromProvider.backAadharCardImage!, "aadhar/back_$driverId.jpg")
           : null;
 
       String? panUrl = fromProvider.penCardImage != null
-          ? await authService.uploadImageToFirebase(fromProvider.penCardImage!, "pan_card.jpg")
+          ? await authService.uploadImageToFirebase(fromProvider.penCardImage!, "pan_card_$driverId.jpg")
           : null;
 
       String? driverImgUrl = fromProvider.driverImage != null
-          ? await authService.uploadImageToFirebase(fromProvider.driverImage!, "driver_image.jpg")
+          ? await authService.uploadImageToFirebase(fromProvider.driverImage!, "driver_image_$driverId.jpg")
           : null;
 
-      // Driver data model me assign karna
+      // Assign data to DriverDataModel
       var data = DriverDataModel(
         driverID: driverId,
         driverName: driverData.driverName,
@@ -132,17 +142,35 @@ class AuthProviderIn extends ChangeNotifier {
         frontVehicleRcImage: frontRcUrl ?? "",
         backVehicleRcImage: backRcUrl ?? "",
         frontAadharCardImage: frontAadharUrl ?? "",
-        backAadharCardImage: backAadharUrl ?? "",
+        backAadharCardImage: backAadharUrl ?? "",  // Fixed the incorrect assignment
         penCardImage: panUrl ?? "",
+        carName: driverData.carName,
+        fcmToken: token,
       );
 
+      var realTimeData = DriverDataModel(
+        driverID: driverId,
+        driverName: driverData.driverName,
+        driverPhoneNumber: driverData.driverPhoneNumber,
+        driverAddress: driverData.driverAddress,
+        driverImage: driverImgUrl ?? "",
+        fcmToken: token,
+      );
+
+      // Store data in Firestore
       await authService.saveDriverData(driverId, data);
+
+      // Store minimal data in Realtime Database
+      await authService.saveDriverDataInRealTime(realTimeData);
+
+      // Navigate to home screen
       AppHelperFunctions.navigateToScreen(Get.context!, BottomNavigation());
+
       fromProvider.clearFeald();
-      AppHelperFunctions.showSnackBar("Driver data successfully saved in Firebase!");
+      AppHelperFunctions.showSnackBar("Driver data successfully saved!");
     } catch (e) {
       AppHelperFunctions.showSnackBar("Error saving driver data: $e");
-    }finally {
+    } finally {
       isLoding = false;
       notifyListeners();
     }
@@ -150,46 +178,14 @@ class AuthProviderIn extends ChangeNotifier {
 
   Future<void> checkLoginStatus(BuildContext context)async{
 
-    var id =  authService.crruntUserId;
-    if(id != null && id.isNotEmpty){
-      AppHelperFunctions.navigateToScreen(context, BottomNavigation());
+    var currentUser =  FirebaseAuth.instance.currentUser;
+    if(currentUser != null){
+      AppHelperFunctions.navigateToScreen(context, const BottomNavigation());
     }else{
-      AppHelperFunctions.navigateToScreen(context, OnBoardingScreen());
+      AppHelperFunctions.navigateToScreen(context, const OnBoardingScreen());
 
     }
     }
-  // Future<void> uploadAllImages() async {
-  //   if (fromProvider.frontDrivingLicenceImage != null) {
-  //     String? frontDlUrl = await authService.uploadImageToFirebase(fromProvider.frontDrivingLicenceImage!, "driving_license/front.jpg");
-  //    }
-  //   if (fromProvider.backDrivingLicenceImage != null) {
-  //     String? backDlUrl = await authService.uploadImageToFirebase(fromProvider.backDrivingLicenceImage!, "driving_license/back.jpg");
-  //   }
-  //   if (fromProvider.frontRcImage != null) {
-  //     String? frontRcUrl = await authService.uploadImageToFirebase(fromProvider.frontRcImage!, "vehicle_rc/front.jpg");
-  //     print("Front RC URL: $frontRcUrl");
-  //   }
-  //   if (fromProvider.backRcImage != null) {
-  //     String? backRcUrl = await authService.uploadImageToFirebase(fromProvider.backRcImage!, "vehicle_rc/back.jpg");
-  //     print("Back RC URL: $backRcUrl");
-  //   }
-  //   if (fromProvider.frontAadharCardImage != null) {
-  //     String? frontAadharUrl = await authService.uploadImageToFirebase(fromProvider.frontAadharCardImage!, "aadhar/front.jpg");
-  //     print("Front Aadhar URL: $frontAadharUrl");
-  //   }
-  //   if (fromProvider.backAadharCardImage != null) {
-  //     String? backAadharUrl = await authService.uploadImageToFirebase(fromProvider.backAadharCardImage!, "aadhar/back.jpg");
-  //     print("Back Aadhar URL: $backAadharUrl");
-  //   }
-  //   if (fromProvider.penCardImage != null) {
-  //     String? panUrl = await authService.uploadImageToFirebase(fromProvider.penCardImage!, "pan_card.jpg");
-  //     print("PAN Card URL: $panUrl");
-  //   }
-  //   if (fromProvider.driverImage != null) {
-  //     String? driverImgUrl = await authService.uploadImageToFirebase(fromProvider.driverImage!, "driver_image.jpg");
-  //     print("Driver Image URL: $driverImgUrl");
-  //   }
-  // }
 
 
 }

@@ -120,6 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
 
+            // Main Content
             _buildSection("Vehicle Information", [
               _buildListTile(Icons.directions_car, "Vehicle Details"),
               _buildListTile(Icons.description, "Documents"),
@@ -155,33 +156,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ]),
 
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 120, vertical: 10),
-              child: ElevatedButton(
-                onPressed: () {
-                  // TODO: Add logout functionality
-                },
+              padding: EdgeInsets.all(16.0),
+              child: ElevatedButton.icon(
+                icon: Icon(Icons.logout),
+                label: Text("Logout"),
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white, // Text color
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10), // Rounded corners
-                  ),
-                  elevation: 1, // Shadow effect
-                  padding: EdgeInsets.symmetric(vertical: 1),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.logout, size: 24),
-                    SizedBox(width: 8),
-                    Text(
-                      "Logout",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                  backgroundColor: Colors.greenAccent,
+                  minimumSize: Size(double.infinity, 50),
+
                 ),
               ),
             ),
-
           ],
         ),
       ),
@@ -264,7 +250,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 });
               },
               child: Text('Save Changes'),
-              ),
+            ),
           ],
         ),
       ),
@@ -276,31 +262,31 @@ class VehicleDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Vehicle Details"),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                  labelText: "Vehicle Number",
-        border: OutlineInputBorder()),
-    ),
-            SizedBox(height: 20),
-            TextField(
-              decoration: InputDecoration(
-                  labelText: "Vehicle Model",
-                  border: OutlineInputBorder()),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-                onPressed: () {},
-                child: Text("Save Vehicle Details")),
-          ],
+        appBar: AppBar(
+          title: Text("Vehicle Details"),
         ),
-      ),
-    );
-  }
+        body: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                TextField(
+                  decoration: InputDecoration(
+                      labelText: "Vehicle Number",
+                      border: OutlineInputBorder()),
+                ),
+                SizedBox(height: 20),
+                TextField(
+                  decoration: InputDecoration(
+                      labelText: "Vehicle Model",
+                      border: OutlineInputBorder()),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                    onPressed: () {},
+                    child: Text("Save Vehicle Details")),
+              ],
+            ),
+            ),
+        );
+    }
 }

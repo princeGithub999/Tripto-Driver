@@ -171,27 +171,27 @@ class ReviewTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: CircleAvatar(
-          backgroundColor: Colors.amber.withOpacity(0.2),
-          child: Text(
-            rating.toStringAsFixed(1),
-            style: const TextStyle(color: Colors.amber),
-          ),
+        margin: const EdgeInsets.only(bottom: 10),
+        child: ListTile(
+            contentPadding: const EdgeInsets.all(16),
+            leading: CircleAvatar(
+              backgroundColor: Colors.amber.withOpacity(0.2),
+              child: Text(
+                rating.toStringAsFixed(1),
+                style: const TextStyle(color: Colors.amber),
+              ),
+            ),
+            title: Text(feedback.isNotEmpty ? feedback : 'No feedback provided'),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Row(
+                children: [
+                  Icon(Icons.star, color: Colors.amber, size: 16),
+                  Text(' $rating • $date'),
+                ],
+              ),
+            ),
         ),
-        title: Text(feedback.isNotEmpty ? feedback : 'No feedback provided'),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Row(
-            children: [
-              Icon(Icons.star, color: Colors.amber, size: 16),
-              Text(' $rating • $date'),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+        );
+    }
 }
