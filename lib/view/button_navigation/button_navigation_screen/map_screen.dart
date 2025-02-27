@@ -147,7 +147,7 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
     });
   }
 
-  /// **Fetch the route and update markers**
+  /// ** Fetch the route and update markers ** ///
   Future<void> _setMarkersAndRoute() async {
     setState(() {
       markers.add(Marker(

@@ -10,30 +10,45 @@ class SelectCar extends StatelessWidget {
     final carProvider = Provider.of<FromProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Select Your Car')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Choose your car:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        appBar: AppBar(title: const Text('Select Your Car')),
+        body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Choose your car:',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                DropdownButtonFormField<String>(
+                  value: carProvider.selectedCar,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  ),
+                  items: carProvider.carList
+                      .map((car) => DropdownMenuItem(value: car, child: Text(car)))
+                      .toList(),
+                  onChanged: (value) {
+                    carProvider.selectCar(value!);
+                  },
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    await carProvider.saveCarToDatabase();
+                  },
+                  child: const Text('Save Car Selection',style: TextStyle(color: Colors.white),),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            DropdownButtonFormField<String>(
-              value: carProvider.selectedCar,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              ),
-              items: carProvider.carList
-                  .map((car) => DropdownMenuItem(value: car, child: Text(car)))
-                  .toList(),
-              onChanged: (value) {
-                carProvider.selectCar(value!);
-              },
             ),
+
+        );
+    }
+}
+
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
@@ -47,3 +62,4 @@ class SelectCar extends StatelessWidget {
     );
   }
 }
+
