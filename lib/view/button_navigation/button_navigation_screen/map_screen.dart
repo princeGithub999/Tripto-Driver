@@ -7,6 +7,7 @@ import 'package:location/location.dart';
 
 import '../../../view_model/service/location_service.dart';
 
+
 class DriverMapScreen extends StatefulWidget {
   final LatLng pickUpLatLng;
   final LatLng dropLatLng;

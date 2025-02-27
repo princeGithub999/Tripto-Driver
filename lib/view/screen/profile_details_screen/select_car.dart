@@ -31,7 +31,7 @@ class SelectCar extends StatelessWidget {
                   .map((car) => DropdownMenuItem(value: car, child: Text(car)))
                   .toList(),
               onChanged: (value) {
-                // carProvider.selectCar(value!);
+                carProvider.selectCar(value!);
               },
             ),
             const SizedBox(height: 20),
@@ -39,7 +39,7 @@ class SelectCar extends StatelessWidget {
               onPressed: () async {
                 await carProvider.saveCarToDatabase();
               },
-              child: const Text('Save Car Selection'),
+              child: const Text('Save Car Selection',style: TextStyle(color: Colors.white),),
             ),
           ],
         ),

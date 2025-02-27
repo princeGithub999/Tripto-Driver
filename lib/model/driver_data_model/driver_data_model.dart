@@ -7,47 +7,49 @@ String welcomeToJson(DriverDataModel data) => json.encode(data.toJson());
 class DriverDataModel {
 
   String? driverID;
-  String driverName;
-  int driverPhoneNumber;
-  String driverEmail;
-  String driverAddress;
-  String driverDateOfBirth;
-  String driverBankName;
-  String driverAccountNumber;
-  String driverIfscCode;
-  String driverUpiCode;
+  String? driverName;
+  int? driverPhoneNumber;
+  String? driverEmail;
+  String? driverAddress;
+  String? driverDateOfBirth;
+  String? driverBankName;
+  String? driverAccountNumber;
+  String? driverIfscCode;
+  String? driverUpiCode;
   String? driverImage;
   String? frontDlImage;
   String? backDlImage;
-  String dlNumber;
+  String? dlNumber;
   String? frontVehicleRcImage;
   String? backVehicleRcImage;
   String? frontAadharCardImage;
   String? backAadharCardImage;
   String? penCardImage;
   String? carName;
+  String? fcmToken;
 
   DriverDataModel({
      this.driverID,
-    required this.driverName,
-    required this.driverPhoneNumber,
-    required this.driverEmail,
-    required this.driverAddress,
-    required this.driverDateOfBirth,
-    required this.driverBankName,
-    required this.driverAccountNumber,
-    required this.driverIfscCode,
-    required this.driverUpiCode,
+     this.driverName,
+     this.driverPhoneNumber,
+     this.driverEmail,
+     this.driverAddress,
+     this.driverDateOfBirth,
+     this.driverBankName,
+     this.driverAccountNumber,
+     this.driverIfscCode,
+     this.driverUpiCode,
      this.driverImage,
      this.frontDlImage,
      this.backDlImage,
-    required this.dlNumber,
+     this.dlNumber,
      this.frontVehicleRcImage,
      this.backVehicleRcImage,
      this.frontAadharCardImage,
      this.backAadharCardImage,
      this.penCardImage,
-     this.carName
+     this.carName,
+     this.fcmToken
   });
 
   factory DriverDataModel.fromJson(Map<String, dynamic> json) => DriverDataModel(
@@ -70,7 +72,8 @@ class DriverDataModel {
     frontAadharCardImage: json["frontAadharCardImage"],
     backAadharCardImage: json["backAadharCardImage"],
     penCardImage: json["penCardImage"],
-    carName: json['carName']
+    carName: json['carName'],
+    fcmToken: json['fcmToken']
   );
 
   Map<String, dynamic> toJson() => {
@@ -93,6 +96,7 @@ class DriverDataModel {
     "frontAadharCardImage": frontAadharCardImage,
     "backAadharCardImage": backAadharCardImage,
     "penCardImage": penCardImage,
-    "carName" : carName
+    "carName" : carName,
+    "fcmToken" :fcmToken
   };
 }

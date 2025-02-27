@@ -25,9 +25,10 @@ class FromProvider extends ChangeNotifier{
     if (selectedCar == null) {
       Fluttertoast.showToast(msg: 'Please select a car');
       return;
+    }else{
+      Navigator.pop(Get.context!);
     }
-    // Database save logic (yahan aap Firebase ya local DB ka code likh sakte hain)
-    Fluttertoast.showToast(msg: 'Car "$selectedCar" saved to database');
+
 
     notifyListeners();
   }

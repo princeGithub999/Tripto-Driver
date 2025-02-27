@@ -13,11 +13,8 @@ import 'package:tripto_driver/view_model/provider/permission_handler/permission_
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 
-  // Initialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  // Enable Firebase Database persistence (Must be set after Firebase initialization)
   FirebaseDatabase database = FirebaseDatabase.instance;
   database.setPersistenceEnabled(true);
   database.setPersistenceCacheSizeBytes(10000000);
