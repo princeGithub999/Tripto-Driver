@@ -170,19 +170,19 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                             const SizedBox(height: 20),
                             _buildCustomTextField(
                                 'Full Name', formProvider.driverName, Icons.person,
-                                validator: Validation.validateName),
+                                validator: Validation.validateName,type: TextInputType.name),
                             _buildCustomTextField(
                                 'Phone Number', formProvider.driverPhone, Icons.phone,
-                                validator: Validation.validatePhoneNumber),
+                                validator: Validation.validatePhoneNumber,type: TextInputType.number),
                             _buildCustomTextField(
                                 'Email', formProvider.driverEmail, Icons.email,
-                                validator: Validation.validateEmail),
+                                validator: Validation.validateEmail,type: TextInputType.emailAddress),
                             _buildCustomTextField(
                                 'Address', formProvider.driverAddress, Icons.location_on,
-                                validator: Validation.validateAddress),
+                                validator: Validation.validateAddress,type: TextInputType.text),
                             _buildCustomTextField(
                                 'Date of Birth', formProvider.driverDateOfBirth, Icons.calendar_today,
-                                validator: Validation.validateDateOfBirth),
+                                validator: Validation.validateDateOfBirth,type: TextInputType.datetime,isDateField: true),
                           ],
                         ),
                       ),
@@ -266,14 +266,33 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
 
   Widget _buildCustomTextField(
       String hint, TextEditingController controller, IconData icon,
-      {String? Function(String?)? validator}) {
+      {String? Function(String?)? validator, TextInputType type = TextInputType.text, bool isDateField = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextFormField(
         controller: controller,
         validator: validator,
+        keyboardType: type,
+        readOnly: isDateField, // Date field editable nahi hoga
         decoration: InputDecoration(
           prefixIcon: Icon(icon, color: AppColors.blue900),
+          suffixIcon: isDateField
+              ? IconButton(
+            icon: const Icon(Icons.calendar_today, color: Colors.blue),
+            onPressed: () async {
+              DateTime? pickedDate = await showDatePicker(
+                context: context,
+                firstDate: DateTime(1900),
+                lastDate: DateTime.now(),
+                initialDate: DateTime.now(),
+              );
+              if (pickedDate != null) {
+                String formattedDate = "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+                controller.text = formattedDate;
+              }
+            },
+          )
+              : null,
           hintText: hint,
           filled: true,
           fillColor: Colors.grey.shade100,
@@ -285,6 +304,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
       ),
     );
   }
+
 }
 
 
