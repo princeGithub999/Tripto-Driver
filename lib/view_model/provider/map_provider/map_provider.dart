@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapProvider extends ChangeNotifier {
+
   final Completer<GoogleMapController> controller = Completer();
   LatLng? _currentPosition;
   StreamSubscription<Position>? _positionStream;
@@ -15,7 +16,6 @@ class MapProvider extends ChangeNotifier {
     zoom: 15,
   );
 
-  /// Ensures location permission is granted before accessing the location
   Future<bool> checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -33,7 +33,6 @@ class MapProvider extends ChangeNotifier {
     return permission == LocationPermission.whileInUse || permission == LocationPermission.always;
   }
 
-  /// Starts live location tracking
   Future<void> trackLiveLocation() async {
     bool hasPermission = await checkLocationPermission();
     if (!hasPermission) return;

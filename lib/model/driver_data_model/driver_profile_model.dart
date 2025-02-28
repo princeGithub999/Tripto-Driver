@@ -1,32 +1,23 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class DriverDataModel {
-  String driverID;
-  String driverName;
-  int driverPhoneNumber;
-  String driverEmail;
-  String driverAddress;
-  String driverDateOfBirth;
-  String driverBankName;
-  String driverAccountNumber;
-  String driverIfscCode;
-  String driverUpiCode;
-  String dlNumber;
-  bool isOnline;
+  String? driverID;
+  String? driverName;
+  int? driverPhoneNumber;
+  String? driverEmail;
+  String? driverAddress;
+  bool? isOnline;
+  LatLng? driverCurrentLocation;
 
   DriverDataModel({
-    required this.driverID,
-    required this.driverName,
-    required this.driverPhoneNumber,
-    required this.driverEmail,
-    required this.driverAddress,
-    required this.driverDateOfBirth,
-    required this.driverBankName,
-    required this.driverAccountNumber,
-    required this.driverIfscCode,
-    required this.driverUpiCode,
-    required this.dlNumber,
-    required this.isOnline,
+    this.driverID,
+    this.driverName,
+    this.driverPhoneNumber,
+    this.driverEmail,
+    this.driverAddress,
+    this.isOnline,
+    this.driverCurrentLocation
   });
 
   // Convert a DriverDataModel to a Map for Firebase
@@ -37,13 +28,8 @@ class DriverDataModel {
       "driverPhoneNumber": driverPhoneNumber,
       "driverEmail": driverEmail,
       "driverAddress": driverAddress,
-      "driverDateOfBirth": driverDateOfBirth,
-      "driverBankName": driverBankName,
-      "driverAccountNumber": driverAccountNumber,
-      "driverIfscCode": driverIfscCode,
-      "driverUpiCode": driverUpiCode,
-      "dlNumber": dlNumber,
       "isOnline": isOnline,
+      "driverCurrentLocation" : driverCurrentLocation
     };
   }
 
@@ -57,13 +43,8 @@ class DriverDataModel {
       driverPhoneNumber: data?["driverPhoneNumber"] ?? 0,
       driverEmail: data?["driverEmail"] ?? "",
       driverAddress: data?["driverAddress"] ?? "",
-      driverDateOfBirth: data?["driverDateOfBirth"] ?? "",
-      driverBankName: data?["driverBankName"] ?? "",
-      driverAccountNumber: data?["driverAccountNumber"] ?? "",
-      driverIfscCode: data?["driverIfscCode"] ?? "",
-      driverUpiCode: data?["driverUpiCode"] ?? "",
-      dlNumber: data?["dlNumber"] ?? "",
       isOnline: data?["isOnline"] ?? false,
+      driverCurrentLocation: data?['driverCurrentLocation']
     );
   }
 }
