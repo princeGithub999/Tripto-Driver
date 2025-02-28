@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tripto_driver/utils/constants/colors.dart';
 import 'package:tripto_driver/utils/validator/validation.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
 
@@ -13,6 +14,8 @@ class ProfileUpdate extends StatefulWidget {
 
 class _ProfileUpdateState extends State<ProfileUpdate> {
   int _currentStep = 0;
+  final GlobalKey<FormState> _personalInfoKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _bankDetailsKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -21,12 +24,8 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Update Profile'),
-        backgroundColor: Colors.blue.shade900,
+        backgroundColor: AppColors.blue900,
         centerTitle: true,
-        // elevation: 5,
-        // shape: const RoundedRectangleBorder(
-        //   borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-        // ),
       ),
       body: Column(
         children: [
@@ -34,7 +33,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.blue.shade900, Colors.blue.shade600],
+                colors: [AppColors.blue900, Colors.blue.shade600],
               ),
             ),
             child: Row(
@@ -55,23 +54,31 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
           Expanded(
             child: Theme(
               data: ThemeData(
-          colorScheme: ColorScheme.light(primary: Colors.blue.shade900),
-          ),
+                colorScheme: ColorScheme.light(primary: AppColors.blue900),
+              ),
               child: Stepper(
                 type: StepperType.horizontal,
                 currentStep: _currentStep,
                 onStepContinue: () {
-                  if (_currentStep < 2) {
-                    setState(() {
-                      _currentStep += 1;
-                    });
-                  } else {
-                    if (formProvider.formKey2.currentState!.validate()) {
-                      formProvider.setErrorMessage('');
-                      Navigator.pop(context);
+                  if (_currentStep == 0) {
+                    if (_personalInfoKey.currentState!.validate()) {
+                      setState(() {
+                        _currentStep += 1;
+                      });
                     } else {
-                      formProvider.setErrorMessage('Please fix the errors above');
+                      formProvider.setErrorMessage('Please fill out all required fields.');
                     }
+                  } else if (_currentStep == 1) {
+                    if (_bankDetailsKey.currentState!.validate()) {
+                      setState(() {
+                        _currentStep += 1;
+                      });
+                    } else {
+                      formProvider.setErrorMessage('Please fill out all required fields for Bank Details.');
+                    }
+                  } else if (_currentStep == 2) {
+                    formProvider.setErrorMessage('');
+                    Navigator.pop(context);
                   }
                 },
                 onStepCancel: () {
@@ -104,7 +111,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                         ElevatedButton(
                           onPressed: details.onStepContinue,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue.shade900,
+                            backgroundColor: AppColors.blue900,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -123,7 +130,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                     title: const Text("Personal"),
                     content: _buildStepCard(
                       child: Form(
-                        key: formProvider.formKey2,
+                        key: _personalInfoKey,
                         child: Column(
                           children: [
                             Center(
@@ -185,17 +192,20 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                   Step(
                     title: const Text("Bank Details"),
                     content: _buildStepCard(
-                      child: Column(
-                        children: [
-                          _buildCustomTextField('Bank Name', formProvider.driverBankName, Icons.account_balance,
-                              validator: Validation.validateBankName),
-                          _buildCustomTextField('Account Number', formProvider.driverAccountNumber, Icons.credit_card,
-                              validator: Validation.validateAccountNumber),
-                          _buildCustomTextField('IFSC Code', formProvider.driverIFSCCode, Icons.code,
-                              validator: Validation.validateIFSC),
-                          _buildCustomTextField('UPI ID', formProvider.driverUPIID, Icons.qr_code,
-                              validator: Validation.validateUPI),
-                        ],
+                      child: Form(
+                        key: _bankDetailsKey,
+                        child: Column(
+                          children: [
+                            _buildCustomTextField('Bank Name', formProvider.driverBankName, Icons.account_balance,
+                                validator: Validation.validateBankName),
+                            _buildCustomTextField('Account Number', formProvider.driverAccountNumber, Icons.credit_card,
+                                validator: Validation.validateAccountNumber),
+                            _buildCustomTextField('IFSC Code', formProvider.driverIFSCCode, Icons.code,
+                                validator: Validation.validateIFSC),
+                            _buildCustomTextField('UPI ID', formProvider.driverUPIID, Icons.qr_code,
+                                validator: Validation.validateUPI),
+                          ],
+                        ),
                       ),
                     ),
                     isActive: _currentStep >= 1,
@@ -212,16 +222,11 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                           const SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: () {
-                              if (formProvider.formKey2.currentState!.validate()) {
-                                formProvider.setErrorMessage('');
-                                Navigator.pop(context);
-                              } else {
-                                formProvider.setErrorMessage('Please fix the errors above');
-                              }
+                              Navigator.pop(context);
                             },
                             style: ElevatedButton.styleFrom(
                               minimumSize: const Size(double.infinity, 50),
-                              backgroundColor: Colors.blue.shade900,
+                              backgroundColor: AppColors.blue900,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -268,7 +273,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
         controller: controller,
         validator: validator,
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: Colors.blue.shade900),
+          prefixIcon: Icon(icon, color: AppColors.blue900),
           hintText: hint,
           filled: true,
           fillColor: Colors.grey.shade100,
@@ -281,3 +286,6 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
     );
   }
 }
+
+
+
