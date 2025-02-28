@@ -1,105 +1,265 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:location/location.dart';
 
-class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+import '../../../view_model/service/location_service.dart';
+
+
+class DriverMapScreen extends StatefulWidget {
+  final LatLng pickUpLatLng;
+  final LatLng dropLatLng;
+  final String driverId; // Added driverId to track the specific driver in Firebase
+
+  const DriverMapScreen({
+    super.key,
+    required this.pickUpLatLng,
+    required this.dropLatLng,
+    required this.driverId, // Required parameter for Firebase tracking
+  });
 
   @override
-  State<MapScreen> createState() => _MapScreenState();
+  State<DriverMapScreen> createState() => _DriverMapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
-  final Completer<GoogleMapController> _controller = Completer();
-  LatLng? _currentPosition;
-  StreamSubscription<Position>? _positionStream;
+class _DriverMapScreenState extends State<DriverMapScreen> {
+  GoogleMapController? mapController;
+  Set<Marker> markers = {};
+  Set<Polyline> polylines = {};
+  String distanceText = "";
+  String durationText = "";
   bool isOnline = false;
-
-  static const CameraPosition _initialPosition = CameraPosition(
-    target: LatLng(25.9753007, 84.9217521),
-    zoom: 15,
-  );
+  LatLng? currentLocation;
+  late DatabaseReference driverRef; // Firebase reference for the driver
+  Location location = Location();
 
   @override
   void initState() {
     super.initState();
-    _checkLocationPermission();
+    driverRef = FirebaseDatabase.instance.ref("drivers/${widget.driverId}"); // Firebase reference for this driver
+    _setMarkersAndRoute();
+    _listenToOnlineStatus();
   }
 
-  Future<void> _checkLocationPermission() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        Fluttertoast.showToast(msg: "Location permissions are denied.");
-        return;
+  /// *Listen to driver's online status from Firebase in real-time*
+  void _listenToOnlineStatus() {
+    driverRef.child("isOnline").onValue.listen((event) {
+      if (event.snapshot.exists) {
+        bool status = event.snapshot.value as bool;
+        setState(() {
+          isOnline = status;
+        });
       }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      Fluttertoast.showToast(msg: "Location permissions are permanently denied. Open settings.");
-      await Geolocator.openAppSettings();
-      return;
-    }
-  }
-
-  void _trackLiveLocation() {
-    _positionStream = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
-    ).listen((Position position) async {
-      setState(() {
-        _currentPosition = LatLng(position.latitude, position.longitude);
-      });
-      GoogleMapController controller = await _controller.future;
-      controller.animateCamera(CameraUpdate.newLatLng(_currentPosition!));
     });
   }
 
-  void _toggleOnlineStatus(bool value) async {
+  /// *Toggle the online status and update Firebase*
+  Future<void> _toggleOnlineStatus(bool status) async {
     setState(() {
-      isOnline = value;
+      isOnline = status;
     });
-    Fluttertoast.showToast(msg: isOnline ? "You are Online" : "You are Offline");
+
+    await driverRef.update({"isOnline": isOnline});
+
+    Fluttertoast.showToast(
+      msg: isOnline ? "You are now Online" : "You are now Offline",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+    );
 
     if (isOnline) {
-      _trackLiveLocation();
-    } else {
-      _positionStream?.cancel();
+      _getCurrentLocation();
+      _trackLiveLocation(); // Start tracking live location
     }
   }
 
-  @override
-  void dispose() {
-    _positionStream?.cancel();
-    super.dispose();
+  /// *Get the driver's current location and update Firebase*
+  Future<void> _getCurrentLocation() async {
+    var locationData = await location.getLocation();
+
+    setState(() {
+      currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
+      markers.add(Marker(
+        markerId: const MarkerId("current_location"),
+        position: currentLocation!,
+        infoWindow: const InfoWindow(title: "Your Current Location"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      ));
+    });
+
+    await driverRef.update({
+      "latitude": locationData.latitude,
+      "longitude": locationData.longitude,
+    });
+
+    if (mapController != null) {
+      mapController!.animateCamera(
+        CameraUpdate.newLatLngZoom(currentLocation!, 14),
+      );
+    }
+  }
+
+  /// *Track live location updates and update Firebase*
+  void _trackLiveLocation() {
+    location.onLocationChanged.listen((locationData) {
+      if (isOnline) {
+        setState(() {
+          currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
+          markers.removeWhere((marker) => marker.markerId.value == "current_location");
+          markers.add(Marker(
+            markerId: const MarkerId("current_location"),
+            position: currentLocation!,
+            infoWindow: const InfoWindow(title: "Your Live Location"),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          ));
+        });
+
+        // Update location in Firebase
+        driverRef.update({
+          "latitude": locationData.latitude,
+          "longitude": locationData.longitude,
+        });
+      }
+    });
+  }
+
+  /// ** Fetch the route and update markers ** ///
+  Future<void> _setMarkersAndRoute() async {
+    setState(() {
+      markers.add(Marker(
+        markerId: const MarkerId("pickup"),
+        position: widget.pickUpLatLng,
+        infoWindow: const InfoWindow(title: "User Pickup Location"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      ));
+
+      markers.add(Marker(
+        markerId: const MarkerId("drop"),
+        position: widget.dropLatLng,
+        infoWindow: const InfoWindow(title: "User Destination"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      ));
+    });
+
+    final result = await LocationServices.getRouteAndDistance(widget.pickUpLatLng, widget.dropLatLng);
+
+    if (result.isNotEmpty) {
+      setState(() {
+        distanceText = result["distance"];
+        durationText = result["duration"];
+        polylines.add(Polyline(
+          polylineId: const PolylineId("route"),
+          points: result["polyline"],
+          width: 5,
+          color: Colors.blue,
+        ));
+      });
+
+      _moveCameraToRoute();
+    }
+  }
+
+  /// *Move camera to fit the route*
+  void _moveCameraToRoute() {
+    mapController?.animateCamera(CameraUpdate.newLatLngBounds(
+      LatLngBounds(
+        southwest: LatLng(
+          widget.pickUpLatLng.latitude < widget.dropLatLng.latitude
+              ? widget.pickUpLatLng.latitude
+              : widget.dropLatLng.latitude,
+          widget.pickUpLatLng.longitude < widget.dropLatLng.longitude
+              ? widget.pickUpLatLng.longitude
+              : widget.dropLatLng.longitude,
+        ),
+        northeast: LatLng(
+          widget.pickUpLatLng.latitude > widget.dropLatLng.latitude
+              ? widget.pickUpLatLng.latitude
+              : widget.dropLatLng.latitude,
+          widget.pickUpLatLng.longitude > widget.dropLatLng.longitude
+              ? widget.pickUpLatLng.longitude
+              : widget.dropLatLng.longitude,
+        ),
+      ),
+      100,
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          GoogleMap(
-            initialCameraPosition: _initialPosition,
-            mapType: MapType.normal,
-            myLocationEnabled: true,
-            onMapCreated: (GoogleMapController controller) {
-              _controller.complete(controller);
-            },
-          ),
-
-          Positioned(
-            top: 30,
-            left: 10,
-            child: CupertinoSwitch(
-              value: isOnline,
-              onChanged: _toggleOnlineStatus,
+        appBar: AppBar(title: const Text("Driver Map")),
+        body: Stack(
+            children: [
+              GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: widget.pickUpLatLng,
+                  zoom: 10,
+                ),
+                onMapCreated: (controller) {
+                  setState(() {
+                    mapController = controller;
+                  });
+                },
+                markers: markers,
+                polylines: polylines,
+              ),
+              // Distance and ETA display (Top Center)
+              Positioned(
+                top: 30,
+                left: 10,
+                right: 10,
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    "Distance: $distanceText, ETA: $durationText",
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              // Online/Offline color indicator (Top Right Corner)
+              Positioned(
+                top: 30,
+                right: 10,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 15,
+                      height: 15,
+                      decoration: BoxDecoration(
+                        color: isOnline ? Colors.green : Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      isOnline ? "Online" : "Offline",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isOnline ? Colors.green : Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Online/Offline switch (Bottom Left)
+              Positioned(
+                bottom: 20,
+                left: 20,
+                child: CupertinoSwitch(
+                  value: isOnline,
+                  onChanged: _toggleOnlineStatus,
+                  activeColor: Colors.green,
+                ),
+              ),
+            ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
+        );
+    }
 }

@@ -224,7 +224,7 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
           ),
           // Online/Offline color indicator (Top Right Corner)
           Positioned(
-            top: 30,
+            top: 40,
             right: 10,
             child: Row(
               children: [
