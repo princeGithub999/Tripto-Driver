@@ -189,7 +189,15 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Driver Map")),
+      appBar: AppBar(title: const Text("Driver Map"),
+        actions: [
+          CupertinoSwitch(
+            value: isOnline,
+            onChanged: _toggleOnlineStatus,
+            activeColor: Colors.green,
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           GoogleMap(
@@ -207,7 +215,7 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
           ),
           // Distance and ETA display (Top Center)
           Positioned(
-            top: 30,
+            top: 10,
             left: 10,
             right: 10,
             child: Container(
@@ -224,8 +232,8 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
           ),
           // Online/Offline color indicator (Top Right Corner)
           Positioned(
-            top: 40,
-            right: 10,
+            top: 20,
+            right: 20,
             child: Row(
               children: [
                 Container(
@@ -246,16 +254,6 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
                   ),
                 ),
               ],
-            ),
-          ),
-          // Online/Offline switch (Bottom Left)
-          Positioned(
-            bottom: 20,
-            left: 20,
-            child: CupertinoSwitch(
-              value: isOnline,
-              onChanged: _toggleOnlineStatus,
-              activeColor: Colors.green,
             ),
           ),
         ],

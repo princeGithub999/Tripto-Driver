@@ -25,7 +25,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => PermissionProvider()),
         ChangeNotifierProvider(create: (context) => AuthProviderIn()),
         ChangeNotifierProvider(create: (context) => FromProvider()),
-        ChangeNotifierProvider(create: (context) => MapProvider()),
+        // ChangeNotifierProvider(create: (context) => MapProvider()),
       ],
       child: const MyApp(),
     ),
