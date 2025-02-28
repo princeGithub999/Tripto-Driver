@@ -21,12 +21,6 @@ class FormFillupScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
         title: const Text(
           "Help",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),

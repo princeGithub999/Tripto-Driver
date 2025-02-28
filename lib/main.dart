@@ -9,6 +9,7 @@ import 'package:tripto_driver/view/screen/splace_screen.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/map_provider.dart';
+import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import 'package:tripto_driver/view_model/provider/permission_handler/permission_provider.dart';
 
 void main() async {
@@ -25,7 +26,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => PermissionProvider()),
         ChangeNotifierProvider(create: (context) => AuthProviderIn()),
         ChangeNotifierProvider(create: (context) => FromProvider()),
-        // ChangeNotifierProvider(create: (context) => MapProvider()),
+        ChangeNotifierProvider(create: (context) => MapsProvider()),
       ],
       child: const MyApp(),
     ),

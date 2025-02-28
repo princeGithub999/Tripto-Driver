@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,7 @@ import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view/auth_screen/verify_otp_page.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
 import 'package:tripto_driver/view_model/service/auth_service.dart';
+import '../../../model/driver_data_model/driver_profile_model.dart';
 import '../../../view/button_navigation/button_navigation.dart';
 import '../../../view/onBoarding/on_boarding_screen.dart';
 import '../../../view/screen/profile_details_screen/form_fillup_screen.dart';
@@ -21,6 +23,10 @@ class AuthProviderIn extends ChangeNotifier {
   AuthService authService = AuthService();
   FromProvider fromProvider = Provider.of(Get.context!, listen: false);
   NotificationService notificationService = NotificationService();
+  final FirebaseDatabase realTimeDb = FirebaseDatabase.instance;
+  bool isOnline = false;
+
+
 
 
 
@@ -60,7 +66,8 @@ class AuthProviderIn extends ChangeNotifier {
 
       if (success == true) {
         print('Login Success! Navigating to HomePage...');
-        Get.to(() =>  FormFillupScreen());
+        // Get.to(() =>  FormFillupScreen());
+        AppHelperFunctions.navigateToScreenBeforeEndPage(Get.context!, FormFillupScreen());
       } else {
         print('Login Failed!');
       }
@@ -148,13 +155,15 @@ class AuthProviderIn extends ChangeNotifier {
         fcmToken: token,
       );
 
-      var realTimeData = DriverDataModel(
+      var realTimeData = DriverProfileModel(
         driverID: driverId,
         driverName: driverData.driverName,
         driverPhoneNumber: driverData.driverPhoneNumber,
         driverAddress: driverData.driverAddress,
         driverImage: driverImgUrl ?? "",
         fcmToken: token,
+        isOnline: false,
+
       );
 
       // Store data in Firestore
@@ -180,12 +189,27 @@ class AuthProviderIn extends ChangeNotifier {
 
     var currentUser =  FirebaseAuth.instance.currentUser;
     if(currentUser != null){
-      AppHelperFunctions.navigateToScreen(context, const BottomNavigation());
+      AppHelperFunctions.navigateToScreenBeforeEndPage(context, const BottomNavigation());
     }else{
-      AppHelperFunctions.navigateToScreen(context, const OnBoardingScreen());
+      AppHelperFunctions.navigateToScreenBeforeEndPage(context, const OnBoardingScreen());
 
     }
     }
+
+
+
+
+  // Stream<DriverProfileModel> driverProfileGet() {
+  //   return realTimeDb.ref("DriverData").onValue.map((event) {
+  //     if (event.snapshot.exists && event.snapshot.value is Map) {
+  //       Map<String, dynamic> data = event.snapshot.value as Map<String, dynamic>;
+  //       return DriverProfileModel.fromJson(data);
+  //     }
+  //     return DriverProfileModel(isOnline: false);
+  //   });
+  // }
+
+
 
 
 }
