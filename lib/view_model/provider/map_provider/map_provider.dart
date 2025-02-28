@@ -5,7 +5,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapProvider extends ChangeNotifier {
-
   final Completer<GoogleMapController> controller = Completer();
   LatLng? _currentPosition;
   StreamSubscription<Position>? _positionStream;
@@ -15,6 +14,7 @@ class MapProvider extends ChangeNotifier {
     target: LatLng(25.9753007, 84.9217521),
     zoom: 15,
   );
+
 
   Future<bool> checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -33,18 +33,19 @@ class MapProvider extends ChangeNotifier {
     return permission == LocationPermission.whileInUse || permission == LocationPermission.always;
   }
 
+
+
   Future<void> trackLiveLocation() async {
     bool hasPermission = await checkLocationPermission();
     if (!hasPermission) return;
 
-    // Cancel previous stream if already running
     await _positionStream?.cancel();
 
     _positionStream = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
     ).listen((Position position) async {
       _currentPosition = LatLng(position.latitude, position.longitude);
-      notifyListeners(); // Notify UI update
+      notifyListeners();
 
       if (controller.isCompleted) {
         GoogleMapController mapController = await controller.future;
@@ -61,7 +62,7 @@ class MapProvider extends ChangeNotifier {
 
   /// Toggles online status and manages live location updates
   Future<void> toggleOnlineStatus(bool value) async {
-    debugPrint("Toggle button pressed: $value"); // Debugging print statement
+    debugPrint("Toggle button pressed: $value");
 
     if (isOnline == value) return; // Avoid unnecessary state updates
 

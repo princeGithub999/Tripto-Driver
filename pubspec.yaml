@@ -69,9 +69,6 @@ dependencies:
   google_sign_in: ^6.2.2
   flutter_rating_bar: ^4.0.1
 
-
-
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -100,7 +97,6 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/images/
-    - assets/lottie_animation/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -1,7 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class DriverDataModel {
+class DriverProfileModel {
   String? driverID;
   String? driverName;
   int? driverPhoneNumber;
@@ -10,7 +10,7 @@ class DriverDataModel {
   bool? isOnline;
   LatLng? driverCurrentLocation;
 
-  DriverDataModel({
+  DriverProfileModel({
     this.driverID,
     this.driverName,
     this.driverPhoneNumber,
@@ -34,17 +34,17 @@ class DriverDataModel {
   }
 
   // Convert Firebase snapshot data to a DriverDataModel
-  factory DriverDataModel.fromSnapshot(DataSnapshot snapshot) {
+  factory DriverProfileModel.fromSnapshot(DataSnapshot snapshot) {
     Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
 
-    return DriverDataModel(
-      driverID: data?["driverID"] ?? "",
-      driverName: data?["driverName"] ?? "",
-      driverPhoneNumber: data?["driverPhoneNumber"] ?? 0,
-      driverEmail: data?["driverEmail"] ?? "",
-      driverAddress: data?["driverAddress"] ?? "",
-      isOnline: data?["isOnline"] ?? false,
-      driverCurrentLocation: data?['driverCurrentLocation']
-    );
-  }
+    return DriverProfileModel(
+        driverID: data?["driverID"] ?? "",
+        driverName: data?["driverName"] ?? "",
+        driverPhoneNumber: data?["driverPhoneNumber"] ?? 0,
+        driverEmail: data?["driverEmail"] ?? "",
+        driverAddress: data?["driverAddress"] ?? "",
+        isOnline: data?["isOnline"] ?? false,
+        driverCurrentLocation: data?['driverCurrentLocation']
+        );
+    }
 }
