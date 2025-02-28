@@ -15,7 +15,7 @@ class MapProvider extends ChangeNotifier {
     zoom: 15,
   );
 
-  /// Ensures location permission is granted before accessing the location
+
   Future<bool> checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -33,19 +33,19 @@ class MapProvider extends ChangeNotifier {
     return permission == LocationPermission.whileInUse || permission == LocationPermission.always;
   }
 
-  /// Starts live location tracking
+
+
   Future<void> trackLiveLocation() async {
     bool hasPermission = await checkLocationPermission();
     if (!hasPermission) return;
 
-    // Cancel previous stream if already running
     await _positionStream?.cancel();
 
     _positionStream = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
     ).listen((Position position) async {
       _currentPosition = LatLng(position.latitude, position.longitude);
-      notifyListeners(); // Notify UI update
+      notifyListeners();
 
       if (controller.isCompleted) {
         GoogleMapController mapController = await controller.future;
@@ -62,7 +62,7 @@ class MapProvider extends ChangeNotifier {
 
   /// Toggles online status and manages live location updates
   Future<void> toggleOnlineStatus(bool value) async {
-    debugPrint("Toggle button pressed: $value"); // Debugging print statement
+    debugPrint("Toggle button pressed: $value");
 
     if (isOnline == value) return; // Avoid unnecessary state updates
 
