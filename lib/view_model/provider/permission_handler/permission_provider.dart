@@ -33,7 +33,7 @@ class PermissionProvider extends ChangeNotifier {
     }
 
 
-    AppHelperFunctions.navigateToScreen(Get.context!, FormFillupScreen());
+    AppHelperFunctions.navigateToScreenBeforeEndPage(Get.context!, FormFillupScreen());
   }
 
 

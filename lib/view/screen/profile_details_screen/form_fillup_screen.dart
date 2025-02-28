@@ -27,6 +27,7 @@ class _FormFillupScreenState extends State<FormFillupScreen> {
 
     return Scaffold(
       appBar: AppBar(
+
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
@@ -35,6 +36,10 @@ class _FormFillupScreenState extends State<FormFillupScreen> {
             Navigator.pop(context);
           },
         ),
+
+        backgroundColor: Colors.white,
+        elevation: 1,
+
         title: const Text(
           "Complete Your Profile",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
