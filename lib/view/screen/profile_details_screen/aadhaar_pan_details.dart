@@ -24,11 +24,11 @@ class AdharPanPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildUploadSection(context, 'Front side of Aadhar Card', true, true, provider.frontAadharCardImage),
+            _buildUploadSection(context, 'Front side of Aadhar Card', "*",true, true, provider.frontAadharCardImage),
             const SizedBox(height: 16),
-            _buildUploadSection(context, 'Back side of Aadhar Card', false, true, provider.backAadharCardImage),
+            _buildUploadSection(context, 'Back side of Aadhar Card',"*", false, true, provider.backAadharCardImage),
             const SizedBox(height: 16),
-            _buildUploadSection(context, 'Upload PAN Card', false, false, provider.penCardImage),
+            _buildUploadSection(context, 'Upload PAN Card',"*", false, false, provider.penCardImage),
             const SizedBox(height: 16),
             _buildSubmitButton(provider),
           ],
@@ -37,13 +37,19 @@ class AdharPanPage extends StatelessWidget {
     );
   }
 
-  Widget _buildUploadSection(BuildContext context, String title, bool isFront, bool isAadhar, File? imageFile) {
+  Widget _buildUploadSection(BuildContext context, String title,String imporatant, bool isFront, bool isAadhar, File? imageFile) {
     var provider = Provider.of<FromProvider>(context, listen: false);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        Row(
+          children: [
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            SizedBox(width: 5,),
+            Text(imporatant,style: TextStyle(color: Colors.red,fontSize: 20,fontWeight: FontWeight.bold),)
+          ],
+        ),
         const SizedBox(height: 8),
         GestureDetector(
           onTap: () => provider.pickAadharCardImage(isFront, isAadhar),

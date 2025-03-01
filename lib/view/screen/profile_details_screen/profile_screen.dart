@@ -29,28 +29,28 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
       ),
       body: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.blue900, Colors.blue.shade600],
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: List.generate(3, (index) {
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  width: _currentStep >= index ? 35 : 20,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: _currentStep >= index ? Colors.yellow.shade600 : Colors.white30,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                );
-              }),
-            ),
-          ),
+          // Container(
+          //   padding: const EdgeInsets.all(12),
+          //   decoration: BoxDecoration(
+          //     gradient: LinearGradient(
+          //       colors: [AppColors.blue900, Colors.blue.shade600],
+          //     ),
+          //   ),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          //     children: List.generate(3, (index) {
+          //       return AnimatedContainer(
+          //         duration: const Duration(milliseconds: 300),
+          //         width: _currentStep >= index ? 35 : 20,
+          //         height: 10,
+          //         decoration: BoxDecoration(
+          //           color: _currentStep >= index ? Colors.yellow.shade600 : Colors.white30,
+          //           borderRadius: BorderRadius.circular(5),
+          //         ),
+          //       );
+          //     }),
+          //   ),
+          // ),
           Expanded(
             child: Theme(
               data: ThemeData(
@@ -219,23 +219,23 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                             "Review your details before submitting.",
                             style: TextStyle(fontSize: 16),
                           ),
-                          const SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(double.infinity, 50),
-                              backgroundColor: AppColors.blue900,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: const Text(
-                              'Submit Profile',
-                              style: TextStyle(fontSize: 18, color: Colors.white),
-                            ),
-                          ),
+                          // const SizedBox(height: 20),
+                          // ElevatedButton(
+                          //   onPressed: () {
+                          //     Navigator.pop(context);
+                          //   },
+                          //   style: ElevatedButton.styleFrom(
+                          //     minimumSize: const Size(double.infinity, 50),
+                          //     backgroundColor: AppColors.blue900,
+                          //     shape: RoundedRectangleBorder(
+                          //       borderRadius: BorderRadius.circular(10),
+                          //     ),
+                          //   ),
+                          //   child: const Text(
+                          //     'Submit Profile',
+                          //     style: TextStyle(fontSize: 18, color: Colors.white),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
