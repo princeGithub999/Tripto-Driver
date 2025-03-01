@@ -14,7 +14,6 @@ class OnboardingGetstarted extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = OnboardingController.instance;
     final dark = AppHelperFunctions.isDarkMode(context);
-
     return Obx(() {
       return controller.isGetStarted.value
           ? Positioned(

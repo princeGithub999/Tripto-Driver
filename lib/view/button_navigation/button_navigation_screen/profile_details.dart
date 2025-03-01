@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../screen/profile_details_screen/bank_details.dart';
+
 class ProfileScreen extends StatefulWidget {
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -9,8 +11,8 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   File? _profileImage;
-  String _name = "Suraj Kumar";
-  String _phone = "8651204362";
+  String _name = "Unknown";
+  String _phone = "Unknown";
   bool _isOnline = true;
 
   Future<void> _pickImage() async {
@@ -49,7 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: EdgeInsets.only(top: 50, bottom: 16, left: 16, right: 16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.blueAccent, Colors.teal],
+                  colors: [Colors.blueGrey, Colors.grey],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -73,7 +75,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               : null,
                         ),
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,12 +84,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Row(
                               children: [
                                 Text(_name,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white)),
                                 IconButton(
-                                  icon: Icon(Icons.edit, color: Colors.white),
+                                  icon: const Icon(Icons.edit, color: Colors.white),
                                   onPressed: () async {
                                     final result = await Navigator.push(
                                       context,
@@ -132,7 +134,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ]),
 
             _buildSection("Account & Payments", [
-              _buildListTile(Icons.account_balance_wallet, "Bank Details"),
+              _buildListTile(
+                Icons.account_balance_wallet,
+                "Bank Details",
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BankDetailScreen()),
+                ),
+              ),
               _buildListTile(Icons.history, "Payment History"),
             ]),
 
@@ -156,23 +165,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ]),
 
             Padding(
-              padding: EdgeInsets.all(16.0),
-              child: ElevatedButton.icon(
-                icon: Icon(Icons.logout),
-                label: Text("Logout"),
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.greenAccent,
-                  minimumSize: Size(double.infinity, 50),
-
+              padding: EdgeInsets.all(15.0),
+              child: GestureDetector(
+                onTap: () {
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 50,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.exit_to_app, color: Colors.redAccent),
+                      SizedBox(width: 8),
+                      Text(
+                        "Logout",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
+
           ],
         ),
       ),
     );
   }
+
 
   Widget _buildListTile(IconData icon, String title, {VoidCallback? onTap}) {
     return ListTile(

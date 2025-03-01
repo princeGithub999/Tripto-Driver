@@ -12,10 +12,11 @@ android {
     namespace = "com.example.tripto_driver"
     compileSdk = 34
     ndkVersion = flutter.ndkVersion
-
+cc
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = kotlinOptions
     }
 
     kotlinOptions {

@@ -58,7 +58,6 @@ class _RatingScreenState extends State<RatingScreen> {
           IconButton(
             icon: const Icon(Icons.thumb_up_alt),
             onPressed: () {
-              // Add share app functionality
             },
           )
         ],
@@ -68,7 +67,6 @@ class _RatingScreenState extends State<RatingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Rating Section
             Card(
               elevation: 3,
               child: Padding(
@@ -117,7 +115,6 @@ class _RatingScreenState extends State<RatingScreen> {
                       icon: const Icon(Icons.send),
                       label: const Text('Submit Review'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
                         foregroundColor: Colors.white,
                         minimumSize: const Size(double.infinity, 50),
                       ),
@@ -128,7 +125,6 @@ class _RatingScreenState extends State<RatingScreen> {
               ),
             ),
 
-            // Previous Reviews
             const Padding(
               padding: EdgeInsets.only(top: 20, bottom: 10),
               child: Text(

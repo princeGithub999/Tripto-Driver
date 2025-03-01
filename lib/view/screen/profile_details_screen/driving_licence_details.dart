@@ -110,3 +110,4 @@ class DrivingLicenseDetails extends StatelessWidget {
         );
     }
 }
+

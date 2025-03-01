@@ -9,12 +9,11 @@ import 'package:tripto_driver/view/screen/splace_screen.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/map_provider.dart';
+import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import 'package:tripto_driver/view_model/provider/permission_handler/permission_provider.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
   FirebaseDatabase database = FirebaseDatabase.instance;
   database.setPersistenceEnabled(true);
   database.setPersistenceCacheSizeBytes(10000000);
@@ -25,7 +24,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => PermissionProvider()),
         ChangeNotifierProvider(create: (context) => AuthProviderIn()),
         ChangeNotifierProvider(create: (context) => FromProvider()),
-        ChangeNotifierProvider(create: (context) => MapProvider()),
+        ChangeNotifierProvider(create: (context) => MapsProvider()),
       ],
       child: const MyApp(),
     ),
@@ -33,13 +32,14 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp(
+      {super.key});
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Tripto Driver',
+      title: 'Trip Driver',
       themeMode: ThemeMode.system,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
