@@ -115,6 +115,7 @@ class Validation {
     return null;
     }
 
+
   static String? validateBankName(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Bank name is required';
