@@ -4,19 +4,16 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:location/location.dart';
-import 'package:provider/provider.dart';
-import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
-import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 
 import '../../../view_model/service/location_service.dart';
 
 
-class DriverMapScreen extends StatefulWidget {
+class MapsScreen extends StatefulWidget {
   final LatLng pickUpLatLng;
   final LatLng dropLatLng;
   final String driverId; // Added driverId to track the specific driver in Firebase
 
-  const DriverMapScreen({
+  const MapsScreen({
     super.key,
     required this.pickUpLatLng,
     required this.dropLatLng,
@@ -24,10 +21,10 @@ class DriverMapScreen extends StatefulWidget {
   });
 
   @override
-  State<DriverMapScreen> createState() => _DriverMapScreenState();
+  State<MapsScreen> createState() => _MapsScreenState();
 }
 
-class _DriverMapScreenState extends State<DriverMapScreen> {
+class _MapsScreenState extends State<MapsScreen> {
   GoogleMapController? mapController;
   Set<Marker> markers = {};
   Set<Polyline> polylines = {};
@@ -41,45 +38,43 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
   @override
   void initState() {
     super.initState();
-    // driverRef = FirebaseDatabase.instance.ref("drivers/${widget.driverId}"); // Firebase reference for this driver
+    driverRef = FirebaseDatabase.instance.ref("drivers/${widget.driverId}"); // Firebase reference for this driver
     _setMarkersAndRoute();
-    Provider.of<MapsProvider>(context,listen: false).listenToOnlineStatus();
-    // _listenToOnlineStatus();
+    _listenToOnlineStatus();
   }
 
-  /// *Listen to driver's online status from Firebase in real-time*
-  // void _listenToOnlineStatus() {
-  //   driverRef.child("isOnline").onValue.listen((event) {
-  //     if (event.snapshot.exists) {
-  //       bool status = event.snapshot.value as bool;
-  //       setState(() {
-  //         isOnline = status;
-  //       });
-  //     }
-  //   });
-  // }
+  void _listenToOnlineStatus() {
+    driverRef.child("isOnline").onValue.listen((event) {
+      if (event.snapshot.exists) {
+        bool status = event.snapshot.value as bool;
+        setState(() {
+          isOnline = status;
+        });
+      }
+    });
+  }
 
-  /// *Toggle the online status and update Firebase*
-  // Future<void> _toggleOnlineStatus(bool status) async {
-  //   setState(() {
-  //     isOnline = status;
-  //   });
-  //
-  //   await driverRef.update({"isOnline": isOnline});
-  //
-  //   Fluttertoast.showToast(
-  //     msg: isOnline ? "You are now Online" : "You are now Offline",
-  //     toastLength: Toast.LENGTH_SHORT,
-  //     gravity: ToastGravity.BOTTOM,
-  //   );
-  //
-  //   if (isOnline) {
-  //     _getCurrentLocation();
-  //     _trackLiveLocation(); // Start tracking live location
-  //   }
-  // }
+  /// **Toggle the online status and update Firebase**
+  Future<void> _toggleOnlineStatus(bool status) async {
+    setState(() {
+      isOnline = status;
+    });
 
-  /// *Get the driver's current location and update Firebase*
+    await driverRef.update({"isOnline": isOnline});
+
+    Fluttertoast.showToast(
+      msg: isOnline ? "You are now Online" : "You are now Offline",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+    );
+
+    if (isOnline) {
+      _getCurrentLocation();
+      _trackLiveLocation(); // Start tracking live location
+    }
+  }
+
+  /// **Get the driver's current location and update Firebase**
   Future<void> _getCurrentLocation() async {
     var locationData = await location.getLocation();
 
@@ -105,7 +100,7 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
     }
   }
 
-  /// *Track live location updates and update Firebase*
+  /// **Track live location updates and update Firebase**
   void _trackLiveLocation() {
     location.onLocationChanged.listen((locationData) {
       if (isOnline) {
@@ -165,7 +160,7 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
     }
   }
 
-  /// *Move camera to fit the route*
+  /// **Move camera to fit the route**
   void _moveCameraToRoute() {
     mapController?.animateCamera(CameraUpdate.newLatLngBounds(
       LatLngBounds(
@@ -192,81 +187,78 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MapsProvider>(
-      builder: (BuildContext context, authProvider, Widget? child) {
-        return Scaffold(
-          appBar: AppBar(title: const Text("Driver Map")),
-          body: Stack(
-            children: [
-              GoogleMap(
-                initialCameraPosition: CameraPosition(
-                  target: widget.pickUpLatLng,
-                  zoom: 10,
-                ),
-                onMapCreated: (controller) {
-                  setState(() {
-                    mapController = controller;
-                  });
-                },
-                markers: markers,
-                polylines: polylines,
-              ),
-              Positioned(
-                top: 30,
-                left: 10,
-                right: 10,
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    "Distance: $distanceText, ETA: $durationText",
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 30,
-                right: 10,
-                child: Row(
-                  children: [
-                    Container(
-                      width: 15,
-                      height: 15,
-                      decoration: BoxDecoration(
-                        color: isOnline ? Colors.green : Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      isOnline ? "Online" : "Offline",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isOnline ? Colors.green : Colors.red,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Positioned(
-                bottom: 20,
-                left: 20,
-                child: CupertinoSwitch(
-                  value: authProvider.isOnline,
-                  onChanged: (value) {
-                    authProvider.toggleOnlineStatus(value);
-                  },
-                  activeColor: Colors.green,
-                ),
-              ),
-            ],
+    return Scaffold(
+      appBar: AppBar(title: const Text("Driver Map")),
+      body: Stack(
+        children: [
+          GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: widget.pickUpLatLng,
+              zoom: 12,
+            ),
+            onMapCreated: (controller) {
+              setState(() {
+                mapController = controller;
+              });
+            },
+            markers: markers,
+            polylines: polylines,
           ),
-        );
-      },
+          // Distance and ETA display (Top Center)
+          Positioned(
+            top: 30,
+            left: 10,
+            right: 10,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                "Distance: $distanceText, ETA: $durationText",
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          // Online/Offline color indicator (Top Right Corner)
+          Positioned(
+            top: 40,
+            right: 10,
+            child: Row(
+              children: [
+                Container(
+                  width: 15,
+                  height: 15,
+                  decoration: BoxDecoration(
+                    color: isOnline ? Colors.green : Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  isOnline ? "Online" : "Offline",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isOnline ? Colors.green : Colors.red,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Online/Offline switch (Bottom Left)
+          Positioned(
+            bottom: 20,
+            left: 20,
+            child: CupertinoSwitch(
+              value: isOnline,
+              onChanged: _toggleOnlineStatus,
+              activeColor: Colors.green,
+            ),
+          ),
+        ],
+      ),
     );
-    }
+  }
 }

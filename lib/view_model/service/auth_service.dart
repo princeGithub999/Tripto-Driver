@@ -8,6 +8,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tripto_driver/model/driver_data_model/driver_data_model.dart';
 
+import '../../model/driver_data_model/driver_profile_model.dart';
+
 class AuthService {
 
   var crruntUserId = FirebaseAuth.instance.currentUser?.uid;
@@ -47,6 +49,7 @@ class AuthService {
       return false;
     }
   }
+
 
 
   Future<bool?> signInWithGoogle() async {
@@ -103,7 +106,7 @@ class AuthService {
     }
   }
 
-  Future<void> saveDriverDataInRealTime(DriverDataModel driverData)async{
+  Future<void> saveDriverDataInRealTime(DriverProfileModel driverData)async{
 
     try{
       realTimeDb.ref('DriverData').child(driverData.driverID!).set(driverData.toJson());
@@ -111,6 +114,13 @@ class AuthService {
     }catch(e){
       Fluttertoast.showToast(msg: 'Error $e');
     }
+  }
+
+
+  Future<void> updateToggleButtonStatus(bool isOnline)async{
+    await realTimeDb.ref('DriverData').child(crruntUserId!).update({
+      'isOnline':isOnline
+    });
   }
 
 

@@ -1,69 +1,59 @@
-import 'package:firebase_database/firebase_database.dart';
+import 'dart:convert';
 
-class DriverDataModel {
-  String driverID;
-  String driverName;
-  int driverPhoneNumber;
-  String driverEmail;
-  String driverAddress;
-  String driverDateOfBirth;
-  String driverBankName;
-  String driverAccountNumber;
-  String driverIfscCode;
-  String driverUpiCode;
-  String dlNumber;
-  bool isOnline;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-  DriverDataModel({
-    required this.driverID,
-    required this.driverName,
-    required this.driverPhoneNumber,
-    required this.driverEmail,
-    required this.driverAddress,
-    required this.driverDateOfBirth,
-    required this.driverBankName,
-    required this.driverAccountNumber,
-    required this.driverIfscCode,
-    required this.driverUpiCode,
-    required this.dlNumber,
-    required this.isOnline,
+DriverProfileModel welcomeFromJson(String str) => DriverProfileModel.fromJson(json.decode(str));
+
+String welcomeToJson(DriverProfileModel data) => json.encode(data.toJson());
+
+class DriverProfileModel {
+
+  String? driverID;
+  String? driverName;
+  int? driverPhoneNumber;
+  String? driverEmail;
+  String? driverAddress;
+  String? driverImage;
+  String? carName;
+  String? fcmToken;
+  LatLng? drCurrantLocation;
+  bool? isOnline;
+
+  DriverProfileModel({
+    this.driverID,
+    this.driverName,
+    this.driverPhoneNumber,
+    this.driverEmail,
+    this.driverAddress,
+    this.driverImage,
+    this.carName,
+    this.fcmToken,
+    this.drCurrantLocation,
+    this.isOnline
   });
 
-  // Convert a DriverDataModel to a Map for Firebase
-  Map<String, dynamic> toMap() {
-    return {
-      "driverID": driverID,
-      "driverName": driverName,
-      "driverPhoneNumber": driverPhoneNumber,
-      "driverEmail": driverEmail,
-      "driverAddress": driverAddress,
-      "driverDateOfBirth": driverDateOfBirth,
-      "driverBankName": driverBankName,
-      "driverAccountNumber": driverAccountNumber,
-      "driverIfscCode": driverIfscCode,
-      "driverUpiCode": driverUpiCode,
-      "dlNumber": dlNumber,
-      "isOnline": isOnline,
-    };
-  }
+  factory DriverProfileModel.fromJson(Map<String, dynamic> json) => DriverProfileModel(
+      driverID: json["driverID"],
+      driverName: json["driverName"],
+      driverPhoneNumber: json["driverPhoneNumber"],
+      driverEmail: json["driverEmail"],
+      driverAddress: json["driverAddress"],
+      driverImage: json["driverImage"],
+      carName: json['carName'],
+      fcmToken: json['fcmToken'],
+      drCurrantLocation: json['drCurrantLocation'],
+    isOnline: json['isOnline']
+  );
 
-  // Convert Firebase snapshot data to a DriverDataModel
-  factory DriverDataModel.fromSnapshot(DataSnapshot snapshot) {
-    Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
-
-    return DriverDataModel(
-      driverID: data?["driverID"] ?? "",
-      driverName: data?["driverName"] ?? "",
-      driverPhoneNumber: data?["driverPhoneNumber"] ?? 0,
-      driverEmail: data?["driverEmail"] ?? "",
-      driverAddress: data?["driverAddress"] ?? "",
-      driverDateOfBirth: data?["driverDateOfBirth"] ?? "",
-      driverBankName: data?["driverBankName"] ?? "",
-      driverAccountNumber: data?["driverAccountNumber"] ?? "",
-      driverIfscCode: data?["driverIfscCode"] ?? "",
-      driverUpiCode: data?["driverUpiCode"] ?? "",
-      dlNumber: data?["dlNumber"] ?? "",
-      isOnline: data?["isOnline"] ?? false,
-    );
-  }
+  Map<String, dynamic> toJson() => {
+    "driverID" : driverID,
+    "driverName": driverName,
+    "driverPhoneNumber": driverPhoneNumber,
+    "driverEmail": driverEmail,
+    "driverAddress": driverAddress,
+    "carName" : carName,
+    "fcmToken" :fcmToken,
+    "drCurrantLocation":drCurrantLocation,
+    "isOnline" : isOnline
+  };
 }
