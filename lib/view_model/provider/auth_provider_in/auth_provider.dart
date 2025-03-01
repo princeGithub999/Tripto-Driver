@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/model/driver_data_model/driver_data_model.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view/auth_screen/verify_otp_page.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
+import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import 'package:tripto_driver/view_model/service/auth_service.dart';
 import '../../../model/driver_data_model/driver_profile_model.dart';
 import '../../../view/button_navigation/button_navigation.dart';
@@ -25,9 +27,7 @@ class AuthProviderIn extends ChangeNotifier {
   NotificationService notificationService = NotificationService();
   final FirebaseDatabase realTimeDb = FirebaseDatabase.instance;
   bool isOnline = false;
-
-
-
+  var mapProvider = Provider.of<MapsProvider>(Get.context!, listen: false);
 
 
   Future<void> requestOTP(String phoneNumber)async{
@@ -155,6 +155,8 @@ class AuthProviderIn extends ChangeNotifier {
         fcmToken: token,
       );
 
+
+
       var realTimeData = DriverProfileModel(
         driverID: driverId,
         driverName: driverData.driverName,
@@ -163,16 +165,15 @@ class AuthProviderIn extends ChangeNotifier {
         driverImage: driverImgUrl ?? "",
         fcmToken: token,
         isOnline: false,
-
+        carName: driverData.carName,
+        drCurrantLongitude: mapProvider.currentLocation?.latitude,
+        drCurrantLatitude: mapProvider.currentLocation?.longitude
       );
 
-      // Store data in Firestore
       await authService.saveDriverData(driverId, data);
 
-      // Store minimal data in Realtime Database
-      await authService.saveDriverDataInRealTime(realTimeData);
+      await authService.saveDriverDataInRealTime(driverId, realTimeData);
 
-      // Navigate to home screen
       AppHelperFunctions.navigateToScreen(Get.context!, BottomNavigation());
 
       fromProvider.clearFeald();
@@ -195,21 +196,6 @@ class AuthProviderIn extends ChangeNotifier {
 
     }
     }
-
-
-
-
-  // Stream<DriverProfileModel> driverProfileGet() {
-  //   return realTimeDb.ref("DriverData").onValue.map((event) {
-  //     if (event.snapshot.exists && event.snapshot.value is Map) {
-  //       Map<String, dynamic> data = event.snapshot.value as Map<String, dynamic>;
-  //       return DriverProfileModel.fromJson(data);
-  //     }
-  //     return DriverProfileModel(isOnline: false);
-  //   });
-  // }
-
-
 
 
 }

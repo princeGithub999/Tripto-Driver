@@ -16,8 +16,10 @@ class DriverProfileModel {
   String? driverImage;
   String? carName;
   String? fcmToken;
-  LatLng? drCurrantLocation;
+  double? drCurrantLongitude;
+  double? drCurrantLatitude;
   bool? isOnline;
+  String? carType;
 
   DriverProfileModel({
     this.driverID,
@@ -28,8 +30,10 @@ class DriverProfileModel {
     this.driverImage,
     this.carName,
     this.fcmToken,
-    this.drCurrantLocation,
-    this.isOnline
+    this.drCurrantLongitude,
+    this.drCurrantLatitude,
+    this.isOnline,
+    this.carType
   });
 
   factory DriverProfileModel.fromJson(Map<String, dynamic> json) => DriverProfileModel(
@@ -41,8 +45,10 @@ class DriverProfileModel {
       driverImage: json["driverImage"],
       carName: json['carName'],
       fcmToken: json['fcmToken'],
-      drCurrantLocation: json['drCurrantLocation'],
-    isOnline: json['isOnline']
+      drCurrantLongitude: json['drCurrantLongitude'],
+      drCurrantLatitude: json['drCurrantLatitude'],
+    isOnline: json['isOnline'],
+    carType: json['carType']
   );
 
   Map<String, dynamic> toJson() => {
@@ -53,7 +59,9 @@ class DriverProfileModel {
     "driverAddress": driverAddress,
     "carName" : carName,
     "fcmToken" :fcmToken,
-    "drCurrantLocation":drCurrantLocation,
-    "isOnline" : isOnline
+    "drCurrantLongitude":drCurrantLongitude,
+    "drCurrantLatitude":drCurrantLatitude,
+    "isOnline" : isOnline,
+    "carType" : carType
   };
 }

@@ -105,23 +105,32 @@ class AuthService {
       return null;
     }
   }
+  Future<void> saveDriverDataInRealTime(String driverID, DriverProfileModel driverData) async {
+    if (driverID.isEmpty) {
+      Fluttertoast.showToast(msg: 'Error: Driver ID is empty');
+      return;
+    }
 
-  Future<void> saveDriverDataInRealTime(DriverProfileModel driverData)async{
-
-    try{
-      realTimeDb.ref('DriverData').child(driverData.driverID!).set(driverData.toJson());
-      Fluttertoast.showToast(msg: 'Save real time data');
-    }catch(e){
-      Fluttertoast.showToast(msg: 'Error $e');
+    try {
+      await realTimeDb.ref('Drivers_Data').child(driverID).set(driverData.toJson());
+      Fluttertoast.showToast(msg: 'Saved in real-time database');
+    } catch (e) {
+      Fluttertoast.showToast(msg: 'Error: $e');
     }
   }
 
 
-  Future<void> updateToggleButtonStatus(bool isOnline)async{
-    await realTimeDb.ref('DriverData').child(crruntUserId!).update({
-      'isOnline':isOnline
-    });
-  }
 
+
+  Future<void> updateToggleBS(bool isOnline,String userId)async{
+    try{
+      realTimeDb.ref('Drivers_Data').child(userId).update({
+        'isOnline':isOnline
+      });
+      // print(crruntUserId!);
+    }catch(e){
+      Fluttertoast.showToast(msg: 'Error s $e');
+    }
+  }
 
 }

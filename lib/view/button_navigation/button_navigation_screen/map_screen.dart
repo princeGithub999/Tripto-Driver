@@ -305,7 +305,7 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
 //   @override
 //   void initState() {
 //     super.initState();
-//     driverRef = FirebaseDatabase.instance.ref("drivers/${widget.driverId}"); // Firebase reference for this driver
+//     // driverRef = FirebaseDatabase.instance.ref("drivers/${widget.driverId}"); // Firebase reference for this driver
 //     _setMarkersAndRoute();
 //     _listenToOnlineStatus();
 //   }
@@ -384,10 +384,6 @@ class _DriverMapScreenState extends State<DriverMapScreen> {
 //         });
 //
 //         // Update location in Firebase
-//         driverRef.update({
-//           "latitude": locationData.latitude,
-//           "longitude": locationData.longitude,
-//         });
 //       }
 //     });
 //   }
