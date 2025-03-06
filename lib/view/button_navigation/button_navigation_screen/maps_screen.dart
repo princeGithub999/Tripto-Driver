@@ -7,6 +7,7 @@ import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dar
 import 'package:tripto_driver/view_model/service/auth_service.dart';
 
 import '../../../model/driver_data_model/driver_profile_model.dart';
+import '../../../utils/globle_widget/ride_accpated_buttom_sheet.dart';
 
 
 
@@ -28,25 +29,69 @@ class MapsScreen extends StatefulWidget {
 
 class _MapsScreenState extends State<MapsScreen> {
   GoogleMapController? mapController;
-
+  bool isRideAccepted = false;  // Added this variable
 
   @override
   void initState() {
     super.initState();
     Provider.of<MapsProvider>(context,listen: false).setMarkersAndRoute(widget.pickUpLatLng,widget.dropLatLng);
   }
-
-
+  // Add this method to show bottom sheet
+  void _showBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(25.0),
+            topRight: Radius.circular(25.0),
+          ),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            Container(
+              height: 5,
+              width: 40,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Ride Details',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            // Add your ride details widgets here
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-
     // AuthService authService = AuthService();
-
     var sizes = MediaQuery.of(context).size;
    // var auht = FirebaseAuth.instance.currentUser!.uid;
     return Consumer<MapsProvider>(
       builder: (BuildContext context, mapProvider, Widget? child) {
+        // Add this listener
+        if (isRideAccepted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _showBottomSheet();
+            isRideAccepted = false; // Reset the value after showing
+          });
+        }
+
         return Scaffold(
           appBar: AppBar(
             title:  InkWell(
@@ -138,8 +183,12 @@ class _MapsScreenState extends State<MapsScreen> {
                   ),
                 ),
               ),
-
-
+              Positioned(child:
+              ElevatedButton(onPressed: () {
+                RideAccpatedButtomSheet().showRideRequestBottomSheet(context);
+              }, child: const Text('Click'))
+        
+         )
             ],
           ),
         );

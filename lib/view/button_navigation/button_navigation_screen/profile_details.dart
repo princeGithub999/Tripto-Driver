@@ -1,6 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:tripto_driver/model/driver_data_model/driver_profile_model.dart';
+import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
+import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -8,6 +12,23 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+
+  DriverProfileModel? data;
+
+  @override
+  void initState() {
+    super.initState();
+    s();
+  }
+
+  s()async{
+    var provider = Provider.of<AuthProviderIn>(context,listen: false);
+    data = await provider.getData();
+    setState(() {
+
+    });
+  }
+
   File? _profileImage;
   String _name = "Suraj Kumar";
   String _phone = "8651204362";
@@ -39,138 +60,142 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Header Section
-            Container(
-              padding: EdgeInsets.only(top: 50, bottom: 16, left: 16, right: 16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blueAccent, Colors.teal],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Profile Header
-                  Row(
+    return Consumer<MapsProvider>(
+      builder: (BuildContext context, mapPro, Widget? child) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                // Header Section
+                Container(
+                  padding: EdgeInsets.only(top: 50, bottom: 16, left: 16, right: 16),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.blueAccent, Colors.teal],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
-                        onTap: _pickImage,
-                        child: CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.white,
-                          backgroundImage: _profileImage != null
-                              ? FileImage(_profileImage!)
-                              : null,
-                          child: _profileImage == null
-                              ? Icon(Icons.person, size: 40, color: Colors.grey)
-                              : null,
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-
-                            Row(
+                      // Profile Header
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: _pickImage,
+                            child: CircleAvatar(
+                              radius: 40,
+                              backgroundColor: Colors.white,
+                              backgroundImage: _profileImage != null
+                                  ? FileImage(_profileImage!)
+                                  : null,
+                              child: _profileImage == null
+                                  ? Icon(Icons.person, size: 40, color: Colors.grey)
+                                  : null,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(_name,
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white)),
-                                IconButton(
-                                  icon: Icon(Icons.edit, color: Colors.white),
-                                  onPressed: () async {
-                                    final result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => EditProfileScreen(
-                                          name: _name,
-                                          phone: _phone,
-                                        ),
-                                      ),
-                                    );
-                                    if (result != null) {
-                                      setState(() {
-                                        _name = result['name'] ?? _name;
-                                        _phone = result['phone'] ?? _phone;
-                                      });
-                                    }
-                                  },
+
+                                Row(
+                                  children: [
+                                    Text(mapPro.name,
+                                        style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white)),
+                                    IconButton(
+                                      icon: const Icon(Icons.edit, color: Colors.white),
+                                      onPressed: () async {
+                                        final result = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => EditProfileScreen(
+                                              name: _name,
+                                              phone: _phone,
+                                            ),
+                                          ),
+                                        );
+                                        if (result != null) {
+                                          setState(() {
+                                            _name = result['name'] ?? _name;
+                                            _phone = result['phone'] ?? _phone;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ],
                                 ),
+                                Text(_phone,
+                                    style: TextStyle(color: Colors.white70)),
                               ],
                             ),
-                            Text(_phone,
-                                style: TextStyle(color: Colors.white70)),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
+                      SizedBox(height: 20),
                     ],
                   ),
-                  SizedBox(height: 20),
-                ],
-              ),
-            ),
-
-            // Main Content
-            _buildSection("Vehicle Information", [
-              _buildListTile(Icons.directions_car, "Vehicle Details"),
-              _buildListTile(Icons.description, "Documents"),
-            ]),
-
-            _buildSection("Performance", [
-              _buildListTile(Icons.star_rate, "Ratings & Feedback"),
-              _buildListTile(Icons.attach_money, "Earnings Summary"),
-            ]),
-
-            _buildSection("Account & Payments", [
-              _buildListTile(Icons.account_balance_wallet, "Bank Details"),
-              _buildListTile(Icons.history, "Payment History"),
-            ]),
-
-            _buildSection("Safety", [
-              _buildListTile(Icons.emergency, "Emergency Contacts"),
-              _buildListTile(Icons.location_on, "Live Location Sharing"),
-            ]),
-
-            _buildSection("Preferences", [
-              SwitchListTile(
-                title: Text("Online Status"),
-                value: _isOnline,
-                onChanged: (value) => setState(() => _isOnline = value),
-              ),
-              _buildListTile(Icons.language, "Language Settings"),
-            ]),
-
-            _buildSection("Support", [
-              _buildListTile(Icons.help, "Help Center"),
-              _buildListTile(Icons.report_problem, "Report Issue"),
-            ]),
-
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: ElevatedButton.icon(
-                icon: Icon(Icons.logout),
-                label: Text("Logout"),
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.greenAccent,
-                  minimumSize: Size(double.infinity, 50),
-
                 ),
-              ),
+
+                // Main Content
+                _buildSection("Vehicle Information", [
+                  _buildListTile(Icons.directions_car, "Vehicle Details"),
+                  _buildListTile(Icons.description, "Documents"),
+                ]),
+
+                _buildSection("Performance", [
+                  _buildListTile(Icons.star_rate, "Ratings & Feedback"),
+                  _buildListTile(Icons.attach_money, "Earnings Summary"),
+                ]),
+
+                _buildSection("Account & Payments", [
+                  _buildListTile(Icons.account_balance_wallet, "Bank Details"),
+                  _buildListTile(Icons.history, "Payment History"),
+                ]),
+
+                _buildSection("Safety", [
+                  _buildListTile(Icons.emergency, "Emergency Contacts"),
+                  _buildListTile(Icons.location_on, "Live Location Sharing"),
+                ]),
+
+                _buildSection("Preferences", [
+                  SwitchListTile(
+                    title: const Text("Online Status"),
+                    value: _isOnline,
+                    onChanged: (value) => setState(() => _isOnline = value),
+                  ),
+                  _buildListTile(Icons.language, "Language Settings"),
+                ]),
+
+                _buildSection("Support", [
+                  _buildListTile(Icons.help, "Help Center"),
+                  _buildListTile(Icons.report_problem, "Report Issue"),
+                ]),
+
+                Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: ElevatedButton.icon(
+                    icon: Icon(Icons.logout),
+                    label: Text("Logout"),
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.greenAccent,
+                      minimumSize: Size(double.infinity, 50),
+
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
