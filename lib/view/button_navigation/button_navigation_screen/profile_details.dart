@@ -266,27 +266,27 @@ class VehicleDetailsScreen extends StatelessWidget {
           title: Text("Vehicle Details"),
         ),
         body: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                TextField(
-                  decoration: InputDecoration(
-                      labelText: "Vehicle Number",
-                      border: OutlineInputBorder()),
-                ),
-                SizedBox(height: 20),
-                TextField(
-                  decoration: InputDecoration(
-                      labelText: "Vehicle Model",
-                      border: OutlineInputBorder()),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                    onPressed: () {},
-                    child: Text("Save Vehicle Details")),
-              ],
-            ),
-            ),
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                    labelText: "Vehicle Number",
+                    border: OutlineInputBorder()),
+              ),
+              SizedBox(height: 20),
+              TextField(
+                decoration: InputDecoration(
+                    labelText: "Vehicle Model",
+                    border: OutlineInputBorder()),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                  onPressed: () {},
+                  child: Text("Save Vehicle Details")),
+            ],
+          ),
+        ),
         );
     }
 }

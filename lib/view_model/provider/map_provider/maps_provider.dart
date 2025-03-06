@@ -39,6 +39,7 @@ class MapsProvider extends ChangeNotifier {
   LatLng? _currentPosition;
   StreamSubscription<Position>? _positionStream;
   bool isOnline = false;
+  String name = '';
 
   Future<void> fetchOnlineStatus() async {
     DatabaseReference ref = realTimeDb.ref('Drivers_Data').child(authService.crruntUserId!);
@@ -47,7 +48,9 @@ class MapsProvider extends ChangeNotifier {
     if (event.snapshot.exists && event.snapshot.value != null) {
       Map<dynamic, dynamic> data = event.snapshot.value as Map<dynamic, dynamic>;
       bool status = data['isOnline'] ?? false;
+      String na = data['driverName'] ?? false;
       isOnline = status;
+      name = na;
       notifyListeners();
     }
   }
@@ -70,7 +73,6 @@ class MapsProvider extends ChangeNotifier {
       }
     }
   }
-
 
   Future<bool> checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
