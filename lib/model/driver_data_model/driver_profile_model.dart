@@ -1,67 +1,67 @@
 import 'dart:convert';
+import 'package:tripto_driver/model/driver_data_model/driver_address_model.dart';
 
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-DriverProfileModel welcomeFromJson(String str) => DriverProfileModel.fromJson(json.decode(str));
+DriverModel driverProfileFromJson(String str) => DriverModel.fromJson(json.decode(str));
 
-String welcomeToJson(DriverProfileModel data) => json.encode(data.toJson());
+String driverProfileToJson(DriverModel data) => json.encode(data.toJson());
 
-class DriverProfileModel {
-
-  String? driverID;
-  String? driverName;
-  int? driverPhoneNumber;
-  String? driverEmail;
-  String? driverAddress;
-  String? driverImage;
-  String? carName;
+class DriverModel {
+  DriverAddressModel? address;
   String? fcmToken;
-  double? drCurrantLongitude;
-  double? drCurrantLatitude;
-  bool? isOnline;
-  String? carType;
+  String? driverEmail;
+  String? driverFirstName;
+  String? driverLastName;
+  String? driverGender;
+  String? driverID;
+  bool? isVerified;
+  int? driverPhoneNumber;
+  String? driverImage;
+  String? vehiclesId;
+  String? documentId;
 
-  DriverProfileModel({
-    this.driverID,
-    this.driverName,
-    this.driverPhoneNumber,
-    this.driverEmail,
-    this.driverAddress,
-    this.driverImage,
-    this.carName,
+  DriverModel({
+    this.address,
     this.fcmToken,
-    this.drCurrantLongitude,
-    this.drCurrantLatitude,
-    this.isOnline,
-    this.carType
+    this.driverEmail,
+    this.driverFirstName,
+    this.driverLastName,
+    this.driverGender,
+    this.driverID,
+    this.isVerified,
+    this.driverPhoneNumber,
+    this.driverImage,
+    this.vehiclesId,
+    this.documentId
   });
 
-  factory DriverProfileModel.fromJson(Map<String, dynamic> json) => DriverProfileModel(
-      driverID: json["driverID"],
-      driverName: json["driverName"],
-      driverPhoneNumber: json["driverPhoneNumber"],
-      driverEmail: json["driverEmail"],
-      driverAddress: json["driverAddress"],
-      driverImage: json["driverImage"],
-      carName: json['carName'],
-      fcmToken: json['fcmToken'],
-      drCurrantLongitude: json['drCurrantLongitude'],
-      drCurrantLatitude: json['drCurrantLatitude'],
-    isOnline: json['isOnline'],
-    carType: json['carType']
+  factory DriverModel.fromJson(Map<String, dynamic> json) => DriverModel(
+    address: json["address"] != null ? DriverAddressModel.fromJson(json["address"]) : null,
+    fcmToken: json["fcmToken"],
+    driverEmail: json["driverEmail"],
+    driverFirstName: json["driverFirstName"],
+    driverLastName: json["driverLastName"],
+    driverGender: json["driverGender"],
+    driverID: json["driverID"],
+    isVerified: json["isVerified"],
+    driverPhoneNumber: json["driverPhoneNumber"],
+    driverImage: json["driverImage"],
+    vehiclesId: json["vehiclesId"],
+    documentId: json['documentId']
   );
 
   Map<String, dynamic> toJson() => {
-    "driverID" : driverID,
-    "driverName": driverName,
-    "driverPhoneNumber": driverPhoneNumber,
+    "address": address?.toJson(),
+    "fcmToken": fcmToken,
     "driverEmail": driverEmail,
-    "driverAddress": driverAddress,
-    "carName" : carName,
-    "fcmToken" :fcmToken,
-    "drCurrantLongitude":drCurrantLongitude,
-    "drCurrantLatitude":drCurrantLatitude,
-    "isOnline" : isOnline,
-    "carType" : carType
+    "driverFirstName": driverFirstName,
+    "driverLastName": driverLastName,
+    "driverGender": driverGender,
+    "driverID": driverID,
+    "isVerified": isVerified,
+    "driverPhoneNumber": driverPhoneNumber,
+    "driverImage": driverImage,
+    "vehiclesId": vehiclesId,
+    "documentId":documentId
   };
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -12,6 +13,8 @@ import 'package:geolocator/geolocator.dart' as geo;
 
 
 class MapsProvider extends ChangeNotifier {
+
+
   MapsProvider() {
     fetchOnlineStatus();
   }
@@ -44,28 +47,29 @@ class MapsProvider extends ChangeNotifier {
   String name = '';
 
   Future<void> fetchOnlineStatus() async {
-    DatabaseReference ref = realTimeDb.ref('Drivers_Data').child(authService.crruntUserId!);
+    DatabaseReference ref = realTimeDb.ref('Vehicle').child(authService.crruntUserId!);
     DatabaseEvent event = await ref.once();
 
     if (event.snapshot.exists && event.snapshot.value != null) {
       Map<dynamic, dynamic> data = event.snapshot.value as Map<dynamic, dynamic>;
+      bool status = data['status'] ?? false;
       bool status = data['isOnline'] ?? false;
       String name = data['driverName'];
       isOnline = status;
       na = name;
       String na = data['driverName'] ?? false;
       isOnline = status;
-      name = na;
       notifyListeners();
     }
   }
 
   Future<void> toggleOnlineStatus(bool status) async {
 
+    var currentUserId = FirebaseAuth.instance.currentUser?.uid;
     isOnline = status;
     notifyListeners();
 
-    await authService.updateToggleBS(status,authService.crruntUserId!);
+    await authService.updateToggleBS(status,currentUserId!);
 
     if (isOnline) {
       await getCurrentLocation();
