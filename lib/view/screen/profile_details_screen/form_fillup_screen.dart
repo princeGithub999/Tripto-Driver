@@ -106,11 +106,8 @@ class _FormFillupScreenState extends State<FormFillupScreen> {
                                 }
                               },
 
-                              child: authProvider.isLoding
-                                  ? const SizedBox(
-                                height: 10,
-                                  child: CircularProgressIndicator(backgroundColor: Colors.white))
-                                  : const Text(
+                              child: authProvider.isLoding ? SizedBox(height: 25, width: 25, child: const CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.blueGrey,))
+                              : const Text(
                                 "Submit",
                                 style: TextStyle(
                                   color: Colors.white,

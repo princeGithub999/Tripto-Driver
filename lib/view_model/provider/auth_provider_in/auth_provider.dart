@@ -219,9 +219,9 @@ class AuthProviderIn extends ChangeNotifier {
   Future<void> saveProfileData(DriverDataModel driverData) async {
 
     var driverId = FirebaseAuth.instance.currentUser?.uid;
-    var supaId = supabaseOTP.auth.currentUser?.id;
+    // var supaId = supabaseOTP.auth.currentUser?.id;
 
-     if (driverId == null || supaId == null) {
+     if (driverId == null) {
       AppHelperFunctions.showSnackBar("User not logged in!");
       return;
     }

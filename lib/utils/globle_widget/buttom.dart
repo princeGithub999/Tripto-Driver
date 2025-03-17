@@ -28,7 +28,9 @@ class MyButton {
         minimumSize: const Size(double.infinity,40),
 
       ),
-      child: isLoding ? SizedBox(height: 25, width: 25, child: const CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.blueGrey,)) :  Text(buttomName,style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: AppSizes.buttomTextSize),),
+      child: isLoding ? SizedBox(height: 25, width: 25, child: const CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.blueGrey,)) :
+
+      Text(buttomName,style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: AppSizes.buttomTextSize),),
     );
   }
 

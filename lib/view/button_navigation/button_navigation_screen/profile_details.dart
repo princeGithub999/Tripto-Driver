@@ -631,6 +631,8 @@ import 'package:provider/provider.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
@@ -670,7 +672,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               children: [
                 Container(
-                  padding: EdgeInsets.only(top: 50, bottom: 16, left: 16, right: 16),
+                  padding: const EdgeInsets.only(top: 50, bottom: 16, left: 16, right: 16),
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Colors.blueAccent, Colors.teal],
@@ -694,7 +696,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ? NetworkImage(data!.driverImage!) as ImageProvider
                                   : null,
                               child: _profileImage == null && data?.driverImage == null
-                                  ? Icon(Icons.person, size: 40, color: Colors.grey)
+                                  ? const Icon(Icons.person, size: 40, color: Colors.grey)
                                   : null,
                             ),
                           ),
@@ -703,8 +705,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('prince',
-                                  style: const TextStyle(
+                                const Text('prince',
+                                  style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -712,14 +714,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 Text(
                                   data?.driverPhoneNumber.toString() ?? "Not Available",
-                                  style: TextStyle(color: Colors.white70),
+                                  style: const TextStyle(color: Colors.white70),
                                 ),
                               ],
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -736,8 +738,7 @@ class EditProfileScreen extends StatefulWidget {
   final String name;
   final String phone;
 
-  const EditProfileScreen({Key? key, required this.name, required this.phone})
-      : super(key: key);
+  const EditProfileScreen({super.key, required this.name, required this.phone});
 
   @override
   _EditProfileScreenState createState() => _EditProfileScreenState();
@@ -758,30 +759,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Profile'),
+        title: const Text('Edit Profile'),
         backgroundColor: Colors.teal,
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Name',
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             TextField(
               controller: _phoneController,
               keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Phone Number',
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context, {
@@ -789,7 +790,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   'phone': _phoneController.text,
                 });
               },
-              child: Text('Save Changes'),
+              child: const Text('Save Changes'),
             ),
           ],
         ),
@@ -799,31 +800,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 }
 
 class VehicleDetailsScreen extends StatelessWidget {
+  const VehicleDetailsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Vehicle Details"),
+          title: const Text("Vehicle Details"),
         ),
         body: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              TextField(
+              const TextField(
                 decoration: InputDecoration(
                     labelText: "Vehicle Number",
                     border: OutlineInputBorder()),
               ),
-              SizedBox(height: 20),
-              TextField(
+              const SizedBox(height: 20),
+              const TextField(
                 decoration: InputDecoration(
                     labelText: "Vehicle Model",
                     border: OutlineInputBorder()),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                   onPressed: () {},
-                  child: Text("Save Vehicle Details")),
+                  child: const Text("Save Vehicle Details")),
             ],
           ),
         ),
