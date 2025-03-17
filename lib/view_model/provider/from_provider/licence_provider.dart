@@ -14,7 +14,7 @@ import '../../../view/screen/profile_details_screen/vehicle_rc.dart';
 class FromProvider extends ChangeNotifier{
 
   String? selectedCar;
-  List<String> carList = ['CAR', 'CNG CAR', 'AUTO', 'CNG AUTO','BIKE'];
+  List<String> carList = ['Auto', 'E-Rickshaw', 'Bike'];
 
   void selectCar(String car) {
     selectedCar = car;

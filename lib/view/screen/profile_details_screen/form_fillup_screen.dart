@@ -80,7 +80,7 @@ class _FormFillupScreenState extends State<FormFillupScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.blue900,
                                 shadowColor: Colors.black26,
-                                minimumSize: const Size(double.infinity, 50),
+                                minimumSize: const Size(double.infinity, 40),
                               ),
                               onPressed: () {
 
@@ -105,8 +105,11 @@ class _FormFillupScreenState extends State<FormFillupScreen> {
                                   AppHelperFunctions.showSnackBar('Please fill in all required fields!');
                                 }
                               },
+
                               child: authProvider.isLoding
-                                  ? const CircularProgressIndicator(backgroundColor: Colors.white)
+                                  ? const SizedBox(
+                                height: 10,
+                                  child: CircularProgressIndicator(backgroundColor: Colors.white))
                                   : const Text(
                                 "Submit",
                                 style: TextStyle(

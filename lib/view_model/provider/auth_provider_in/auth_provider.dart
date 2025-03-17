@@ -46,9 +46,10 @@ class AuthProviderIn extends ChangeNotifier {
   }
 
   Future<void> supaOtp(String phoneNumber) async {
+
+    isLoding = true;
+    notifyListeners();
     try {
-      isLoding = true;
-      notifyListeners();
 
       await supabaseOTP.auth.signInWithOtp(
         phone: '+91$phoneNumber',
