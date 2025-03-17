@@ -40,6 +40,9 @@ class MapsProvider extends ChangeNotifier {
   StreamSubscription<Position>? _positionStream;
   bool isOnline = false;
   String na = '';
+
+  String name = '';
+
   Future<void> fetchOnlineStatus() async {
     DatabaseReference ref = realTimeDb.ref('Drivers_Data').child(authService.crruntUserId!);
     DatabaseEvent event = await ref.once();
@@ -50,6 +53,9 @@ class MapsProvider extends ChangeNotifier {
       String name = data['driverName'];
       isOnline = status;
       na = name;
+      String na = data['driverName'] ?? false;
+      isOnline = status;
+      name = na;
       notifyListeners();
     }
   }
@@ -72,7 +78,6 @@ class MapsProvider extends ChangeNotifier {
       }
     }
   }
-
 
   Future<bool> checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();

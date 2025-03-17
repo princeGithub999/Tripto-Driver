@@ -291,5 +291,32 @@ class AuthProviderIn extends ChangeNotifier {
     }
     }
 
+    Future<DriverProfileModel?> getData()async{
+
+      var currentUser =  FirebaseAuth.instance.currentUser;
+
+      // if(currentUser!.uid.isNotEmpty){
+      //   Fluttertoast.showToast(msg: 'Error: Driver ID is empty');
+      //   return null;
+      // }
+
+      try{
+          DatabaseReference driverRef = realTimeDb.ref('Drivers_Data').child('Otc5g5d4PiWdiRa5MAaiqMhJrot1');
+          DatabaseEvent event = await driverRef.once();
+
+          if(event.snapshot.value != null){
+            Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
+            return DriverProfileModel.fromJson(data);
+          }else{
+            Fluttertoast.showToast(msg: 'No data found');
+            return null;
+          }
+
+      }catch(e){
+        Fluttertoast.showToast(msg: 'Error: $e');
+        return null;
+      }
+
+    }
 
 }

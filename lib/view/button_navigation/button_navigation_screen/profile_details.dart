@@ -732,3 +732,102 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+
+class EditProfileScreen extends StatefulWidget {
+  final String name;
+  final String phone;
+
+  const EditProfileScreen({Key? key, required this.name, required this.phone})
+      : super(key: key);
+
+  @override
+  _EditProfileScreenState createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  late TextEditingController _nameController;
+  late TextEditingController _phoneController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.name);
+    _phoneController = TextEditingController(text: widget.phone);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Edit Profile'),
+        backgroundColor: Colors.teal,
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            TextField(
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                labelText: 'Phone Number',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context, {
+                  'name': _nameController.text,
+                  'phone': _phoneController.text,
+                });
+              },
+              child: Text('Save Changes'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class VehicleDetailsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Vehicle Details"),
+        ),
+        body: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                    labelText: "Vehicle Number",
+                    border: OutlineInputBorder()),
+              ),
+              SizedBox(height: 20),
+              TextField(
+                decoration: InputDecoration(
+                    labelText: "Vehicle Model",
+                    border: OutlineInputBorder()),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                  onPressed: () {},
+                  child: Text("Save Vehicle Details")),
+            ],
+          ),
+        ),
+        );
+    }
+}
