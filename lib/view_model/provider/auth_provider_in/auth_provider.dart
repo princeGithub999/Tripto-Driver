@@ -36,7 +36,7 @@ class AuthProviderIn extends ChangeNotifier {
   var mapProvider = Provider.of<MapsProvider>(Get.context!, listen: false);
   final supabaseOTP = Supabase.instance.client;
   dynamic supaNumber;
-  DriverProfileModel? driverProfile;
+  DriverModel? driverProfile;
 
 
   AuthProviderIn(){
@@ -175,31 +175,7 @@ class AuthProviderIn extends ChangeNotifier {
   //   }
 
 
-  // Future<DriverProfileModel?> getData() async {
-  //   var currentUser = FirebaseAuth.instance.currentUser;
-  //   if (currentUser == null) {
-  //     Fluttertoast.showToast(msg: 'User not logged in');
-  //     return null;
-  //   }
-  //
-  //   try {
-  //     DatabaseReference driverRef = realTimeDb.ref('Drivers_Data').child(currentUser.uid);
-  //     DatabaseEvent event = await driverRef.once();
-  //
-  //     if (event.snapshot.value != null) {
-  //       Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
-  //       print("Fetched Driver Data: $data");  // Debugging
-  //
-  //       return DriverProfileModel.fromJson(data);
-  //     } else {
-  //       Fluttertoast.showToast(msg: 'No data found');
-  //       return null;
-  //     }
-  //   } catch (e) {
-  //     Fluttertoast.showToast(msg: 'Error: $e');
-  //     return null;
-  //   }
-  // }
+
 
   void fetchLiveProfileData(String driverId) {
 
@@ -210,7 +186,7 @@ class AuthProviderIn extends ChangeNotifier {
         Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
         print("🔥 Live Updated Driver Data: $data");
 
-        driverProfile = DriverProfileModel.fromJson(data);
+        driverProfile = DriverModel.fromJson(data);
         notifyListeners();  // **🔥 UI को Auto-Refresh करें**
       } else {
         Fluttertoast.showToast(msg: 'No data found in Firebase.');

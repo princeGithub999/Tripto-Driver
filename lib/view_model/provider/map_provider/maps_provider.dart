@@ -53,10 +53,9 @@ class MapsProvider extends ChangeNotifier {
     if (event.snapshot.exists && event.snapshot.value != null) {
       Map<dynamic, dynamic> data = event.snapshot.value as Map<dynamic, dynamic>;
       bool status = data['status'] ?? false;
-      bool status = data['isOnline'] ?? false;
-      String name = data['driverName'];
+      // String name = data['driverName'];
       isOnline = status;
-      na = name;
+      // na = name;
       String na = data['driverName'] ?? false;
       isOnline = status;
       notifyListeners();
