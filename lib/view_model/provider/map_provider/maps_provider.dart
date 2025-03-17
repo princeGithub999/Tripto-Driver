@@ -42,6 +42,8 @@ class MapsProvider extends ChangeNotifier {
   LatLng? _currentPosition;
   StreamSubscription<Position>? _positionStream;
   bool isOnline = false;
+  String na = '';
+
   String name = '';
 
   Future<void> fetchOnlineStatus() async {
@@ -51,6 +53,11 @@ class MapsProvider extends ChangeNotifier {
     if (event.snapshot.exists && event.snapshot.value != null) {
       Map<dynamic, dynamic> data = event.snapshot.value as Map<dynamic, dynamic>;
       bool status = data['status'] ?? false;
+      bool status = data['isOnline'] ?? false;
+      String name = data['driverName'];
+      isOnline = status;
+      na = name;
+      String na = data['driverName'] ?? false;
       isOnline = status;
       notifyListeners();
     }
