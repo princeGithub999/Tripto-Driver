@@ -28,8 +28,6 @@ class FromProvider extends ChangeNotifier{
     }else{
       Navigator.pop(Get.context!);
     }
-
-
     notifyListeners();
   }
 
@@ -131,6 +129,9 @@ class FromProvider extends ChangeNotifier{
 
     notifyListeners();
   }
+
+
+
   Future<bool> checkRcFeald() async {
 
     if (frontRcImage == null && backRcImage == null) {
@@ -152,6 +153,8 @@ class FromProvider extends ChangeNotifier{
       return true;
     }
   }
+
+
 
   Future<void> pickAadharCardImage(bool isFront, isAadhar)async{
 
@@ -201,6 +204,8 @@ class FromProvider extends ChangeNotifier{
     }
   }
 
+
+
   Future<void> pickDriverImage()async{
 
     var image = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -214,6 +219,8 @@ class FromProvider extends ChangeNotifier{
 
     notifyListeners();
   }
+
+
 
   void selectDocument(String document, BuildContext context) {
     selectedDocument = document;

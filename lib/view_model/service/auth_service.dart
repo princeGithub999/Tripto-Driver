@@ -89,8 +89,6 @@ class AuthService {
         .doc(currentUserID)
         .set(driverData.toJson());
 
-
-
   }
 
   Future<String?> uploadImageToFirebase(File imageFile, String path) async {
