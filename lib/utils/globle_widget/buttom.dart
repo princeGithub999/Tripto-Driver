@@ -6,7 +6,7 @@ import '../app_sizes/sizes.dart';
 
 class MyButton {
 
-  static Widget globalButton(VoidCallback onPress, String buttomName) {
+  static Widget globalButton(VoidCallback onPress, String buttomName, bool isLoding) {
     return ElevatedButton(
       onPressed: onPress,
       style: ElevatedButton.styleFrom(
@@ -15,7 +15,7 @@ class MyButton {
         minimumSize: const Size(double.infinity,40),
 
       ),
-      child:  Text(buttomName,style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: AppSizes.buttomTextSize),),
+      child: isLoding ? const CircularProgressIndicator(backgroundColor: Colors.white,) :  Text(buttomName,style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: AppSizes.buttomTextSize),),
     );
   }
 

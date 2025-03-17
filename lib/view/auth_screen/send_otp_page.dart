@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/constants/colors.dart';
 import '../../utils/globle_widget/buttom.dart';
 import '../../utils/globle_widget/form_divider.dart';
 import '../../view_model/provider/auth_provider_in/auth_provider.dart';
+import '../../view_model/service/auth_service.dart';
 
 
 
@@ -16,10 +18,13 @@ class SendOtpPage extends StatefulWidget {
 }
 
 class _SendOtpPageState extends State<SendOtpPage> {
+
+
   @override
   Widget build(BuildContext context) {
     var sizes = MediaQuery.of(context).size;
     var authProvider =  Provider.of<AuthProviderIn>(context, listen: false);
+    AuthService authService = AuthService();
 
     return Scaffold(
 
@@ -60,6 +65,7 @@ class _SendOtpPageState extends State<SendOtpPage> {
 
                 SizedBox(height: sizes.height * 0.1 - 50,),
                IntlPhoneField(
+
                  flagsButtonPadding: const EdgeInsets.all(8),
                  dropdownIconPosition: IconPosition.trailing,
                  controller: authProvider.inputNumber,
@@ -87,7 +93,7 @@ class _SendOtpPageState extends State<SendOtpPage> {
                  ),
                  initialCountryCode: 'IN',
                  onChanged: (phone) {
-                   // print(phone.completeNumber);
+
                  },
                ),
 
@@ -95,8 +101,8 @@ class _SendOtpPageState extends State<SendOtpPage> {
                SizedBox(height: sizes.height * 0.3,),
 
                MyButton.globalButton(() {
-                 authProvider.requestOTP(authProvider.inputNumber.text);
-               },'Send OTP'),
+                 authProvider.supaOtp(authProvider.inputNumber.text);
+               },'Send OTP',authProvider.isLoding),
                SizedBox(height: sizes.height * 0.1 - 70,),
 
 

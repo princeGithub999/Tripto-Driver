@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/view/auth_screen/send_otp_page.dart';
+import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 import 'package:tripto_driver/view_model/provider/permission_handler/permission_provider.dart';
 
 import '../../utils/globle_widget/buttom.dart';
@@ -19,19 +20,21 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => SendOtpPage()));
-            },
-          ),
+    return Consumer<AuthProviderIn>(
+      builder: (BuildContext context, authProvider, Widget? child) {
+        return  Scaffold(
           backgroundColor: Colors.white,
-          elevation: 0,
-        ),
-        body: Padding(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => SendOtpPage()));
+              },
+            ),
+            backgroundColor: Colors.white,
+            elevation: 0,
+          ),
+          body: Padding(
             padding: EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,8 +73,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                 Consumer<PermissionProvider>(
                   builder: (BuildContext context, permissionProvider, Widget? child) {
                     return MyButton.globalButton(() {
-                      permissionProvider.checkLocationPermission();
-                    },'Verify OTP');
+                      authProvider.supaVeryfiOTP(authProvider.inputNumber.text,_otpController.text);
+                      // permissionProvider.checkLocationPermission();
+                    },'Verify OTP',authProvider.isLoding);
                   },
                 ),
                 // ElevatedButton(
@@ -85,7 +89,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                 // ),
               ],
             ),
-            ),
+          ),
         );
+      },
+    );
     }
 }
