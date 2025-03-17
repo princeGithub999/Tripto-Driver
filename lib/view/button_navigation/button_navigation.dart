@@ -26,13 +26,16 @@ class _BottomNavigationState extends State<BottomNavigation> {
   void initState() {
     super.initState();
 
-    // Provider.of<MapsProvider>(context,listen: false).getCurrentLocation();
+    Provider.of<MapsProvider>(context,listen: false).getCurrentLocation();
     listPage = [
       MapsScreen(pickUpLatLng: defaultPickup, dropLatLng: defaultDrop, driverId: '', ),
       const RatingScreen(),
       DriverHomeScreen(driverId: '',),
       ProfileScreen()
     ];
+
+
+
   }
 
   @override

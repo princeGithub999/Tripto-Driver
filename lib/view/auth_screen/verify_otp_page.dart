@@ -72,7 +72,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
 
                 Consumer<PermissionProvider>(
                   builder: (BuildContext context, permissionProvider, Widget? child) {
-                    return MyButton.globalButton(() {
+                    return MyButton.verifyOtpButton(() {
                       authProvider.supaVeryfiOTP(authProvider.inputNumber.text,_otpController.text);
                       // permissionProvider.checkLocationPermission();
                     },'Verify OTP',authProvider.isLoding);
