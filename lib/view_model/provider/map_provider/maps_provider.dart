@@ -56,7 +56,6 @@ class MapsProvider extends ChangeNotifier {
       bool status = data['isOnline'] ?? false;
       String name = data['driverName'];
       isOnline = status;
-      na = name;
       String na = data['driverName'] ?? false;
       isOnline = status;
       notifyListeners();
