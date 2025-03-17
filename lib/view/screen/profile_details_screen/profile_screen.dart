@@ -23,7 +23,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Update Profile'),
+        title: Text('Update Profile'),
         backgroundColor: AppColors.blue900,
         centerTitle: true,
       ),
