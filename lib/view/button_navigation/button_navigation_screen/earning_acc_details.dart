@@ -6,7 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 class DriverHomeScreen extends StatefulWidget {
   final String driverId;
 
-  DriverHomeScreen({required this.driverId});
+  const DriverHomeScreen({super.key, required this.driverId});
 
   @override
   _DriverHomeScreenState createState() => _DriverHomeScreenState();
@@ -108,7 +108,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          title: Text("New Ride Request 🚖"),
+          title: const Text("New Ride Request 🚖"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,18 +116,18 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               Text("Pickup: ${ride['pickup_location']['lat']}, ${ride['pickup_location']['lng']}"),
               Text("Drop: ${ride['drop_location']['lat']}, ${ride['drop_location']['lng']}"),
               SizedBox(height: 10),
-              Text("Do you want to accept this ride?", style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text("Do you want to accept this ride?", style: TextStyle(fontWeight: FontWeight.bold)),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => _cancelRide(ride.id),
-              child: Text("Reject", style: TextStyle(color: Colors.red)),
+              child: const Text("Reject", style: TextStyle(color: Colors.red)),
             ),
             ElevatedButton(
               onPressed: () => _acceptRide(ride.id),
-              child: Text("Accept"),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+              child: const Text("Accept"),
             ),
           ],
         );

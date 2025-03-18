@@ -14,7 +14,6 @@ import 'package:geolocator/geolocator.dart' as geo;
 
 class MapsProvider extends ChangeNotifier {
 
-
   MapsProvider() {
     fetchOnlineStatus();
   }
