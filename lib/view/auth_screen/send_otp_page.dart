@@ -26,7 +26,6 @@ class _SendOtpPageState extends State<SendOtpPage> {
     AuthService authService = AuthService();
 
     return Scaffold(
-
       appBar: AppBar(
         // leading: ,
         backgroundColor: Colors.white,
