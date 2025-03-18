@@ -9,6 +9,7 @@ import 'package:tripto_driver/view_model/provider/ride_request/ride_request_prov
 import 'package:tripto_driver/view_model/service/auth_service.dart';
 
 import '../../../model/driver_data_model/driver_profile_model.dart';
+import '../../../notification/push_notification.dart';
 import '../../../utils/globle_widget/ride_accpated_buttom_sheet.dart';
 
 
@@ -32,6 +33,8 @@ class MapsScreen extends StatefulWidget {
 class _MapsScreenState extends State<MapsScreen> {
   GoogleMapController? mapController;
   bool isRideAccepted = false;
+  bool isRideAccepted = false;  // Added this variable
+  PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
 
   @override
   void initState() {
@@ -207,6 +210,13 @@ class _MapsScreenState extends State<MapsScreen> {
                   );
                 },
               )
+              Positioned(child:
+              ElevatedButton(onPressed: () {
+                pushNotificationSystem.sendOrderNotification(message: 'dfghj', token: 'dulS42R6Sfm4TqWV80k-Qc:APA91bE8TOHDdn0ecNFD5gj88StTCv6NkMt9qAMHFrFxtg4bpVg-ww9cZ8etBUNCjVXj2JncB7MaqWEENzE6hDgMwyL3ujG_MWRPY1tDZ1ae3GYw4ixAzAI');
+                // RideAccpatedButtomSheet().showRideRequestBottomSheet(context);
+              }, child: const Text('Click'))
+        
+         )
             ],
           ),
         );
