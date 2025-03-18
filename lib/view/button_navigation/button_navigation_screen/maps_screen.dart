@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:tripto_driver/model/ride_request_model/ride_request_model.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
-import 'package:tripto_driver/view_model/provider/ride_request/ride_request_provider.dart';
 import 'package:tripto_driver/view_model/service/auth_service.dart';
 
 import '../../../model/driver_data_model/driver_profile_model.dart';
+import '../../../notification/push_notification.dart';
 import '../../../utils/globle_widget/ride_accpated_buttom_sheet.dart';
 
 
@@ -16,13 +15,13 @@ import '../../../utils/globle_widget/ride_accpated_buttom_sheet.dart';
 class MapsScreen extends StatefulWidget {
   final LatLng pickUpLatLng;
   final LatLng dropLatLng;
-  final String driverId;
+  final String driverId; // Added driverId to track the specific driver in Firebase
 
   const MapsScreen({
     super.key,
     required this.pickUpLatLng,
     required this.dropLatLng,
-    required this.driverId,
+    required this.driverId, // Required parameter for Firebase tracking
   });
 
   @override
@@ -31,7 +30,8 @@ class MapsScreen extends StatefulWidget {
 
 class _MapsScreenState extends State<MapsScreen> {
   GoogleMapController? mapController;
-  bool isRideAccepted = false;
+  bool isRideAccepted = false;  // Added this variable
+  PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
 
   @override
   void initState() {
@@ -81,13 +81,16 @@ class _MapsScreenState extends State<MapsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // AuthService authService = AuthService();
     var sizes = MediaQuery.of(context).size;
+   // var auht = FirebaseAuth.instance.currentUser!.uid;
     return Consumer<MapsProvider>(
       builder: (BuildContext context, mapProvider, Widget? child) {
+        // Add this listener
         if (isRideAccepted) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _showBottomSheet();
-            isRideAccepted = false;
+            isRideAccepted = false; // Reset the value after showing
           });
         }
 
@@ -125,6 +128,7 @@ class _MapsScreenState extends State<MapsScreen> {
                 markers: mapProvider.markers,
                 polylines: mapProvider.polyline,
               ),
+
 
               Positioned(
                 top: 10,
@@ -164,49 +168,13 @@ class _MapsScreenState extends State<MapsScreen> {
                   ),
                 ),
               ),
-              Consumer<RideRequestProvider>(
-                builder: (BuildContext context, rideRequest, Widget? child) {
-                  return Positioned(child:
-                  StreamBuilder<List<RideRequestModel>>(
-                    stream: rideRequest.getPendingRideRequests(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      var rideRequests = snapshot.data!;
-
-                      if (rideRequests.isEmpty) {
-                        return const Center(child: Text("No ride requests available"));
-                      }
-
-                      return ListView.builder(
-                        itemCount: rideRequests.length,
-                        itemBuilder: (context, index) {
-                          var ride = rideRequests[index];
-
-                          return Card(
-                            margin: const EdgeInsets.all(10),
-                            child: ListTile(
-                              title: Text("User: ${ride.userName}"),
-                              subtitle: Text("Pickup: ${ride.pickupLat}, ${ride.pickupLng}"),
-                              trailing: ElevatedButton(
-                                onPressed: () {
-
-                                },
-                                child: const Text("Accept"),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  )
-
-
-                  );
-                },
-              )
+              Positioned(child:
+              ElevatedButton(onPressed: () {
+                pushNotificationSystem.sendOrderNotification(message: 'dfghj', token: 'dulS42R6Sfm4TqWV80k-Qc:APA91bE8TOHDdn0ecNFD5gj88StTCv6NkMt9qAMHFrFxtg4bpVg-ww9cZ8etBUNCjVXj2JncB7MaqWEENzE6hDgMwyL3ujG_MWRPY1tDZ1ae3GYw4ixAzAI');
+                // RideAccpatedButtomSheet().showRideRequestBottomSheet(context);
+              }, child: const Text('Click'))
+        
+         )
             ],
           ),
         );
