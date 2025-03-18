@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/constants/colors.dart';
 import '../../utils/globle_widget/buttom.dart';
 import '../../utils/globle_widget/form_divider.dart';

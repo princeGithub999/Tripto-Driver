@@ -7,6 +7,7 @@ import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dar
 import 'package:tripto_driver/view_model/service/auth_service.dart';
 
 import '../../../model/driver_data_model/driver_profile_model.dart';
+import '../../../notification/push_notification.dart';
 import '../../../utils/globle_widget/ride_accpated_buttom_sheet.dart';
 
 
@@ -30,6 +31,7 @@ class MapsScreen extends StatefulWidget {
 class _MapsScreenState extends State<MapsScreen> {
   GoogleMapController? mapController;
   bool isRideAccepted = false;  // Added this variable
+  PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
 
   @override
   void initState() {
@@ -95,23 +97,6 @@ class _MapsScreenState extends State<MapsScreen> {
         return Scaffold(
           appBar: AppBar(
             title:  InkWell(
-                // onTap: () {
-                //   var realTimeData = DriverProfileModel(
-                //       driverID: 'cvbn',
-                //       driverName: 'cvbnm',
-                //       driverPhoneNumber: 1233,
-                //       driverAddress: 'xcvbnm',
-                //       driverImage: 'cvbn',
-                //       fcmToken: 'token',
-                //       isOnline: false,
-                //       carName: 'driverData',
-                //       drCurrantLatitude: mapProvider.currentLocation?.latitude,
-                //       drCurrantLongitude: mapProvider.currentLocation?.longitude,
-                //   );
-                //
-                //   authService.saveDriverDataInRealTime(auht, realTimeData);
-                //
-                // },
                 child: Text("Location sharing ${mapProvider.isOnline ? ' Enable' :'Disable'}. Tap hare")),
             actions: [
               Padding(
@@ -185,7 +170,8 @@ class _MapsScreenState extends State<MapsScreen> {
               ),
               Positioned(child:
               ElevatedButton(onPressed: () {
-                RideAccpatedButtomSheet().showRideRequestBottomSheet(context);
+                pushNotificationSystem.sendOrderNotification(message: 'dfghj', token: 'dulS42R6Sfm4TqWV80k-Qc:APA91bE8TOHDdn0ecNFD5gj88StTCv6NkMt9qAMHFrFxtg4bpVg-ww9cZ8etBUNCjVXj2JncB7MaqWEENzE6hDgMwyL3ujG_MWRPY1tDZ1ae3GYw4ixAzAI');
+                // RideAccpatedButtomSheet().showRideRequestBottomSheet(context);
               }, child: const Text('Click'))
         
          )
