@@ -47,7 +47,7 @@ dependencies:
   firebase_core: ^3.11.0
   firebase_auth: ^5.4.2
   firebase_messaging: ^15.1.4
-  flutter_local_notifications: ^18.0.0
+  flutter_local_notifications: ^18.0.1
   googleapis_auth: ^1.6.0
   firebase_dynamic_links: ^6.1.2
   firebase_analytics: ^11.4.2
@@ -71,6 +71,8 @@ dependencies:
   flutter_datetime_picker: ^1.5.1
   just_audio: ^0.9.46
   geoflutterfire_plus: ^0.0.32
+  supabase: ^2.6.3
+  supabase_flutter: ^2.8.4
 
 
 dev_dependencies:
