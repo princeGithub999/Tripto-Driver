@@ -4,8 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:just_audio/just_audio.dart';
+
 import '../utils/google_secret/google_secret.dart';
+
 
 
 
@@ -13,55 +14,54 @@ class PushNotificationSystem {
 
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  final AudioPlayer audioPlayer = AudioPlayer();
+  // final AudioPlayer audioPlayer=AudioPlayer();
   FlutterLocalNotificationsPlugin flutterLocalNotifications = FlutterLocalNotificationsPlugin();
 
+    void requestNotificationPermission()async{
+      NotificationSettings settings = await messaging.requestPermission(
+        provisional: true,
+        sound: true,
+        alert: true,
+        badge: true,
+        announcement: true,
+        carPlay: true,);
 
-  void requestNotificationPermission() async {
-    NotificationSettings settings = await messaging.requestPermission(
-      provisional: true,
-      sound: true,
-      alert: true,
-      badge: true,
-      announcement: true,
-      carPlay: true,);
+      if(settings.authorizationStatus == AuthorizationStatus.authorized){
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-
-    } else {
-      Fluttertoast.showToast(msg: 'User denied permission');
+      }else{
+        Fluttertoast.showToast(msg: 'User denied permission');
+      }
     }
-  }
 
 
-  Future<void> initialize() async {
-    AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings(
-        '@mipmap/ic_launcher');
-    InitializationSettings initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid);
 
-    await flutterLocalNotifications.initialize(
+    Future<void> initialize()async{
+      AndroidInitializationSettings initializationSettingsAndroid  = AndroidInitializationSettings('@mipmap/ic_launcher');
+      InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+
+      await flutterLocalNotifications.initialize(
         initializationSettings,
-        onDidReceiveBackgroundNotificationResponse: handleNotificationResponse
-    );
+        onDidReceiveBackgroundNotificationResponse:handleNotificationResponse
+      );
 
-    FirebaseMessaging.onMessage.listen((event) {
+      FirebaseMessaging.onMessage.listen((event) {
 
-    },);
+      },);
 
-    FirebaseMessaging.onMessageOpenedApp.listen((event) {
+      FirebaseMessaging.onMessageOpenedApp.listen((event) {
 
-    },);
+      },);
 
-    FirebaseMessaging.instance.getInitialMessage().then((value) {
+      FirebaseMessaging.instance.getInitialMessage().then((value) {
 
-    },);
-  }
+      },);
+    }
 
 
-  Future<void> handlerMessage() async {
+    Future<void> handlerMessage()async{
 
-  }
+    }
+
 
 
   void sendOrderNotification(
@@ -80,9 +80,11 @@ class PushNotificationSystem {
           "message": {
             "token": token,
             "data": {
+
             },
             "notification": {"title": 'Prince', "body": message}
           }
+
         }),
       );
 
@@ -107,9 +109,12 @@ class PushNotificationSystem {
     if (response.payload != null && response.input != null) {
       Map<String, dynamic> data = jsonDecode(response.payload!);
       String replyText = response.input!;
+
+
+
+
     }
   }
-}
 
   // Future initializeCloudMessaging(BuildContext context) async {
   //   // 1. Terminated
@@ -201,4 +206,4 @@ class PushNotificationSystem {
   //   messaging.subscribeToTopic("allUsers");
   // }
 
-
+}

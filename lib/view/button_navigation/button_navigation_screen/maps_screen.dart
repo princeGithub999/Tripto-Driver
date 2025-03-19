@@ -33,7 +33,6 @@ class MapsScreen extends StatefulWidget {
 class _MapsScreenState extends State<MapsScreen> {
   GoogleMapController? mapController;
   bool isRideAccepted = false;
-  bool isRideAccepted = false;  // Added this variable
   PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
 
   @override
@@ -209,7 +208,7 @@ class _MapsScreenState extends State<MapsScreen> {
 
                   );
                 },
-              )
+              ),
               Positioned(child:
               ElevatedButton(onPressed: () {
                 pushNotificationSystem.sendOrderNotification(message: 'dfghj', token: 'dulS42R6Sfm4TqWV80k-Qc:APA91bE8TOHDdn0ecNFD5gj88StTCv6NkMt9qAMHFrFxtg4bpVg-ww9cZ8etBUNCjVXj2JncB7MaqWEENzE6hDgMwyL3ujG_MWRPY1tDZ1ae3GYw4ixAzAI');
