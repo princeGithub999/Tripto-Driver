@@ -45,7 +45,7 @@ class VehicleRc extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(width: 5,),
             Text(important,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20,color: Colors.red),)
           ],
