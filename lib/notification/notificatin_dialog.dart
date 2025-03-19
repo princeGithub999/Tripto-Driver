@@ -3,9 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:just_audio/just_audio.dart';
 import '../model/ride_request_model/user_ride_request_notification_model.dart';
 
 

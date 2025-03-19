@@ -8,7 +8,6 @@ import '../../../notification/notificatin_dialog.dart';
 import '../../../model/ride_request_model/user_ride_request_notification_model.dart';
 
 
-  const DriverHomeScreen({super.key, required this.driverId});
 
 class DriverHomePage extends StatefulWidget {
   const DriverHomePage({super.key});
@@ -43,33 +42,6 @@ class _DriverHomePageState extends State<DriverHomePage> {
     });
   }
 
-
-  void _showRideRequestDialog(DocumentSnapshot ride) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("New Ride Request 🚖"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Pickup: ${ride['pickup_location']['lat']}, ${ride['pickup_location']['lng']}"),
-              Text("Drop: ${ride['drop_location']['lat']}, ${ride['drop_location']['lng']}"),
-              SizedBox(height: 10),
-              const Text("Do you want to accept this ride?", style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => _cancelRide(ride.id),
-              child: const Text("Reject", style: TextStyle(color: Colors.red)),
-            ),
-            ElevatedButton(
-              onPressed: () => _acceptRide(ride.id),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              child: const Text("Accept"),
   void fetchRideRequestDetails(String rideRequestId) {
     DatabaseReference rideRequestRef = FirebaseDatabase.instance
         .ref()
