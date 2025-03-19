@@ -30,7 +30,6 @@ class _BottomNavigationState extends State<BottomNavigation> {
     listPage = [
       MapsScreen(pickUpLatLng: defaultPickup, dropLatLng: defaultDrop, driverId: '', ),
       const RatingScreen(),
-      DriverHomePage(),
       ProfileScreen()
     ];
 
