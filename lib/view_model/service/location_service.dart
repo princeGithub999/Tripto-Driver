@@ -36,6 +36,7 @@ class LocationServices {
     return null;
   }
 
+
   static Future<Map<String, dynamic>> getRouteAndDistance(LatLng start, LatLng end) async {
     final response = await http.get(
       Uri.parse("https://maps.gomaps.pro/maps/api/directions/json?origin=${start.latitude},${start.longitude}&destination=${end.latitude},${end.longitude}&mode=driving&key=$_apiKey"),
