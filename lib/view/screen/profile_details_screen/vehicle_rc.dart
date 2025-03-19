@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/utils/app_sizes/sizes.dart';
+import 'package:tripto_driver/utils/constants/colors.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
 
 class VehicleRc extends StatelessWidget {
@@ -27,9 +28,9 @@ class VehicleRc extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildUploadSection('Front side of your RC', true, provider),
+            _buildUploadSection('Front side of your RC',"*", true, provider),
             const SizedBox(height: 16),
-            _buildUploadSection('Back side of your RC', false, provider),
+            _buildUploadSection('Back side of your RC',"*", false, provider),
             const SizedBox(height: 16),
             _buildSubmitButton(provider, context),
           ],
@@ -38,11 +39,17 @@ class VehicleRc extends StatelessWidget {
     );
   }
 
-  Widget _buildUploadSection(String title, bool isFront, FromProvider provider) {
+  Widget _buildUploadSection(String title,String important ,bool isFront, FromProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        Row(
+          children: [
+            Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+            SizedBox(width: 5,),
+            Text(important,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20,color: Colors.red),)
+          ],
+        ),
         const SizedBox(height: 8),
         GestureDetector(
           onTap: () => provider.pickRcImage(isFront),
@@ -50,7 +57,7 @@ class VehicleRc extends StatelessWidget {
             width: double.infinity,
             height: 150,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.blue, width: 1),
+              border: Border.all(color: AppColors.blue900, width: 2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: (isFront ? provider.frontRcImage : provider.backRcImage) == null

@@ -5,7 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
 class LocationServices {
-  static const String _apiKey = "AlzaSyLunTpi4Vdi1r11jKOdxae_3FH6uLV4doi";
+  static const String _apiKey = "AlzaSye-jhvZNrXcvPX1gWvOgXNlPd0zo6fbZop";
 
   static Future<LatLng> getUserLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -35,6 +35,7 @@ class LocationServices {
     }
     return null;
   }
+
 
   static Future<Map<String, dynamic>> getRouteAndDistance(LatLng start, LatLng end) async {
     final response = await http.get(

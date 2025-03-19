@@ -29,9 +29,9 @@ class DrivingLicenseDetails extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildUploadSection('Front side of your DL', true, provider),
+              _buildUploadSection('Front side of your DL',"*", true, provider),
               const SizedBox(height: 16),
-              _buildUploadSection('Back side of your DL', false, provider),
+              _buildUploadSection('Back side of your DL',"*", false, provider),
               const SizedBox(height: 16),
 
               TextFromPage.buildTextField(
@@ -54,11 +54,17 @@ class DrivingLicenseDetails extends StatelessWidget {
   }
 
 
-  Widget _buildUploadSection(String title, bool isFront, FromProvider provider) {
+  Widget _buildUploadSection(String title,String important, bool isFront, FromProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        Row(
+          children: [
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            SizedBox(width: 5,),
+            Text(important,style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.red,fontSize: 20))
+          ],
+        ),
         const SizedBox(height: 8),
         GestureDetector(
           onTap: () => provider.pickDrivingLicenceImage(isFront),

@@ -74,24 +74,38 @@ class Validation {
     if (value == null || value.isEmpty) {
       return 'Date of Birth is required';
     }
-    // Regular expression for DD/MM/YYYY or YYYY-MM-DD format
-    final RegExp dobRegex = RegExp(r"^(?:\d{2}/\d{2}/\d{4}|\d{4}-\d{2}-\d{2})$");
+
+    // Regular expression to match D/M/YYYY, DD/MM/YYYY, YYYY-M-D, YYYY-MM-DD
+    final RegExp dobRegex = RegExp(r"^(?:\d{1,2}/\d{1,2}/\d{4}|\d{4}-\d{1,2}-\d{1,2})$");
+
     if (!dobRegex.hasMatch(value)) {
-      return 'Enter a valid Date of Birth (DD/MM/YYYY or YYYY-MM-DD)';
+      return 'Enter a valid Date of Birth (D/M/YYYY or YYYY-M-D)';
     }
+
     try {
-      // Convert string to DateTime
-      DateTime dob = DateTime.parse(value.contains('/')
-          ? value.split('/').reversed.join('-')
-          : value);
+      DateTime dob;
+      if (value.contains('/')) {
+        // Convert "2/1/2002" to "2002-01-02" for DateTime.parse()
+        List<String> parts = value.split('/');
+        String formattedDate =
+            "${parts[2]}-${parts[1].padLeft(2, '0')}-${parts[0].padLeft(2, '0')}";
+        dob = DateTime.parse(formattedDate);
+      } else {
+        // Direct parsing for "YYYY-MM-DD"
+        dob = DateTime.parse(value);
+      }
 
       DateTime today = DateTime.now();
       int age = today.year - dob.year;
 
-      // Age check (e.g., 18+ required)
       if (dob.isAfter(today)) {
         return 'Date of Birth cannot be in the future';
-      } else if (age < 18) {
+      } else if (dob.month > today.month ||
+          (dob.month == today.month && dob.day > today.day)) {
+        age--; // Adjust age if birthday hasn't occurred this year yet
+      }
+
+      if (age < 18) {
         return 'You must be at least 18 years old';
       }
     } catch (e) {
@@ -99,7 +113,8 @@ class Validation {
     }
 
     return null;
-  }
+    }
+
 
   static String? validateBankName(String? value) {
     if (value == null || value.trim().isEmpty) {

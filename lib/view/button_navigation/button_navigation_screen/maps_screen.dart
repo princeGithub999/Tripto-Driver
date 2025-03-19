@@ -1,23 +1,29 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:location/location.dart';
+import 'package:provider/provider.dart';
+import 'package:tripto_driver/model/ride_request_model/ride_request_model.dart';
+import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
+import 'package:tripto_driver/view_model/provider/ride_request/ride_request_provider.dart';
+import 'package:tripto_driver/view_model/service/auth_service.dart';
 
-import '../../../view_model/service/location_service.dart';
+import '../../../model/driver_data_model/driver_profile_model.dart';
+import '../../../notification/push_notification.dart';
+import '../../../utils/globle_widget/ride_accpated_buttom_sheet.dart';
+
 
 
 class MapsScreen extends StatefulWidget {
   final LatLng pickUpLatLng;
   final LatLng dropLatLng;
-  final String driverId; // Added driverId to track the specific driver in Firebase
+  final String driverId;
 
   const MapsScreen({
     super.key,
     required this.pickUpLatLng,
     required this.dropLatLng,
-    required this.driverId, // Required parameter for Firebase tracking
+    required this.driverId,
   });
 
   @override
@@ -26,239 +32,194 @@ class MapsScreen extends StatefulWidget {
 
 class _MapsScreenState extends State<MapsScreen> {
   GoogleMapController? mapController;
-  Set<Marker> markers = {};
-  Set<Polyline> polylines = {};
-  String distanceText = "";
-  String durationText = "";
-  bool isOnline = false;
-  LatLng? currentLocation;
-  late DatabaseReference driverRef; // Firebase reference for the driver
-  Location location = Location();
+  bool isRideAccepted = false;
+  PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
 
   @override
   void initState() {
     super.initState();
-    driverRef = FirebaseDatabase.instance.ref("drivers/${widget.driverId}"); // Firebase reference for this driver
-    _setMarkersAndRoute();
-    _listenToOnlineStatus();
+    Provider.of<MapsProvider>(context,listen: false).setMarkersAndRoute(widget.pickUpLatLng,widget.dropLatLng);
   }
-
-  void _listenToOnlineStatus() {
-    driverRef.child("isOnline").onValue.listen((event) {
-      if (event.snapshot.exists) {
-        bool status = event.snapshot.value as bool;
-        setState(() {
-          isOnline = status;
-        });
-      }
-    });
-  }
-
-  /// **Toggle the online status and update Firebase**
-  Future<void> _toggleOnlineStatus(bool status) async {
-    setState(() {
-      isOnline = status;
-    });
-
-    await driverRef.update({"isOnline": isOnline});
-
-    Fluttertoast.showToast(
-      msg: isOnline ? "You are now Online" : "You are now Offline",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-    );
-
-    if (isOnline) {
-      _getCurrentLocation();
-      _trackLiveLocation(); // Start tracking live location
-    }
-  }
-
-  /// **Get the driver's current location and update Firebase**
-  Future<void> _getCurrentLocation() async {
-    var locationData = await location.getLocation();
-
-    setState(() {
-      currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
-      markers.add(Marker(
-        markerId: const MarkerId("current_location"),
-        position: currentLocation!,
-        infoWindow: const InfoWindow(title: "Your Current Location"),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-      ));
-    });
-
-    await driverRef.update({
-      "latitude": locationData.latitude,
-      "longitude": locationData.longitude,
-    });
-
-    if (mapController != null) {
-      mapController!.animateCamera(
-        CameraUpdate.newLatLngZoom(currentLocation!, 14),
-      );
-    }
-  }
-
-  /// **Track live location updates and update Firebase**
-  void _trackLiveLocation() {
-    location.onLocationChanged.listen((locationData) {
-      if (isOnline) {
-        setState(() {
-          currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
-          markers.removeWhere((marker) => marker.markerId.value == "current_location");
-          markers.add(Marker(
-            markerId: const MarkerId("current_location"),
-            position: currentLocation!,
-            infoWindow: const InfoWindow(title: "Your Live Location"),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-          ));
-        });
-
-        // Update location in Firebase
-        driverRef.update({
-          "latitude": locationData.latitude,
-          "longitude": locationData.longitude,
-        });
-      }
-    });
-  }
-
-  /// ** Fetch the route and update markers ** ///
-  Future<void> _setMarkersAndRoute() async {
-    setState(() {
-      markers.add(Marker(
-        markerId: const MarkerId("pickup"),
-        position: widget.pickUpLatLng,
-        infoWindow: const InfoWindow(title: "User Pickup Location"),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-      ));
-
-      markers.add(Marker(
-        markerId: const MarkerId("drop"),
-        position: widget.dropLatLng,
-        infoWindow: const InfoWindow(title: "User Destination"),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-      ));
-    });
-
-    final result = await LocationServices.getRouteAndDistance(widget.pickUpLatLng, widget.dropLatLng);
-
-    if (result.isNotEmpty) {
-      setState(() {
-        distanceText = result["distance"];
-        durationText = result["duration"];
-        polylines.add(Polyline(
-          polylineId: const PolylineId("route"),
-          points: result["polyline"],
-          width: 5,
-          color: Colors.blue,
-        ));
-      });
-
-      _moveCameraToRoute();
-    }
-  }
-
-  /// **Move camera to fit the route**
-  void _moveCameraToRoute() {
-    mapController?.animateCamera(CameraUpdate.newLatLngBounds(
-      LatLngBounds(
-        southwest: LatLng(
-          widget.pickUpLatLng.latitude < widget.dropLatLng.latitude
-              ? widget.pickUpLatLng.latitude
-              : widget.dropLatLng.latitude,
-          widget.pickUpLatLng.longitude < widget.dropLatLng.longitude
-              ? widget.pickUpLatLng.longitude
-              : widget.dropLatLng.longitude,
+  // Add this method to show bottom sheet
+  void _showBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(25.0),
+            topRight: Radius.circular(25.0),
+          ),
         ),
-        northeast: LatLng(
-          widget.pickUpLatLng.latitude > widget.dropLatLng.latitude
-              ? widget.pickUpLatLng.latitude
-              : widget.dropLatLng.latitude,
-          widget.pickUpLatLng.longitude > widget.dropLatLng.longitude
-              ? widget.pickUpLatLng.longitude
-              : widget.dropLatLng.longitude,
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            Container(
+              height: 5,
+              width: 40,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Ride Details',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            // Add your ride details widgets here
+          ],
         ),
       ),
-      100,
-    ));
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Driver Map")),
-      body: Stack(
-        children: [
-          GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: widget.pickUpLatLng,
-              zoom: 12,
-            ),
-            onMapCreated: (controller) {
-              setState(() {
-                mapController = controller;
-              });
-            },
-            markers: markers,
-            polylines: polylines,
-          ),
-          // Distance and ETA display (Top Center)
-          Positioned(
-            top: 30,
-            left: 10,
-            right: 10,
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
+    var sizes = MediaQuery.of(context).size;
+    return Consumer<MapsProvider>(
+      builder: (BuildContext context, mapProvider, Widget? child) {
+        if (isRideAccepted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _showBottomSheet();
+            isRideAccepted = false;
+          });
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            title:  InkWell(
+                child: Text("Location sharing ${mapProvider.isOnline ? ' Enable' :'Disable'}. Tap hare")),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: CupertinoSwitch(
+                  value: mapProvider.isOnline,
+                  onChanged: (value) {
+                    mapProvider.toggleOnlineStatus(value);
+                  },
+                  activeColor: Colors.green,
+                ),
               ),
-              child: Text(
-                "Distance: $distanceText, ETA: $durationText",
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
+
+            ],
           ),
-          // Online/Offline color indicator (Top Right Corner)
-          Positioned(
-            top: 40,
-            right: 10,
-            child: Row(
-              children: [
-                Container(
-                  width: 15,
-                  height: 15,
+          body: Stack(
+            children: [
+              GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: mapProvider.isOnline
+                      ? (mapProvider.currentLocation??LatLng(25.6102, 85.1415))
+                      : const LatLng(25.6102, 85.1415),
+                  zoom: 15,
+                ),
+                onMapCreated: (controller) {
+                  mapProvider.onMapCreated(controller);
+                },
+
+                markers: mapProvider.markers,
+                polylines: mapProvider.polyline,
+              ),
+
+              Positioned(
+                top: 10,
+                left: 5,
+                right: 5,
+                child: Container(
+                  padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
-                    color: isOnline ? Colors.green : Colors.red,
-                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Distance: ${mapProvider.distanceText}, ETA: ${mapProvider.durationText}",
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(width: sizes.width * 0.1),
+                      Container(
+                        width: 15,
+                        height: 15,
+                        decoration: BoxDecoration(
+                          color: mapProvider.isOnline ? Colors.green : Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 5,),
+                      Text(
+                      mapProvider. isOnline ? "Online" : "Offline",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: mapProvider.isOnline ? Colors.green : Colors.red,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 5),
-                Text(
-                  isOnline ? "Online" : "Offline",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isOnline ? Colors.green : Colors.red,
-                  ),
-                ),
-              ],
-            ),
+              ),
+              Consumer<RideRequestProvider>(
+                builder: (BuildContext context, rideRequest, Widget? child) {
+                  return Positioned(child:
+                  StreamBuilder<List<RideRequestModel>>(
+                    stream: rideRequest.getPendingRideRequests(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      var rideRequests = snapshot.data!;
+
+                      if (rideRequests.isEmpty) {
+                        return const Center(child: Text("No ride requests available"));
+                      }
+
+                      return ListView.builder(
+                        itemCount: rideRequests.length,
+                        itemBuilder: (context, index) {
+                          var ride = rideRequests[index];
+
+                          return Card(
+                            margin: const EdgeInsets.all(10),
+                            child: ListTile(
+                              title: Text("User: ${ride.userName}"),
+                              subtitle: Text("Pickup: ${ride.pickupLat}, ${ride.pickupLng}"),
+                              trailing: ElevatedButton(
+                                onPressed: () {
+
+                                },
+                                child: const Text("Accept"),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  )
+
+
+                  );
+                },
+              ),
+              Positioned(child:
+              ElevatedButton(onPressed: () {
+                pushNotificationSystem.sendOrderNotification(message: 'dfghj', token: 'dulS42R6Sfm4TqWV80k-Qc:APA91bE8TOHDdn0ecNFD5gj88StTCv6NkMt9qAMHFrFxtg4bpVg-ww9cZ8etBUNCjVXj2JncB7MaqWEENzE6hDgMwyL3ujG_MWRPY1tDZ1ae3GYw4ixAzAI');
+                // RideAccpatedButtomSheet().showRideRequestBottomSheet(context);
+              }, child: const Text('Click'))
+        
+         )
+            ],
           ),
-          // Online/Offline switch (Bottom Left)
-          Positioned(
-            bottom: 20,
-            left: 20,
-            child: CupertinoSwitch(
-              value: isOnline,
-              onChanged: _toggleOnlineStatus,
-              activeColor: Colors.green,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

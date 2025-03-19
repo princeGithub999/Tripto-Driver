@@ -2,24 +2,42 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:provider/provider.dart';
 import '../../utils/constants/app_image.dart';
 import '../../utils/constants/app_string.dart';
 import '../../utils/helpers/helper_functions.dart';
 import '../../view_model/getx/onboarding_controller/onboarding_controller.dart';
+import '../../view_model/provider/map_provider/maps_provider.dart';
 import 'onboarding_desine_page.dart';
 import 'onboarding_dot_navigation.dart';
 import 'onboarding_getstarted.dart';
 import 'onboarding_skip.dart';
 
 
-class OnBoardingScreen extends StatelessWidget {
+class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
 
+  @override
+  State<OnBoardingScreen> createState() => _OnBoardingScreenState();
+}
+
+class _OnBoardingScreenState extends State<OnBoardingScreen> {
+
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<MapsProvider>(context,listen: false).getCurrentLocation();
+    Provider.of<MapsProvider>(context,listen: false).fetchOnlineStatus();
+
+  }
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(OnboardingController());
     final sizes = MediaQuery.of(context).size;
     final dark = AppHelperFunctions.isDarkMode(context);
+
+
 
     return Scaffold(
       body: Stack(

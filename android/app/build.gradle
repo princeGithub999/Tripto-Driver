@@ -10,13 +10,13 @@ plugins {
 
 android {
     namespace = "com.example.tripto_driver"
-    compileSdk = 34
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
-cc
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-        sourceCompatibility = kotlinOptions
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
@@ -41,6 +41,10 @@ cc
             signingConfig = signingConfigs.debug
         }
     }
+    dependencies {
+        coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
+    }
+
 }
 
 flutter {

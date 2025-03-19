@@ -166,6 +166,7 @@ class AuthProviderIn extends ChangeNotifier {
 
       );
 
+      // Store data in Firestore
       await authService.saveDriverData(driverId, data);
 
       // Store minimal data in Realtime Database

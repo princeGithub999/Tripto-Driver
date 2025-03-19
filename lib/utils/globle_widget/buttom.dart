@@ -6,7 +6,7 @@ import '../app_sizes/sizes.dart';
 
 class MyButton {
 
-  static Widget globalButton(VoidCallback onPress, String buttomName) {
+  static Widget sendOtpButton(VoidCallback onPress, String buttomName, bool isLoding) {
     return ElevatedButton(
       onPressed: onPress,
       style: ElevatedButton.styleFrom(
@@ -15,7 +15,22 @@ class MyButton {
         minimumSize: const Size(double.infinity,40),
 
       ),
-      child:  Text(buttomName,style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: AppSizes.buttomTextSize),),
+      child: isLoding ? SizedBox(height: 25, width: 25, child: const CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.blueGrey,)) :  Text(buttomName,style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: AppSizes.buttomTextSize),),
+    );
+  }
+
+  static Widget verifyOtpButton(VoidCallback onPress, String buttomName, bool isLoding) {
+    return ElevatedButton(
+      onPressed: onPress,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.blue900,
+        // padding: EdgeInsets.symmetric(horizontal:130),
+        minimumSize: const Size(double.infinity,40),
+
+      ),
+      child: isLoding ? SizedBox(height: 25, width: 25, child: const CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.blueGrey,)) :
+
+      Text(buttomName,style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: AppSizes.buttomTextSize),),
     );
   }
 
