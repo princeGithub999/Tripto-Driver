@@ -6,11 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:tripto_driver/model/ride_request_model/ride_request_model.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import 'package:tripto_driver/view_model/provider/ride_request/ride_request_provider.dart';
-import 'package:tripto_driver/view_model/service/auth_service.dart';
-
-import '../../../model/driver_data_model/driver_profile_model.dart';
 import '../../../notification/push_notification.dart';
-import '../../../utils/globle_widget/ride_accpated_buttom_sheet.dart';
+
 
 
 
