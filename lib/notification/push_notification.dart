@@ -93,9 +93,7 @@ class PushNotificationSystem {
       } else {
         print(
             'Failed to send notification. Status Code: ${response.statusCode}');
-        Fluttertoast.showToast(
-          msg: "Failed to send notification ${response.statusCode}",
-        );
+        Fluttertoast.showToast(msg: "Failed to send notification ${response.statusCode}",);
       }
     } catch (e) {
       print('Error sending notification: $e');

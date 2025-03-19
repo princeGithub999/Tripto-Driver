@@ -100,7 +100,7 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                   Row(
                     children: [
                       Image.asset('assets/icons/destination.png', height: 24, width: 24),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           widget.userRideRequestDetails?.destinationAddress ?? "Unknown Destination",
@@ -124,7 +124,7 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
 
             // Buttons
             Padding(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -149,7 +149,7 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                     },
                     child: Text(
                       "Accept".toUpperCase(),
-                      style: TextStyle(fontSize: 15),
+                      style: const TextStyle(fontSize: 15),
                     ),
                   ),
                 ],

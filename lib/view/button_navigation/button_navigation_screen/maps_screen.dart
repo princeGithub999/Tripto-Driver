@@ -1,15 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/model/ride_request_model/ride_request_model.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import 'package:tripto_driver/view_model/provider/ride_request/ride_request_provider.dart';
 import '../../../notification/push_notification.dart';
-
-
-
+import '../../../utils/constants/colors.dart';
 
 class MapsScreen extends StatefulWidget {
   final LatLng pickUpLatLng;
@@ -27,55 +25,41 @@ class MapsScreen extends StatefulWidget {
   State<MapsScreen> createState() => _MapsScreenState();
 }
 
-class _MapsScreenState extends State<MapsScreen> {
+class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateMixin {
   GoogleMapController? mapController;
   bool isRideAccepted = false;
   PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
+  late AnimationController _animationController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
-    Provider.of<MapsProvider>(context,listen: false).setMarkersAndRoute(widget.pickUpLatLng,widget.dropLatLng);
-  }
-  // Add this method to show bottom sheet
-  void _showBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.7,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(25.0),
-            topRight: Radius.circular(25.0),
-          ),
-        ),
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-            Container(
-              height: 5,
-              width: 40,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Ride Details',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            // Add your ride details widgets here
-          ],
-        ),
-      ),
+    Provider.of<MapsProvider>(context, listen: false).setMarkersAndRoute(widget.pickUpLatLng, widget.dropLatLng);
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
     );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 1), // Start position (bottom se aayega)
+      end: Offset.zero, // End position
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void showRideRequests() {
+    _animationController.forward();
+  }
+
+  void hideRideRequests() {
+    _animationController.reverse();
   }
 
   @override
@@ -83,17 +67,10 @@ class _MapsScreenState extends State<MapsScreen> {
     var sizes = MediaQuery.of(context).size;
     return Consumer<MapsProvider>(
       builder: (BuildContext context, mapProvider, Widget? child) {
-        if (isRideAccepted) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _showBottomSheet();
-            isRideAccepted = false;
-          });
-        }
-
         return Scaffold(
           appBar: AppBar(
-            title:  InkWell(
-                child: Text("Location sharing ${mapProvider.isOnline ? ' Enable' :'Disable'}. Tap hare")),
+            title: InkWell(
+                child: Text("Location sharing ${mapProvider.isOnline ? ' Enable' : 'Disable'}. Tap here")),
             actions: [
               Padding(
                 padding: const EdgeInsets.only(right: 10),
@@ -105,24 +82,153 @@ class _MapsScreenState extends State<MapsScreen> {
                   activeColor: Colors.green,
                 ),
               ),
-
             ],
           ),
+
           body: Stack(
             children: [
               GoogleMap(
                 initialCameraPosition: CameraPosition(
                   target: mapProvider.isOnline
-                      ? (mapProvider.currentLocation??LatLng(25.6102, 85.1415))
+                      ? (mapProvider.currentLocation ?? LatLng(25.6102, 85.1415))
                       : const LatLng(25.6102, 85.1415),
                   zoom: 15,
                 ),
                 onMapCreated: (controller) {
                   mapProvider.onMapCreated(controller);
                 },
-
                 markers: mapProvider.markers,
                 polylines: mapProvider.polyline,
+              ),
+
+              Consumer<RideRequestProvider>(
+                builder: (BuildContext context, rideRequest, Widget? child) {
+                  return Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: StreamBuilder<List<RideRequestModel>>(
+                      stream: rideRequest.getPendingRideRequests(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          hideRideRequests(); // Hide box if no request
+                          return const SizedBox();
+                        }
+
+                        var latestRide = snapshot.data!.last; // Get only the latest ride request
+                        showRideRequests(); // Show box when a request arrives
+
+                        return SlideTransition(
+                          position: _slideAnimation,
+                          child: Container(
+                            height: sizes.height * 0.4 - 50,
+                            padding: const EdgeInsets.all(10),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10)],
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                            ),
+                            child:  Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: sizes.height * 0.1 - 70),
+                              Text(
+                                "New Ride Request",
+                                style: GoogleFonts.aBeeZee(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 5),
+                              const Divider(),
+                              const SizedBox(height: 10),
+
+                              Row(
+                                children: [
+                                  const CircleAvatar(
+                                    maxRadius: 30,
+                                    backgroundColor: AppColors.blue900,
+                                    child: Icon(Icons.person, color: Colors.white),
+                                  ),
+                                  const SizedBox(width: 15),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Prince Yadav', style: GoogleFonts.aBeeZee(fontSize: 18, fontWeight: FontWeight.bold)),
+                                      Text('Cash Payment', style: GoogleFonts.aBeeZee()),
+                                    ],
+                                  )
+                                ],
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              const Row(
+                                children: [
+                                  Icon(Icons.pin_drop),
+                                  SizedBox(width: 5),
+                                  Text("Pickup: India Gate, Delhi", style: TextStyle(fontSize: 16)),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+
+                              const Row(
+                                children: [
+                                  Icon(Icons.local_fire_department_rounded),
+                                  SizedBox(width: 5),
+                                  Text("Drop: Connaught Place, Delhi", style: TextStyle(fontSize: 16)),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: () {
+
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(vertical: 10),
+                                        backgroundColor: Colors.red
+                                      ),
+                                      child: const Text("Cancel", style: TextStyle(fontSize: 18, color: Colors.white)),
+                                    ),
+                                  ),
+                                   const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Consumer<RideRequestProvider>(
+                                      builder: (context, rideRequest, child) {
+                                        return ElevatedButton(
+                                          onPressed: () async {
+                                            await rideRequest.acceptRideRequest(latestRide.id, 'accept');
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(vertical: 10),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                          child: rideRequest.isLoding
+                                              ? const SizedBox(
+                                                height: 21,
+                                                width: 21,
+                                                child: CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                ),
+                                              )
+                                              : const Text("Accept", style: TextStyle(fontSize: 18, color: Colors.white)),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                        );
+
+                      },
+                    ),
+                  );
+                },
               ),
 
               Positioned(
@@ -150,9 +256,9 @@ class _MapsScreenState extends State<MapsScreen> {
                           shape: BoxShape.circle,
                         ),
                       ),
-                      const SizedBox(width: 5,),
+                      const SizedBox(width: 5),
                       Text(
-                      mapProvider. isOnline ? "Online" : "Offline",
+                        mapProvider.isOnline ? "Online" : "Offline",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -163,56 +269,6 @@ class _MapsScreenState extends State<MapsScreen> {
                   ),
                 ),
               ),
-              Consumer<RideRequestProvider>(
-                builder: (BuildContext context, rideRequest, Widget? child) {
-                  return Positioned(child:
-                  StreamBuilder<List<RideRequestModel>>(
-                    stream: rideRequest.getPendingRideRequests(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      var rideRequests = snapshot.data!;
-
-                      if (rideRequests.isEmpty) {
-                        return const Center(child: Text("No ride requests available"));
-                      }
-
-                      return ListView.builder(
-                        itemCount: rideRequests.length,
-                        itemBuilder: (context, index) {
-                          var ride = rideRequests[index];
-
-                          return Card(
-                            margin: const EdgeInsets.all(10),
-                            child: ListTile(
-                              title: Text("User: ${ride.userName}"),
-                              subtitle: Text("Pickup: ${ride.pickupLat}, ${ride.pickupLng}"),
-                              trailing: ElevatedButton(
-                                onPressed: () {
-
-                                },
-                                child: const Text("Accept"),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  )
-
-
-                  );
-                },
-              ),
-              Positioned(child:
-              ElevatedButton(onPressed: () {
-                pushNotificationSystem.sendOrderNotification(message: 'dfghj', token: 'dulS42R6Sfm4TqWV80k-Qc:APA91bE8TOHDdn0ecNFD5gj88StTCv6NkMt9qAMHFrFxtg4bpVg-ww9cZ8etBUNCjVXj2JncB7MaqWEENzE6hDgMwyL3ujG_MWRPY1tDZ1ae3GYw4ixAzAI');
-                // RideAccpatedButtomSheet().showRideRequestBottomSheet(context);
-              }, child: const Text('Click'))
-        
-         )
             ],
           ),
         );
