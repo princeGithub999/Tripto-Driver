@@ -1,4 +1,4 @@
-import 'dart:convert';
+ import 'dart:convert';
 
 DriverAddressModel welcomeFromJson(String str) => DriverAddressModel.fromJson(json.decode(str));
 

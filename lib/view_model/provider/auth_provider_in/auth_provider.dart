@@ -5,10 +5,16 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tripto_driver/model/driver_data_model/driver_address_model.dart';
 import 'package:tripto_driver/model/driver_data_model/driver_data_model.dart';
+import 'package:tripto_driver/model/driver_data_model/driver_document_model.dart';
+import 'package:tripto_driver/model/driver_data_model/vehicles_model.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view/auth_screen/verify_otp_page.dart';
+import 'package:tripto_driver/view/home_page.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
+import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import 'package:tripto_driver/view_model/service/auth_service.dart';
 import '../../../model/driver_data_model/driver_profile_model.dart';
 import '../../../view/button_navigation/button_navigation.dart';
@@ -18,6 +24,8 @@ import '../../service/notifaction_service.dart';
 
 class AuthProviderIn extends ChangeNotifier {
 
+
+
   TextEditingController inputNumber = TextEditingController();
   bool isLoding = false;
   AuthService authService = AuthService();
@@ -25,35 +33,90 @@ class AuthProviderIn extends ChangeNotifier {
   NotificationService notificationService = NotificationService();
   final FirebaseDatabase realTimeDb = FirebaseDatabase.instance;
   bool isOnline = false;
+  var mapProvider = Provider.of<MapsProvider>(Get.context!, listen: false);
+  final supabaseOTP = Supabase.instance.client;
+  dynamic supaNumber;
+  DriverModel? driverProfile;
 
 
+  AuthProviderIn(){
+    supaNumber = supabaseOTP.auth.currentUser?.phone;
+    Fluttertoast.showToast(msg: '$supaNumber');
+    print('Number $supaNumber');
+  }
 
+  Future<void> supaOtp(String phoneNumber) async {
 
+    isLoding = true;
+    notifyListeners();
+    try {
 
-  Future<void> requestOTP(String phoneNumber)async{
-
-    try{
-
-      isLoding = true;
-      notifyListeners();
-      if(phoneNumber.isNotEmpty){
-        authService.requestOTP(phoneNumber).then((value) {
-          if(value == true){
-            AppHelperFunctions.navigateToScreen(Get.context!, const VerifyOtpPage());
-          }
-        },);
-      }else{
-        Fluttertoast.showToast(msg: 'please enter phone number');
-      }
-    }catch(error){
-      Fluttertoast.showToast(msg: '$error');
-
-    }finally{
-
+      await supabaseOTP.auth.signInWithOtp(
+        phone: '+91$phoneNumber',
+      );
+      AppHelperFunctions.navigateToScreen(Get.context!,const VerifyOtpPage());
+      AppHelperFunctions.showSnackBar('OTP sent successfully!');
+    } catch (e, stackTrace) {
+      print('OTP Error: $e');
+      print('Stack Trace: $stackTrace');
+      AppHelperFunctions.showSnackBar('Failed to send OTP: $e');
+    } finally {
       isLoding = false;
       notifyListeners();
     }
   }
+
+  Future<void> supaVeryfiOTP(String phoneNumber, String otp)async{
+
+    var currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    isLoding = true;
+    notifyListeners();
+    try{
+      final response = await supabaseOTP.auth.verifyOTP(
+          phone: '+91$phoneNumber',
+          token: otp,
+          type: OtpType.sms
+      );
+
+      if(response.session != null){
+        Fluttertoast.showToast(msg: 'v sucess');
+        authService.checkStatus(phoneNumber,);
+      }else{
+        AppHelperFunctions.showSnackBar('Invalid OTP!');
+      }
+    }catch(e){
+      AppHelperFunctions.showSnackBar('Failed to verify OTP: $e');
+    }finally{
+      isLoding = false;
+      notifyListeners();
+    }
+  }
+
+
+  // Future<void> requestOTP(String phoneNumber)async{
+  //
+  //   try{  b0.0
+  //
+  //     isLoding = true;
+  //     notifyListeners();
+  //     if(phoneNumber.isNotEmpty){
+  //       authService.requestOTP(phoneNumber).then((value) {
+  //         if(value == true){
+  //           AppHelperFunctions.navigateToScreen(Get.context!, const VerifyOtpPage());
+  //         }
+  //       },);
+  //     }else{
+  //       Fluttertoast.showToast(msg: 'please enter phone number');
+  //     }
+  //   }catch(error){
+  //     Fluttertoast.showToast(msg: '$error');
+  //
+  //   }finally{
+  //
+  //     isLoding = false;
+  //     notifyListeners();
+  //   }
+  // }
 
 
   Future<void> signInWithGoogle()async{
@@ -67,7 +130,9 @@ class AuthProviderIn extends ChangeNotifier {
       if (success == true) {
         print('Login Success! Navigating to HomePage...');
         // Get.to(() =>  FormFillupScreen());
-        AppHelperFunctions.navigateToScreenBeforeEndPage(Get.context!, FormFillupScreen());
+        // AppHelperFunctions.navigateToScreenBeforeEndPage(Get.context!, FormFillupScreen());
+
+        authService.checkStatus(inputNumber.text.trim());
       } else {
         print('Login Failed!');
       }
@@ -81,9 +146,81 @@ class AuthProviderIn extends ChangeNotifier {
 
   }
 
+  // Future<DriverProfileModel?> getData()async{
+  //
+  //   var currentUser =  FirebaseAuth.instance.currentUser;
+  //
+  //   // if(currentUser!.uid.isNotEmpty){
+  //   //   Fluttertoast.showToast(msg: 'Error: Driver ID is empty');
+  //   //   return null;
+  //   // }
+  //
+  //   try{
+  //     DatabaseReference driverRef = realTimeDb.ref('Drivers_Data').child(currentUser!.uid);
+  //     DatabaseEvent event = await driverRef.once();
+  //
+  //     if(event.snapshot.value != null){
+  //       Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
+  //       return DriverProfileModel.fromJson(data);
+  //     }else{
+  //       Fluttertoast.showToast(msg: 'No data found');
+  //       return null;
+  //     }
+  //
+  //   }catch(e){
+  //     Fluttertoast.showToast(msg: 'Error: $e');
+  //     return null;
+  //   }
+  //
+  //   }
+
+
+
+
+  void fetchLiveProfileData(String driverId) {
+
+    DatabaseReference ref = realTimeDb.ref('Drivers_Data').child(driverId);
+
+    ref.onValue.listen((DatabaseEvent event) {
+      if (event.snapshot.exists && event.snapshot.value != null) {
+        Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
+        print("🔥 Live Updated Driver Data: $data");
+
+        driverProfile = DriverModel.fromJson(data);
+        notifyListeners();  // *🔥 UI को Auto-Refresh करें*
+      } else {
+        Fluttertoast.showToast(msg: 'No data found in Firebase.');
+      }
+    }, onError: (error) {
+      Fluttertoast.showToast(msg: 'Error: $error');
+    });
+  }
+
+
+  /// *🔥 Update Profile Data in Firebase (Live Reflect in UI)*
+  Future<void> updateProfileData(String driverId, String newName, String newPhone) async {
+    DatabaseReference ref = realTimeDb.ref('Drivers_Data').child(driverId);
+
+    try {
+      await ref.update({
+        "driverName": newName,
+        "driverPhoneNumber": newPhone,
+      });
+
+      Fluttertoast.showToast(msg: "Profile updated successfully!");
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Error updating profile: $e");
+    }
+  }
+
+
+
 
   Future<void> saveProfileData(DriverDataModel driverData) async {
+
     var driverId = FirebaseAuth.instance.currentUser?.uid;
+    // var supaId = supabaseOTP.auth.currentUser?.id;
+
     if (driverId == null) {
       AppHelperFunctions.showSnackBar("User not logged in!");
       return;
@@ -104,8 +241,6 @@ class AuthProviderIn extends ChangeNotifier {
           ? await authService.uploadImageToFirebase(fromProvider.backDrivingLicenceImage!, "driving_license/back_$driverId.jpg")
           : null;
 
-
-
       String? frontRcUrl = fromProvider.frontRcImage != null
           ? await authService.uploadImageToFirebase(fromProvider.frontRcImage!, "vehicle_rc/front_$driverId.jpg")
           : null;
@@ -122,7 +257,7 @@ class AuthProviderIn extends ChangeNotifier {
           ? await authService.uploadImageToFirebase(fromProvider.backAadharCardImage!, "aadhar/back_$driverId.jpg")
           : null;
 
-      String? panUrl = fromProvider.penCardImage != null
+      String? penUrl = fromProvider.penCardImage != null
           ? await authService.uploadImageToFirebase(fromProvider.penCardImage!, "pan_card_$driverId.jpg")
           : null;
 
@@ -130,6 +265,8 @@ class AuthProviderIn extends ChangeNotifier {
           ? await authService.uploadImageToFirebase(fromProvider.driverImage!, "driver_image_$driverId.jpg")
           : null;
 
+      var lat = mapProvider.currentLocation?.latitude;
+      var lang = mapProvider.currentLocation?.longitude;
       // Assign data to DriverDataModel
       var data = DriverDataModel(
         driverID: driverId,
@@ -150,30 +287,64 @@ class AuthProviderIn extends ChangeNotifier {
         backVehicleRcImage: backRcUrl ?? "",
         frontAadharCardImage: frontAadharUrl ?? "",
         backAadharCardImage: backAadharUrl ?? "",  // Fixed the incorrect assignment
-        penCardImage: panUrl ?? "",
+        penCardImage: penUrl ?? "",
         carName: driverData.carName,
         fcmToken: token,
       );
 
-      var realTimeData = DriverProfileModel(
-        driverID: driverId,
-        driverName: driverData.driverName,
-        driverPhoneNumber: driverData.driverPhoneNumber,
-        driverAddress: driverData.driverAddress,
-        driverImage: driverImgUrl ?? "",
-        fcmToken: token,
-        isOnline: false,
+      var address = DriverAddressModel(
+          vill: driverData.driverAddress,
+          district: 'hello',
+          pinCode: 841218,
+          policeStation: 'beheld',
+          post: 'paiga',
+          state: 'bihar',
+          lat:  lat,
+          lang: lang
+      );
+
+      var driver = DriverModel(
+          driverID: driverId,
+          documentId: driverId,
+          vehiclesId: driverId,
+          driverFirstName: driverData.driverName,
+          driverLastName: 'kumar',
+          driverEmail: driverData.driverEmail,
+          driverImage: driverImgUrl,
+          driverGender: 'male',
+          driverPhoneNumber: driverData.driverPhoneNumber,
+          fcmToken: token,
+          address: address
+      );
+      var vehiclesData = VehiclesModel(
+          driverId: driverId,
+          driverToken: token,
+          id: driverId,
+          rcImageFront: frontRcUrl,
+          rcImageBack: backRcUrl,
+          type: driverData.carName,
+          status: false,
+          vehicleNumber: ''
+
+      );
+      var documentData = DriverDocumentModel(
+        id: driverId,
+        driverId: driverId,
+        adharFront: frontAadharUrl,
+        adharBack: backAadharUrl,
+        driverLicence: driverData.dlNumber,
+        isAdharVerifide: false,
+        isDriverLicenceVerifide: false,
+        isPanVerifide: false,
+        pen: penUrl,
 
       );
 
-      // Store data in Firestore
       await authService.saveDriverData(driverId, data);
-
-      // Store minimal data in Realtime Database
-      await authService.saveDriverDataInRealTime(realTimeData);
-
-      // Navigate to home screen
-      AppHelperFunctions.navigateToScreen(Get.context!, BottomNavigation());
+      await authService.saveDriverDataInRealTime(driverId, driver);
+      await authService.saveDriverVehiclesData(driverId, vehiclesData);
+      await authService.saveDriverDocumentData(driverId, documentData);
+      AppHelperFunctions.navigateToScreenBeforeEndPage(Get.context!, const BottomNavigation());
 
       fromProvider.clearFeald();
       AppHelperFunctions.showSnackBar("Driver data successfully saved!");
@@ -188,28 +359,42 @@ class AuthProviderIn extends ChangeNotifier {
   Future<void> checkLoginStatus(BuildContext context)async{
 
     var currentUser =  FirebaseAuth.instance.currentUser;
-    if(currentUser != null){
+    var respons = Supabase.instance.client;
+    if(currentUser != null || respons.auth.currentUser != null){
       AppHelperFunctions.navigateToScreenBeforeEndPage(context, const BottomNavigation());
     }else{
       AppHelperFunctions.navigateToScreenBeforeEndPage(context, const OnBoardingScreen());
 
     }
+  }
+
+
+  Future<DriverModel?> getData()async{
+
+    var currentUser =  FirebaseAuth.instance.currentUser;
+
+    // if(currentUser!.uid.isNotEmpty){
+    //   Fluttertoast.showToast(msg: 'Error: Driver ID is empty');
+    //   return null;
+    // }
+
+    try{
+      DatabaseReference driverRef = realTimeDb.ref('Drivers_Data').child('Otc5g5d4PiWdiRa5MAaiqMhJrot1');
+      DatabaseEvent event = await driverRef.once();
+
+      if(event.snapshot.value != null){
+        Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
+        return DriverModel.fromJson(data);
+      }else{
+        Fluttertoast.showToast(msg: 'No data found');
+        return null;
+      }
+
+    }catch(e){
+      Fluttertoast.showToast(msg: 'Error: $e');
+      return null;
     }
 
-
-
-
-  // Stream<DriverProfileModel> driverProfileGet() {
-  //   return realTimeDb.ref("DriverData").onValue.map((event) {
-  //     if (event.snapshot.exists && event.snapshot.value is Map) {
-  //       Map<String, dynamic> data = event.snapshot.value as Map<String, dynamic>;
-  //       return DriverProfileModel.fromJson(data);
-  //     }
-  //     return DriverProfileModel(isOnline: false);
-  //   });
-  // }
-
-
-
+    }
 
 }
