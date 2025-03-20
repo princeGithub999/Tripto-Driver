@@ -84,7 +84,7 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                       Image.asset('assets/icons/origin.png', height: 24, width: 24),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: Text(
+                        child: Text(  
                           widget.userRideRequestDetails?.originAddress ?? "Unknown Location",
                           style: TextStyle(
                             fontSize: 16,
@@ -194,7 +194,7 @@ class AssistantMethod {
     if (streamSubscriptionPosition != null) {
       streamSubscriptionPosition!.pause();
     } else {
-      print("Error: streamSubscriptionPosition is null!");
+        ("Error: streamSubscriptionPosition is null!");
     }
 
     String? currentUserId = FirebaseAuth.instance.currentUser?.uid;
