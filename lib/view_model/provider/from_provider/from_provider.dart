@@ -14,7 +14,6 @@ import '../../../view/screen/profile_details_screen/vehicle_rc.dart';
 class FromProvider extends ChangeNotifier{
 
   String? selectedCar;
-  File? rcImage;
   List<String> carList = ['Auto', 'E-Rickshaw', 'Bike'];
 
   void selectCar(String car) {
@@ -34,14 +33,6 @@ class FromProvider extends ChangeNotifier{
 
 
 
-  Future<void> pickSingleRcImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      rcImage = File(pickedFile.path);
-      notifyListeners();
-    }
-
-    }
 
   TextEditingController dlNumberContro = TextEditingController();
   TextEditingController driverName = TextEditingController();
