@@ -5,9 +5,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/model/ride_request_model/ride_request_model.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
-import 'package:tripto_driver/view_model/provider/ride_request/ride_request_provider.dart';
 import '../../../notification/push_notification.dart';
 import '../../../utils/constants/colors.dart';
+import '../../../view_model/provider/trip_provider/trip_provider.dart';
 
 class MapsScreen extends StatefulWidget {
   final LatLng pickUpLatLng;
@@ -77,7 +77,7 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                 child: CupertinoSwitch(
                   value: mapProvider.isOnline,
                   onChanged: (value) {
-                    mapProvider.toggleOnlineStatus(value);
+                    mapProvider.toggleOnlineStatus(value,context);
                   },
                   activeColor: Colors.green,
                 ),
@@ -101,22 +101,22 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                 polylines: mapProvider.polyline,
               ),
 
-              Consumer<RideRequestProvider>(
+              Consumer<TripProvider>(
                 builder: (BuildContext context, rideRequest, Widget? child) {
                   return Positioned(
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    child: StreamBuilder<List<RideRequestModel>>(
+                    child: StreamBuilder<List<TripModel>>(
                       stream: rideRequest.getPendingRideRequests(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          hideRideRequests(); // Hide box if no request
+                          hideRideRequests();
                           return const SizedBox();
                         }
 
-                        var latestRide = snapshot.data!.last; // Get only the latest ride request
-                        showRideRequests(); // Show box when a request arrives
+                        var latestRide = snapshot.data!.last;
+                        showRideRequests();
 
                         return SlideTransition(
                           position: _slideAnimation,
@@ -151,7 +151,7 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text('Prince Yadav', style: GoogleFonts.aBeeZee(fontSize: 18, fontWeight: FontWeight.bold)),
+                                      Text('${latestRide.userName}', style: GoogleFonts.aBeeZee(fontSize: 18, fontWeight: FontWeight.bold)),
                                       Text('Cash Payment', style: GoogleFonts.aBeeZee()),
                                     ],
                                   )
@@ -160,20 +160,20 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
 
                               const SizedBox(height: 10),
 
-                              const Row(
+                               Row(
                                 children: [
                                   Icon(Icons.pin_drop),
                                   SizedBox(width: 5),
-                                  Text("Pickup: India Gate, Delhi", style: TextStyle(fontSize: 16)),
+                                  Text("Pickup: ${latestRide.pickupLng}", style: TextStyle(fontSize: 16)),
                                 ],
                               ),
                               const SizedBox(height: 10),
 
-                              const Row(
+                               Row(
                                 children: [
                                   Icon(Icons.local_fire_department_rounded),
                                   SizedBox(width: 5),
-                                  Text("Drop: Connaught Place, Delhi", style: TextStyle(fontSize: 16)),
+                                  Text("Drop: ${latestRide.dropLat}", style: TextStyle(fontSize: 16)),
                                 ],
                               ),
                               const SizedBox(height: 20),
@@ -195,11 +195,11 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                   ),
                                    const SizedBox(width: 10),
                                   Expanded(
-                                    child: Consumer<RideRequestProvider>(
+                                    child: Consumer<TripProvider>(
                                       builder: (context, rideRequest, child) {
                                         return ElevatedButton(
                                           onPressed: () async {
-                                            await rideRequest.acceptRideRequest(latestRide.id, 'accept');
+                                            await rideRequest.acceptRideRequest(latestRide.id!, 'accept');
                                           },
                                           style: ElevatedButton.styleFrom(
                                             padding: const EdgeInsets.symmetric(vertical: 10),

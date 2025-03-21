@@ -1,21 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tripto_driver/model/ride_request_model/ride_request_model.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 
-class RideRequestProvider extends ChangeNotifier{
+import '../../../model/ride_request_model/active_driver_model.dart';
+
+class TripProvider extends ChangeNotifier{
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  FirebaseDatabase realTimeDb = FirebaseDatabase.instance;
   bool isLoding = false;
 
-  Stream<List<RideRequestModel>> getPendingRideRequests() {
+  Stream<List<TripModel>> getPendingRideRequests() {
     return firestore
-        .collection('ride_requests')
+        .collection('trip')
         .where('status', isEqualTo: 'pending')
         .snapshots()
         .map((snapshot) =>
-        snapshot.docs.map((doc) => RideRequestModel.fromMap(doc.data())).toList());
+        snapshot.docs.map((doc) => TripModel.fromMap(doc.data())).toList());
   }
 
 
@@ -26,9 +29,9 @@ class RideRequestProvider extends ChangeNotifier{
       isLoding = true;
       notifyListeners();
 
-    await  firestore.collection('ride_requests').doc(userId).update({'status':status});
+    await  firestore.collection('trip').doc(userId).update({'status':status});
 
-      var doc = await firestore.collection('ride_requests').doc(userId).get();
+      var doc = await firestore.collection('trip').doc(userId).get();
       if (doc.exists && doc.data()?['status'] == status) {
         AppHelperFunctions.showSnackBar('Ride request accepted successfully');
       } else {
@@ -43,5 +46,15 @@ class RideRequestProvider extends ChangeNotifier{
     }
   }
 
+
+  Future<void> activeDriver(ActiveModel ride)async{
+    await realTimeDb.ref('activeDriver').child(ride.id!).set(ride.toJson());
+
+  }
+
+  Future<void> diActiveDriver(ActiveModel ride)async{
+
+    await realTimeDb.ref('activeDriver').child(ride.id!).remove();
+  }
 
 }

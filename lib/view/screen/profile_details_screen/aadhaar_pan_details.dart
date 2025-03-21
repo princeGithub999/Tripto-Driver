@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
-import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
+import 'package:tripto_driver/view_model/provider/from_provider/from_provider.dart';
 import 'dart:io';
 
 class AdharPanPage extends StatelessWidget {

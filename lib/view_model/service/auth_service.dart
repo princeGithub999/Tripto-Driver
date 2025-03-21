@@ -13,6 +13,7 @@ import 'package:tripto_driver/model/driver_data_model/driver_document_model.dart
 import 'package:tripto_driver/model/driver_data_model/vehicles_model.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import '../../model/driver_data_model/driver_profile_model.dart';
+import '../../model/driver_data_model/vehicles_model.dart';
 import '../../view/button_navigation/button_navigation.dart';
 import '../../view/screen/profile_details_screen/form_fillup_screen.dart';
 
@@ -24,6 +25,11 @@ class AuthService {
   final FirebaseDatabase realTimeDb = FirebaseDatabase.instance;
   String? userEmail;
   String? crruntUserId;
+  String driverName = "";
+  String driverId = "";
+  String city = "";
+
+
 
   AuthService() {
     crruntUserId = FirebaseAuth.instance.currentUser?.uid;
@@ -114,14 +120,14 @@ class AuthService {
       return null;
     }
   }
-  Future<void> saveDriverDataInRealTime(String driverID, DriverModel driverData) async {
+  Future<void> saveDriver(String driverID, DriverModel driverData) async {
     if (driverID.isEmpty) {
       Fluttertoast.showToast(msg: 'Error: Driver ID is empty');
       return;
     }
 
     try {
-      await realTimeDb.ref('Drivers').child(driverID).set(driverData.toJson());
+      await db.collection('drivers').doc(driverID).set(driverData.toJson());
       Fluttertoast.showToast(msg: 'Saved in real-time database');
     } catch (e) {
       Fluttertoast.showToast(msg: 'Error: $e');
@@ -135,8 +141,8 @@ class AuthService {
     }
 
     try {
-      await realTimeDb.ref('Vehicle').child(driverID).set(driverData.toJson());
-      Fluttertoast.showToast(msg: 'Saved in real-time database');
+      await db.collection('vehicle').doc(driverID).set(driverData.toJson());
+      Fluttertoast.showToast(msg: 'Saved data');
     } catch (e) {
       Fluttertoast.showToast(msg: 'Error: $e');
     }
@@ -149,7 +155,7 @@ class AuthService {
     }
 
     try {
-      await realTimeDb.ref('driver_documents').child(driverID).set(driverData.toJson());
+      await db.collection('driverDocuments').doc(driverID).set(driverData.toJson());
       Fluttertoast.showToast(msg: 'Saved in real-time database');
     } catch (e) {
       Fluttertoast.showToast(msg: 'Error: $e');
@@ -159,7 +165,7 @@ class AuthService {
 
   Future<void> updateToggleBS(bool isOnline,String userId)async{
     try{
-      realTimeDb.ref('Vehicle').child(userId).update({
+      db.collection('vehicle').doc(userId).update({
         'status':isOnline
       });
       // print(crruntUserId!);
@@ -171,18 +177,12 @@ class AuthService {
 
    Future<void> checkStatus(String number) async {
      try {
-       final DatabaseReference ref = realTimeDb.ref('Drivers');
-       final DatabaseEvent event = await ref.once();
-       final DataSnapshot snapshot = event.snapshot;
+
+       QuerySnapshot snapshot = await db.collection('drivers').get();
        final String? email = auth.currentUser?.email;
-
-       if (snapshot.exists && snapshot.value != null) {
-         Map<dynamic, dynamic> driversData = snapshot.value as Map<dynamic, dynamic>;
-
          bool found = false;
-
-         for (var key in driversData.keys) {
-           var driverData = driversData[key] as Map<dynamic, dynamic>;
+         for (var doc in snapshot.docs) {
+           var driverData = doc.data() as Map<dynamic, dynamic>;
 
            var n = driverData["driverPhoneNumber"] ?? '';
            var e = driverData["driverEmail"] ?? '';
@@ -190,17 +190,15 @@ class AuthService {
            if (n.toString().trim() == number.trim() || e == email) {
              found = true;
              Fluttertoast.showToast(msg: 'Phone: $n, Email: $e');
-             AppHelperFunctions.navigateToScreenBeforeEndPage(Get.context!, const BottomNavigation());
+             AppHelperFunctions.navigateToScreenBeforeEndPage(
+                 Get.context!, const BottomNavigation());
              break;
            }
+           if (!found) {
+             AppHelperFunctions.navigateToScreenBeforeEndPage(
+                 Get.context!, const FormFillupScreen());
+           }
          }
-
-         if (!found) {
-           AppHelperFunctions.navigateToScreenBeforeEndPage(Get.context!, const FormFillupScreen());
-         }
-       } else {
-         AppHelperFunctions.navigateToScreenBeforeEndPage(Get.context!, const FormFillupScreen());
-       }
 
      } catch (error) {
        print("Error checking status: $error");
@@ -210,4 +208,39 @@ class AuthService {
 
 
 
+
+   Future<DriverModel?> retriveDriver(String currentUserId)async{
+      DocumentSnapshot doc = await db.collection('drivers').doc(currentUserId).get();
+      if(doc.exists && doc.data() != null){
+        return DriverModel.fromJson(doc.data() as Map<String, dynamic>);
+      }else{
+        Fluttertoast.showToast(msg: 'driver not found!');
+      }
+      return null;
+   }
+
+
+   Future<VehiclesModel?> retriveVehicle(String currentUserId)async{
+    DocumentSnapshot doc = await db.collection('vehicle').doc(currentUserId).get();
+    if(doc.exists && doc.data() != null){
+      return VehiclesModel.fromJson(doc.data() as Map<String, dynamic>);
+
+    }else{
+      Fluttertoast.showToast(msg: 'vehicle not found!');
+
+    }
+    return null;
+   }
+
+
+   Future<DriverDocumentModel?> retriveDoc(String currentUserId)async{
+    DocumentSnapshot doc = await db.collection('driverDocuments').doc(currentUserId).get();
+    if(doc.exists && doc.data() != null){
+      return DriverDocumentModel.fromJson(doc.data() as Map<String, dynamic>);
+    }else{
+      Fluttertoast.showToast(msg: 'driverDocuments data not found!');
+
+    }
+    return null;
+   }
 }
