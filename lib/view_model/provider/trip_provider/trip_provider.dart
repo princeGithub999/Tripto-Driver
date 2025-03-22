@@ -21,10 +21,11 @@ class TripProvider extends ChangeNotifier{
     getActiveDriverOnce();
   }
 
-  Stream<List<TripModel>> getPendingRideRequests() {
+  Stream<List<TripModel>> getPendingRideRequests(String vehiclesType) {
     return firestore
         .collection('trip')
         .where('status', isEqualTo: 'pending')
+        .where('type', isEqualTo: vehiclesType)
         .snapshots()
         .map((snapshot) =>
         snapshot.docs.map((doc) => TripModel.fromMap(doc.data())).toList());
