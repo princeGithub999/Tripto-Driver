@@ -207,7 +207,4 @@ class AuthService {
        AppHelperFunctions.showSnackBar("Failed to check status: $error");
      }
    }
-
-
-
 }

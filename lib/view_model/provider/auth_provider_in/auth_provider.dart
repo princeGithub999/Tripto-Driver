@@ -187,7 +187,7 @@ class AuthProviderIn extends ChangeNotifier {
         print("🔥 Live Updated Driver Data: $data");
 
         driverProfile = DriverModel.fromJson(data);
-        notifyListeners();  // **🔥 UI को Auto-Refresh करें**
+        notifyListeners();  //
       } else {
         Fluttertoast.showToast(msg: 'No data found in Firebase.');
       }
