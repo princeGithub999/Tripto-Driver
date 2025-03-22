@@ -27,6 +27,8 @@ class DriverDataModel {
   String? penCardImage;
   String? carName;
   String? fcmToken;
+  String? vehiclesImage;
+  String? vehiclesNumber;
 
   DriverDataModel({
      this.driverID,
@@ -49,7 +51,9 @@ class DriverDataModel {
      this.backAadharCardImage,
      this.penCardImage,
      this.carName,
-     this.fcmToken
+     this.fcmToken,
+    this.vehiclesImage,
+    this.vehiclesNumber
   });
 
   factory DriverDataModel.fromJson(Map<String, dynamic> json) => DriverDataModel(
@@ -73,7 +77,9 @@ class DriverDataModel {
     backAadharCardImage: json["backAadharCardImage"],
     penCardImage: json["penCardImage"],
     carName: json['carName'],
-    fcmToken: json['fcmToken']
+    fcmToken: json['fcmToken'],
+    vehiclesImage: json['vehiclesImage'],
+    vehiclesNumber: json['vehiclesNumber']
   );
 
   Map<String, dynamic> toJson() => {
@@ -97,6 +103,8 @@ class DriverDataModel {
     "backAadharCardImage": backAadharCardImage,
     "penCardImage": penCardImage,
     "carName" : carName,
-    "fcmToken" :fcmToken
+    "fcmToken" :fcmToken,
+    "vehiclesImage" : vehiclesImage,
+    "vehiclesNumber" : vehiclesNumber
   };
 }

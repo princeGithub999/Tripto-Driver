@@ -5,19 +5,15 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tripto_driver/utils/app_theme/app_theme.dart';
-import 'package:tripto_driver/view/auth_screen/send_otp_page.dart';
-import 'package:tripto_driver/view/auth_screen/verify_otp_page.dart';
 import 'package:tripto_driver/view/screen/splace_screen.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
-import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
+import 'package:tripto_driver/view_model/provider/from_provider/from_provider.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import 'package:tripto_driver/view_model/provider/permission_handler/permission_provider.dart';
-import 'package:tripto_driver/view_model/provider/ride_request/ride_request_provider.dart';
+import 'package:tripto_driver/view_model/provider/trip_provider/trip_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-
 
   Supabase.initialize(
       url: 'https://etisnndumecqmopuvome.supabase.co',
@@ -30,8 +26,6 @@ void main() async {
   database.setPersistenceEnabled(true);
   database.setPersistenceCacheSizeBytes(10000000);
 
-
-
   runApp(
     MultiProvider(
       providers: [
@@ -39,7 +33,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => AuthProviderIn()),
         ChangeNotifierProvider(create: (context) => FromProvider()),
         ChangeNotifierProvider(create: (context) => MapsProvider()),
-        ChangeNotifierProvider(create: (context) => RideRequestProvider()),
+        ChangeNotifierProvider(create: (context) => TripProvider()),
       ],
       child: const MyApp(),
     ),

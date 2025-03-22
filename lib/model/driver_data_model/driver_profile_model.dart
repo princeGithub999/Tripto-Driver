@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:tripto_driver/model/driver_data_model/driver_address_model.dart';
 
-
+/// JSON se DriverModel convert karne ke liye helper functions
 DriverModel driverProfileFromJson(String str) => DriverModel.fromJson(json.decode(str));
-
 String driverProfileToJson(DriverModel data) => json.encode(data.toJson());
 
 class DriverModel {
@@ -32,11 +31,14 @@ class DriverModel {
     this.driverPhoneNumber,
     this.driverImage,
     this.vehiclesId,
-    this.documentId
+    this.documentId,
   });
 
+  /// ✅ **Fixed fromJson method**
   factory DriverModel.fromJson(Map<String, dynamic> json) => DriverModel(
-    address: json["address"] != null ? DriverAddressModel.fromJson(json["address"]) : null,
+    address: json["address"] != null
+        ? DriverAddressModel.fromJson(Map<String, dynamic>.from(json["address"])) // ✅ FIXED: Ensure proper Map<String, dynamic>
+        : null,
     fcmToken: json["fcmToken"],
     driverEmail: json["driverEmail"],
     driverFirstName: json["driverFirstName"],
@@ -44,12 +46,15 @@ class DriverModel {
     driverGender: json["driverGender"],
     driverID: json["driverID"],
     isVerified: json["isVerified"],
-    driverPhoneNumber: json["driverPhoneNumber"],
+    driverPhoneNumber: json["driverPhoneNumber"] != null
+        ? int.tryParse(json["driverPhoneNumber"].toString())
+        : null,
     driverImage: json["driverImage"],
     vehiclesId: json["vehiclesId"],
-    documentId: json['documentId']
+    documentId: json["documentId"],
   );
 
+  /// ✅ **Fixed toJson method**
   Map<String, dynamic> toJson() => {
     "address": address?.toJson(),
     "fcmToken": fcmToken,
@@ -59,9 +64,9 @@ class DriverModel {
     "driverGender": driverGender,
     "driverID": driverID,
     "isVerified": isVerified,
-    "driverPhoneNumber": driverPhoneNumber,
+    "driverPhoneNumber": driverPhoneNumber?.toString(),
     "driverImage": driverImage,
     "vehiclesId": vehiclesId,
-    "documentId":documentId
+    "documentId": documentId,
   };
 }

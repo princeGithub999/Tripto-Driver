@@ -14,7 +14,7 @@ import '../../../view/screen/profile_details_screen/vehicle_rc.dart';
 class FromProvider extends ChangeNotifier{
 
   String? selectedCar;
-  File? rcImage;
+  File? carImage;
   List<String> carList = ['Auto', 'E-Rickshaw', 'Bike'];
 
   void selectCar(String car) {
@@ -22,23 +22,15 @@ class FromProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  Future<void> saveCarToDatabase() async {
-    if (selectedCar == null) {
-      Fluttertoast.showToast(msg: 'Please select a car');
-      return;
-    }else{
-      Navigator.pop(Get.context!);
-    }
-    notifyListeners();
-  }
+
+
   Future<void> pickSingleRcImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      rcImage = File(pickedFile.path);
+      carImage = File(pickedFile.path);
       notifyListeners();
     }
-  }
-
+    }
 
 
   TextEditingController dlNumberContro = TextEditingController();
@@ -51,6 +43,7 @@ class FromProvider extends ChangeNotifier{
   TextEditingController driverAccountNumber = TextEditingController();
   TextEditingController driverIFSCCode = TextEditingController();
   TextEditingController driverUPIID = TextEditingController();
+  TextEditingController vehiclesNumber = TextEditingController();
 
 
 

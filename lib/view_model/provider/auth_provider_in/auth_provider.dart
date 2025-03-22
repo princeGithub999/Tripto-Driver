@@ -13,7 +13,7 @@ import 'package:tripto_driver/model/driver_data_model/vehicles_model.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view/auth_screen/verify_otp_page.dart';
 import 'package:tripto_driver/view/home_page.dart';
-import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
+import 'package:tripto_driver/view_model/provider/from_provider/from_provider.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import 'package:tripto_driver/view_model/service/auth_service.dart';
 import '../../../model/driver_data_model/driver_profile_model.dart';
@@ -36,12 +36,18 @@ class AuthProviderIn extends ChangeNotifier {
   var mapProvider = Provider.of<MapsProvider>(Get.context!, listen: false);
   final supabaseOTP = Supabase.instance.client;
   dynamic supaNumber;
-  DriverModel? driverProfile;
+  DriverModel driverModels = DriverModel();
+  VehiclesModel vehiclesModels = VehiclesModel();
+  DriverDocumentModel driverDocumentModels = DriverDocumentModel();
+
 
 
   AuthProviderIn(){
+    retriveDriver();
+    retriveVehicle();
+    retriveDriverDocuments();
     supaNumber = supabaseOTP.auth.currentUser?.phone;
-    Fluttertoast.showToast(msg: '$supaNumber');
+    // Fluttertoast.showToast(msg: '$supaNumber');
     print('Number $supaNumber');
   }
 
@@ -79,7 +85,7 @@ class AuthProviderIn extends ChangeNotifier {
         );
 
         if(response.session != null){
-          Fluttertoast.showToast(msg: 'v sucess');
+          Fluttertoast.showToast(msg: 'v success');
         authService.checkStatus(phoneNumber,);
         }else{
           AppHelperFunctions.showSnackBar('Invalid OTP!');
@@ -91,33 +97,6 @@ class AuthProviderIn extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-
-  // Future<void> requestOTP(String phoneNumber)async{
-  //
-  //   try{
-  //
-  //     isLoding = true;
-  //     notifyListeners();
-  //     if(phoneNumber.isNotEmpty){
-  //       authService.requestOTP(phoneNumber).then((value) {
-  //         if(value == true){
-  //           AppHelperFunctions.navigateToScreen(Get.context!, const VerifyOtpPage());
-  //         }
-  //       },);
-  //     }else{
-  //       Fluttertoast.showToast(msg: 'please enter phone number');
-  //     }
-  //   }catch(error){
-  //     Fluttertoast.showToast(msg: '$error');
-  //
-  //   }finally{
-  //
-  //     isLoding = false;
-  //     notifyListeners();
-  //   }
-  // }
-
 
   Future<void> signInWithGoogle()async{
 
@@ -146,58 +125,6 @@ class AuthProviderIn extends ChangeNotifier {
 
   }
 
-  // Future<DriverProfileModel?> getData()async{
-  //
-  //   var currentUser =  FirebaseAuth.instance.currentUser;
-  //
-  //   // if(currentUser!.uid.isNotEmpty){
-  //   //   Fluttertoast.showToast(msg: 'Error: Driver ID is empty');
-  //   //   return null;
-  //   // }
-  //
-  //   try{
-  //     DatabaseReference driverRef = realTimeDb.ref('Drivers_Data').child(currentUser!.uid);
-  //     DatabaseEvent event = await driverRef.once();
-  //
-  //     if(event.snapshot.value != null){
-  //       Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
-  //       return DriverProfileModel.fromJson(data);
-  //     }else{
-  //       Fluttertoast.showToast(msg: 'No data found');
-  //       return null;
-  //     }
-  //
-  //   }catch(e){
-  //     Fluttertoast.showToast(msg: 'Error: $e');
-  //     return null;
-  //   }
-  //
-  //   }
-
-
-
-
-  void fetchLiveProfileData(String driverId) {
-
-    DatabaseReference ref = realTimeDb.ref('Drivers_Data').child(driverId);
-
-    ref.onValue.listen((DatabaseEvent event) {
-      if (event.snapshot.exists && event.snapshot.value != null) {
-        Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
-        print("🔥 Live Updated Driver Data: $data");
-
-        driverProfile = DriverModel.fromJson(data);
-        notifyListeners();  // **🔥 UI को Auto-Refresh करें**
-      } else {
-        Fluttertoast.showToast(msg: 'No data found in Firebase.');
-      }
-    }, onError: (error) {
-      Fluttertoast.showToast(msg: 'Error: $error');
-    });
-  }
-
-
-  /// **🔥 Update Profile Data in Firebase (Live Reflect in UI)**
   Future<void> updateProfileData(String driverId, String newName, String newPhone) async {
     DatabaseReference ref = realTimeDb.ref('Drivers_Data').child(driverId);
 
@@ -213,13 +140,9 @@ class AuthProviderIn extends ChangeNotifier {
     }
   }
 
-
-
-
   Future<void> saveProfileData(DriverDataModel driverData) async {
 
     var driverId = FirebaseAuth.instance.currentUser?.uid;
-    // var supaId = supabaseOTP.auth.currentUser?.id;
 
      if (driverId == null) {
       AppHelperFunctions.showSnackBar("User not logged in!");
@@ -264,6 +187,10 @@ class AuthProviderIn extends ChangeNotifier {
       String? driverImgUrl = fromProvider.driverImage != null
           ? await authService.uploadImageToFirebase(fromProvider.driverImage!, "driver_image_$driverId.jpg")
           : null;
+
+      String? carImage = fromProvider.carImage != null
+            ? await authService.uploadImageToFirebase(fromProvider.carImage!, "car_image_$driverId.jpg")
+            :null;
 
       var lat = mapProvider.currentLocation?.latitude;
       var lang = mapProvider.currentLocation?.longitude;
@@ -316,6 +243,7 @@ class AuthProviderIn extends ChangeNotifier {
         fcmToken: token,
         address: address
       );
+
       var vehiclesData = VehiclesModel(
         driverId: driverId,
         driverToken: token,
@@ -324,7 +252,8 @@ class AuthProviderIn extends ChangeNotifier {
         rcImageBack: backRcUrl,
         type: driverData.carName,
         status: false,
-        vehicleNumber: ''
+        vehicleNumber: driverData.vehiclesNumber,
+          vehicleImage: carImage
 
       );
       var documentData = DriverDocumentModel(
@@ -340,10 +269,13 @@ class AuthProviderIn extends ChangeNotifier {
 
       );
 
-       await authService.saveDriverData(driverId, data);
-      await authService.saveDriverDataInRealTime(driverId, driver);
+       // await authService.saveDriverData(driverId, data);
+      await authService.saveDriver(driverId, driver);
       await authService.saveDriverVehiclesData(driverId, vehiclesData);
       await authService.saveDriverDocumentData(driverId, documentData);
+
+
+      notifyListeners();
       AppHelperFunctions.navigateToScreenBeforeEndPage(Get.context!, const BottomNavigation());
 
       fromProvider.clearFeald();
@@ -353,6 +285,57 @@ class AuthProviderIn extends ChangeNotifier {
     } finally {
       isLoding = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> retriveDriver() async {
+    var currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) {
+      Fluttertoast.showToast(msg: 'User not logged in.');
+      return;
+    }
+
+   var retriveData = await authService.retriveDriver(currentUserId);
+    if(retriveData != null){
+      driverModels = retriveData;
+      notifyListeners();
+    }else{
+      Fluttertoast.showToast(msg: 'dont retrive driver');
+    }
+  }
+
+  void retriveVehicle()async {
+
+    var currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) {
+
+      Fluttertoast.showToast(msg: 'User not logged in.');
+      return;
+    }
+    var data = await authService.retriveVehicle(currentUserId);
+    if(data != null){
+      vehiclesModels = data;
+      notifyListeners();
+    }else{
+      Fluttertoast.showToast(msg: "don't retrive vehicle");
+    }
+  }
+
+  void retriveDriverDocuments() async{
+
+    var currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) {
+
+      Fluttertoast.showToast(msg: 'User not logged in.');
+      return;
+    }
+
+   var data = await authService.retriveDoc(currentUserId);
+    if(data != null){
+      driverDocumentModels = data;
+      notifyListeners();
+    }else{
+      Fluttertoast.showToast(msg: "don't retrive driver doc");
     }
   }
 
@@ -367,7 +350,6 @@ class AuthProviderIn extends ChangeNotifier {
 
     }
   }
-
 
     Future<DriverModel?> getData()async{
 
