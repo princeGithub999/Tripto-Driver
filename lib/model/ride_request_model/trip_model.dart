@@ -8,6 +8,8 @@ class TripModel {
   double? pickupLng;
   double? dropLat;
   double? dropLng;
+  String? dropAddress;
+  String? pickupAddress;
   String? status;
   Timestamp? createdAt;
   String? vehicleType;
@@ -22,6 +24,8 @@ class TripModel {
      this.pickupLng,
      this.dropLat,
      this.dropLng,
+     this.dropAddress,
+     this.pickupAddress,
      this.status,
      this.createdAt,
      this.vehicleType,
@@ -38,6 +42,8 @@ class TripModel {
       'pickupLng': pickupLng,
       'dropLat': dropLat,
       'dropLng': dropLng,
+      'dropAddress' : dropAddress,
+      'pickUpAddress' : pickupAddress,
       'status': status,
       'createdAt': createdAt,
       'type': vehicleType,
@@ -55,6 +61,8 @@ class TripModel {
         pickupLng: map['pickupLng'],
         dropLat: map['dropLat'],
         dropLng: map['dropLng'],
+        dropAddress: map['dropAddress'],
+        pickupAddress: map['pickUpAddress'],
         status: map['status'],
         createdAt: map['createdAt'],
         vehicleType: map['type'],

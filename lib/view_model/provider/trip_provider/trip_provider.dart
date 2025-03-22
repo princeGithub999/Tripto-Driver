@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tripto_driver/model/ride_request_model/ride_request_model.dart';
+import 'package:tripto_driver/model/ride_request_model/trip_model.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 
 import '../../../model/ride_request_model/active_driver_model.dart';
