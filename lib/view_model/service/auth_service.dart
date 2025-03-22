@@ -181,24 +181,29 @@ class AuthService {
        QuerySnapshot snapshot = await db.collection('drivers').get();
        final String? email = auth.currentUser?.email;
          bool found = false;
-         for (var doc in snapshot.docs) {
-           var driverData = doc.data() as Map<dynamic, dynamic>;
+          if(snapshot.docs.isNotEmpty){
+            for (var doc in snapshot.docs) {
+              var driverData = doc.data() as Map<dynamic, dynamic>;
 
-           var n = driverData["driverPhoneNumber"] ?? '';
-           var e = driverData["driverEmail"] ?? '';
+              var n = driverData["driverPhoneNumber"] ?? '';
+              var e = driverData["driverEmail"] ?? '';
 
-           if (n.toString().trim() == number.trim() || e == email) {
-             found = true;
-             Fluttertoast.showToast(msg: 'Phone: $n, Email: $e');
-             AppHelperFunctions.navigateToScreenBeforeEndPage(
-                 Get.context!, const BottomNavigation());
-             break;
-           }
-           if (!found) {
-             AppHelperFunctions.navigateToScreenBeforeEndPage(
-                 Get.context!, const FormFillupScreen());
-           }
-         }
+              if (n.toString().trim() == number.trim() || e == email) {
+                found = true;
+                Fluttertoast.showToast(msg: 'Phone: $n, Email: $e');
+                AppHelperFunctions.navigateToScreenBeforeEndPage(
+                    Get.context!, const BottomNavigation());
+                break;
+              }else{
+                AppHelperFunctions.navigateToScreenBeforeEndPage(
+                    Get.context!, const FormFillupScreen());
+              }
+
+            }
+          }else{
+            AppHelperFunctions.navigateToScreenBeforeEndPage(
+                Get.context!, const FormFillupScreen());
+          }
 
      } catch (error) {
        print("Error checking status: $error");

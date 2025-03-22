@@ -5,8 +5,6 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tripto_driver/utils/app_theme/app_theme.dart';
-import 'package:tripto_driver/view/auth_screen/send_otp_page.dart';
-import 'package:tripto_driver/view/auth_screen/verify_otp_page.dart';
 import 'package:tripto_driver/view/screen/splace_screen.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/from_provider.dart';
@@ -16,8 +14,6 @@ import 'package:tripto_driver/view_model/provider/trip_provider/trip_provider.da
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-
 
   Supabase.initialize(
       url: 'https://etisnndumecqmopuvome.supabase.co',
@@ -29,8 +25,6 @@ void main() async {
   FirebaseDatabase database = FirebaseDatabase.instance;
   database.setPersistenceEnabled(true);
   database.setPersistenceCacheSizeBytes(10000000);
-
-
 
   runApp(
     MultiProvider(

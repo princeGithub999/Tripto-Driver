@@ -97,7 +97,8 @@ class _FormFillupScreenState extends State<FormFillupScreen> {
                                       driverIfscCode: value.driverIFSCCode.text,
                                       driverUpiCode: value.driverUPIID.text,
                                       dlNumber: value.dlNumberContro.text,
-                                      carName: fromProvider.selectedCar
+                                      carName: fromProvider.selectedCar,
+                                      vehiclesNumber: fromProvider.vehiclesNumber.text
                                   );
                                   authProvider.saveProfileData(data);
                                 } else {

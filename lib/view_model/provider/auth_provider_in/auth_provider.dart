@@ -188,6 +188,10 @@ class AuthProviderIn extends ChangeNotifier {
           ? await authService.uploadImageToFirebase(fromProvider.driverImage!, "driver_image_$driverId.jpg")
           : null;
 
+      String? carImage = fromProvider.carImage != null
+            ? await authService.uploadImageToFirebase(fromProvider.carImage!, "car_image_$driverId.jpg")
+            :null;
+
       var lat = mapProvider.currentLocation?.latitude;
       var lang = mapProvider.currentLocation?.longitude;
       // Assign data to DriverDataModel
@@ -248,7 +252,8 @@ class AuthProviderIn extends ChangeNotifier {
         rcImageBack: backRcUrl,
         type: driverData.carName,
         status: false,
-        vehicleNumber: ''
+        vehicleNumber: driverData.vehiclesNumber,
+          vehicleImage: carImage
 
       );
       var documentData = DriverDocumentModel(
