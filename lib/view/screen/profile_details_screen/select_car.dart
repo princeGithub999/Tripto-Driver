@@ -19,14 +19,14 @@ class SelectCar extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            const Row(
               children: [
-                const Text(
+                Text(
                   'Choose your car',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(width: 5),
-                const Text("*", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20)),
+                SizedBox(width: 5),
+                Text("*", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20)),
               ],
             ),
             const SizedBox(height: 20),
