@@ -107,13 +107,13 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
 
                   return Consumer<AuthProviderIn>(
                     builder: (BuildContext context, authProvider, Widget? child) {
-                      var type = authProvider.vehiclesModels.type ?? 'E-Rickshaw';
+                      // var type = authProvider.vehiclesModels.type ?? 'E-Rickshaw';
                       return Positioned(
                         bottom: 0,
                         left: 0,
                         right: 0,
                         child: StreamBuilder<List<TripModel>>(
-                          stream: rideRequest.getPendingRideRequests(type),
+                          stream: rideRequest.getPendingRideRequests('E-Rickshaw'),
                           builder: (context, snapshot) {
                             if (!snapshot.hasData || snapshot.data!.isEmpty) {
                               hideRideRequests();
