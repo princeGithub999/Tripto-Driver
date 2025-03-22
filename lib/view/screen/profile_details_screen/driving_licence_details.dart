@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:tripto_driver/utils/app_sizes/sizes.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
 import 'package:tripto_driver/utils/validator/validation.dart';
-import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
+import 'package:tripto_driver/view_model/provider/from_provider/from_provider.dart';
 import '../../../utils/globle_widget/text_from_page.dart';
 
 class DrivingLicenseDetails extends StatelessWidget {

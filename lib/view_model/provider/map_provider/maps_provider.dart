@@ -1,15 +1,23 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
+import 'package:location/location.dart' as loc;
+import 'package:provider/provider.dart';
+import 'package:tripto_driver/model/ride_request_model/active_driver_model.dart';
+import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
+import 'package:uuid/uuid.dart';
 import '../../service/auth_service.dart';
 import '../../service/location_service.dart';
 import '../../service/map_service.dart';
 import 'package:geolocator/geolocator.dart' as geo;
+
+import '../trip_provider/trip_provider.dart';
 
 
 class MapsProvider extends ChangeNotifier {
@@ -18,7 +26,8 @@ class MapsProvider extends ChangeNotifier {
     fetchOnlineStatus();
   }
 
-  Location location = Location();
+  loc.Location location =  loc.Location();
+  final db = FirebaseFirestore.instance;
   final FirebaseDatabase realTimeDb = FirebaseDatabase.instance;
   final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
   BitmapDescriptor? liveLocationMarker;
@@ -42,45 +51,77 @@ class MapsProvider extends ChangeNotifier {
   StreamSubscription<Position>? _positionStream;
   bool isOnline = false;
   String na = '';
-
   String name = '';
 
+  var uuid =  Uuid().v4();
+
   Future<void> fetchOnlineStatus() async {
-    DatabaseReference ref = realTimeDb.ref('Vehicle').child(authService.crruntUserId!);
-    DatabaseEvent event = await ref.once();
+    DocumentSnapshot ref = await db.collection('vehicle').doc(authService.crruntUserId!).get();
 
-    if (event.snapshot.exists && event.snapshot.value != null) {
-      Map<dynamic, dynamic> data = event.snapshot.value as Map<dynamic, dynamic>;
+    if (ref.data() != null) {
+     var data = ref.data() as Map<dynamic, dynamic>;
       bool status = data['status'] ?? false;
-      // String name = data['driverName'];
-     
-      // na = name;
-
-      String na = data['driverName'] ?? false;
       isOnline = status;
       notifyListeners();
+    }else{
+      Fluttertoast.showToast(msg: 'not get status');
     }
   }
 
-  Future<void> toggleOnlineStatus(bool status) async {
-
+  Future<void> toggleOnlineStatus(bool status, BuildContext context) async {
+    var authProvider = Provider.of<AuthProviderIn>(context,listen: false);
+    var rideProvider = Provider.of<TripProvider>(context,listen: false);
     var currentUserId = FirebaseAuth.instance.currentUser?.uid;
     isOnline = status;
     notifyListeners();
 
     await authService.updateToggleBS(status,currentUserId!);
+    var ad = await getAddressFromLatLng(currentLocation!.latitude, currentLocation!.longitude);
+
+    var activeVehicle = ActiveVehicleModel(
+      id: authProvider.vehiclesModels.id,
+      type: authProvider.vehiclesModels.type,
+      name: '',
+      color: '',
+      imageUrl: '',
+      price: '250',
+      isOnline: isOnline
+    );
+    var activeDrivers = ActiveDriverModel(
+      id: authProvider.driverModels.driverID,
+      fullName: authProvider.driverModels.driverFirstName,
+      location: ad,
+      vehicle: activeVehicle,
+      fcmToken: authProvider.driverModels.fcmToken,
+      lat: currentLocation?.latitude,
+      lang: currentLocation?.longitude,
+
+    );
+    var data = ActiveModel(
+      id: authProvider.driverModels.driverID,
+      city: 'chhapra',
+      driver: activeDrivers,
+
+    );
 
     if (isOnline) {
       await getCurrentLocation();
       trackLiveLocation();
 
+      rideProvider.activeDriver(data);
       if (currentLocation != null && mapController != null) {
         mapController!.animateCamera(
           CameraUpdate.newLatLngZoom(currentLocation!, 17),
         );
       }
+      notifyListeners();
+    }else{
+
+     rideProvider.diActiveDriver(data);
+      notifyListeners();
     }
   }
+
 
   Future<bool> checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -219,6 +260,26 @@ class MapsProvider extends ChangeNotifier {
       }
     }
   }
+
+
+  Future<String?> getAddressFromLatLng(double lat, double lang)async{
+
+    try{
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lang);
+
+      if(placemarks.isNotEmpty){
+        Placemark place = placemarks[0];
+
+        return "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+      }else{
+        Fluttertoast.showToast(msg: 'address is null');
+      }
+    }catch(e){
+      Fluttertoast.showToast(msg: 'Error');
+    }
+    return null;
+  }
+
 
   @override
   void dispose() {
