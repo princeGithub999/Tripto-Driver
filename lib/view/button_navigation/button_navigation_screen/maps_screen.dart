@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:tripto_driver/model/ride_request_model/ride_request_model.dart';
+import 'package:tripto_driver/model/ride_request_model/trip_model.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import '../../../notification/push_notification.dart';
 import '../../../utils/constants/colors.dart';
@@ -160,20 +160,20 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
 
                                   const SizedBox(height: 10),
 
-                                  const Row(
+                                   Row(
                                     children: [
-                                      Icon(Icons.pin_drop),
-                                      SizedBox(width: 5),
-                                      Text("Pickup: India Gate, Delhi", style: TextStyle(fontSize: 16)),
+                                      const Icon(Icons.pin_drop),
+                                      const SizedBox(width: 5),
+                                      Text("Pickup: ${latestRide.pickupAddress}", style: TextStyle(fontSize: 16)),
                                     ],
                                   ),
                                   const SizedBox(height: 10),
 
-                                  const Row(
+                                   Row(
                                     children: [
                                       Icon(Icons.local_fire_department_rounded),
                                       SizedBox(width: 5),
-                                      Text("Drop: Connaught Place, Delhi", style: TextStyle(fontSize: 16)),
+                                      Text("Drop: ${latestRide.dropAddress}", style: TextStyle(fontSize: 16)),
                                     ],
                                   ),
                                   const SizedBox(height: 20),
