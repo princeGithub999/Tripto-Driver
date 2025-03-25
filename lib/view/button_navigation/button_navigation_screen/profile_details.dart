@@ -65,7 +65,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
                               child: _profileImage == null
                                   ? const Icon(Icons.person, size: 40, color: Colors.grey)
-                                  : null,
+                                   : null,
                             ),
                           ),
                           const SizedBox(width: 16),
