@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:tripto_driver/model/ride_request_model/active_driver_model.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 import 'package:uuid/uuid.dart';
+import '../../../utils/globle_widget/marker_icon.dart';
 import '../../service/auth_service.dart';
 import '../../service/location_service.dart';
 import '../../service/map_service.dart';
@@ -25,6 +26,7 @@ class MapsProvider extends ChangeNotifier {
 
   MapsProvider() {
     fetchOnlineStatus();
+    // determinePosition();
   }
 
 
@@ -32,6 +34,8 @@ class MapsProvider extends ChangeNotifier {
   loc.Location location =  loc.Location();
   final db = FirebaseFirestore.instance;
   final FirebaseDatabase realTimeDb = FirebaseDatabase.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  var currentUserId = FirebaseAuth.instance.currentUser?.uid;
   final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
   BitmapDescriptor? liveLocationMarker;
   AuthService authService = AuthService();
@@ -39,6 +43,8 @@ class MapsProvider extends ChangeNotifier {
   GoogleMapController? mapController;
   LatLng? currentLocation;
   // var auth = FirebaseAuth.instance.currentUser!.uid;
+  late GoogleMapController? googleMapController;
+
   Set<Marker> markers = {};
   Set<Polyline> polyline = {};
 
@@ -90,6 +96,7 @@ class MapsProvider extends ChangeNotifier {
       price: '250',
       isOnline: isOnline
     );
+
     var activeDrivers = ActiveDriverModel(
       id: authProvider.driverModels.driverID,
       fullName: authProvider.driverModels.driverFirstName,
@@ -108,15 +115,16 @@ class MapsProvider extends ChangeNotifier {
     );
 
     if (isOnline) {
-      await getCurrentLocation();
-      trackLiveLocation();
+      // await getCurrentLocation();
+      // trackLiveLocation();
+      determinePosition();
 
       rideProvider.activeDriver(data);
-      if (currentLocation != null && mapController != null) {
-        mapController!.animateCamera(
-          CameraUpdate.newLatLngZoom(currentLocation!, 17),
-        );
-      }
+      // if (currentLocation != null && mapController != null) {
+      //   mapController!.animateCamera(
+      //     CameraUpdate.newLatLngZoom(currentLocation!, 17),
+      //   );
+      // }
       notifyListeners();
     }else{
 
@@ -143,6 +151,66 @@ class MapsProvider extends ChangeNotifier {
     return permission == LocationPermission.whileInUse || permission == LocationPermission.always;
   }
 
+
+
+  Future<void> determinePosition() async {
+    try {
+      bool serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        throw Exception('Location services are disabled.');
+      }
+
+      LocationPermission permission = await _geolocatorPlatform.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await _geolocatorPlatform.requestPermission();
+        if (permission == LocationPermission.denied) {
+          throw Exception('Location permissions are denied.');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        throw Exception('Location permissions are permanently denied.');
+      }
+
+      Position position = await _geolocatorPlatform.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+      );
+
+      currentLocation = LatLng(position.latitude, position.longitude);
+      initialPosition = CameraPosition(target: currentLocation!, zoom: 15);
+
+      //  Ensure custom marker is loaded
+      if (liveLocationMarker == null || liveLocationMarker == BitmapDescriptor.defaultMarker) {
+        liveLocationMarker = await getByFromAsset('assets/images/img_1.png', 100);
+      }
+
+      //  Remove old marker & add new marker
+      markers.removeWhere((m) => m.markerId.value == 'currentLocation');
+
+      markers.add(
+        Marker(
+          markerId: const MarkerId('currentLocation'),
+          position: currentLocation!,
+          icon: liveLocationMarker ?? BitmapDescriptor.defaultMarker,
+          rotation: position.heading,
+        ),
+      );
+
+      if (controller.isCompleted) {
+        mapController = await controller.future;
+        mapController!.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: currentLocation!, zoom: 15),
+          ),
+        );
+      }
+      trackLiveLocation();
+      notifyListeners();
+    } catch (e) {
+      Fluttertoast.showToast(msg: 'Error: $e');
+    }
+  }
+
   Future<void> trackLiveLocation() async {
     bool hasPermission = await checkLocationPermission();
     if (!hasPermission) return;
@@ -150,31 +218,45 @@ class MapsProvider extends ChangeNotifier {
     await _positionStream?.cancel();
 
     _positionStream = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(accuracy: geo.LocationAccuracy.high),
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
     ).listen((Position position) async {
-      _currentPosition = LatLng(position.latitude, position.longitude);
+      currentLocation = LatLng(position.latitude, position.longitude);
+
+      markers.removeWhere((m) => m.markerId.value == 'currentLocation');
+
+      markers.add(
+        Marker(
+          markerId: const MarkerId('currentLocation'),
+          position: currentLocation!,
+          icon: liveLocationMarker!,
+          rotation: position.heading,
+        ),
+      );
+
+      //  Move camera with FULL ZOOM (max 20)
+      // if (controller.isCompleted) {
+      //   mapController = await controller.future;
+      //   mapController!.animateCamera(
+      //     CameraUpdate.newCameraPosition(
+      //       CameraPosition(target: currentLocation!, zoom: 18), // 🔥 FULL ZOOM
+      //     ),
+      //   );
+      // }
+      updateLatLong(position.latitude, position.longitude);
       notifyListeners();
-
-      if (controller.isCompleted) {
-        mapController = await controller.future;
-        if (_currentPosition != null && mapController != null) {
-          mapController!.animateCamera(
-            CameraUpdate.newCameraPosition(
-              CameraPosition(target: _currentPosition!, zoom: 17),
-            ),
-          );
-
-          notifyListeners();
-        }
-      }
     });
   }
 
-  void onMapCreated(GoogleMapController controllerInstance) {
-    if (!controller.isCompleted) {
-      controller.complete(controllerInstance);
-    }
-    mapController = controllerInstance;
+
+  Future<void> updateLatLong(double lat, double long)async{
+    await firestore.collection('drivers').doc(currentUserId).update(
+      {
+        'address':{
+          'lang':long,
+          'lat': lat
+        }
+      }
+    );
   }
 
   Future<void> setMarkersAndRoute(LatLng pickUpLatLng, LatLng dropLatLng) async {
@@ -237,33 +319,6 @@ class MapsProvider extends ChangeNotifier {
       ));
     }
   }
-
-  Future<void> getCurrentLocation() async {
-    var locationData = await location.getLocation();
-
-    if (locationData.latitude != null && locationData.longitude != null) {
-      currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
-
-      markers.add(Marker(
-        markerId: const MarkerId("current_location"),
-        position: currentLocation!,
-        infoWindow: const InfoWindow(title: "Your Current Location"),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-      ));
-
-      notifyListeners();
-
-      if (controller.isCompleted) {
-        mapController = await controller.future;
-        if (mapController != null) {
-          mapController!.animateCamera(
-            CameraUpdate.newLatLngZoom(currentLocation!, 17),
-          );
-        }
-      }
-    }
-  }
-
 
   Future<String?> getAddressFromLatLng(double lat, double lang)async{
 

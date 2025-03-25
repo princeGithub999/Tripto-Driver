@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 import '../../view_model/provider/map_provider/maps_provider.dart';
 import 'button_navigation_screen/earning_acc_details.dart';
 import 'button_navigation_screen/maps_screen.dart';
@@ -26,7 +27,10 @@ class _BottomNavigationState extends State<BottomNavigation> {
   void initState() {
     super.initState();
 
-    Provider.of<MapsProvider>(context,listen: false).getCurrentLocation();
+    Provider.of<AuthProviderIn>(context,listen: false).retriveDriver();
+
+    // Provider.of<MapsProvider>(context,listen: false).getCurrentLocation();
+     Provider.of<MapsProvider>(context,listen: false).determinePosition();
     listPage = [
       MapsScreen(pickUpLatLng: defaultPickup, dropLatLng: defaultDrop, driverId: '', ),
       const RatingScreen(),
