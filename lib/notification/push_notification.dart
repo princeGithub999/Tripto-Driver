@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -58,6 +59,52 @@ class PushNotificationSystem {
     }
 
 
+  Future<void> showNotification(RemoteMessage message) async {
+    if (message.notification == null) {
+      print("❌ Error: Notification data is null.");
+      return;
+    }
+
+    const AndroidNotificationDetails androidNotificationDetails =
+    AndroidNotificationDetails(
+      'ride_request_channel_id',
+      'Ride Requests',
+      channelDescription: 'Ride request notifications with quick actions',
+      importance: Importance.high,
+      priority: Priority.high,
+      ticker: 'New Ride Request',
+      color: Color(0xFF2196F3),
+      enableLights: true,
+      enableVibration: true,
+      actions: <AndroidNotificationAction>[
+        AndroidNotificationAction(
+          'accept_action_id',
+          '✅ Accept',
+          titleColor: Color(0xFF4CAF50),
+        ),
+        AndroidNotificationAction(
+          'reject_action_id',
+          '❌ Reject',
+          titleColor: Color(0xFFF44336),
+        ),
+      ],
+    );
+
+    const NotificationDetails notificationDetails =
+    NotificationDetails(android: androidNotificationDetails);
+
+    try {
+      await flutterLocalNotifications.show(
+        0,
+        message.notification?.title ?? "🚗 Ride Request",
+        message.notification?.body ?? "You have a new ride request!",
+        notificationDetails,
+        payload: jsonEncode(message.data),
+      );
+    } catch (e) {
+      print("❌ Error in showNotification: $e");
+    }
+  }
     Future<void> handlerMessage()async{
 
     }
@@ -65,13 +112,14 @@ class PushNotificationSystem {
 
 
   void sendOrderNotification(
-      {required String message, required String token}) async {
+      {required String message,}) async {
+    String? token = await FirebaseMessaging.instance.getToken();
+    print('Token :- $token');
     final serverKey = await GoogleSecret.getServerKey();
     print('ServerKey:$serverKey');
     try {
       final response = await http.post(
-        Uri.parse(
-            'https://fcm.googleapis.com/v1/projects/fir-apptest-c3e4e/messages:send'),
+        Uri.parse('https://fcm.googleapis.com/v1/projects/fir-apptest-c3e4e/messages:send'),
         headers: <String, String>{
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $serverKey',
@@ -79,10 +127,10 @@ class PushNotificationSystem {
         body: jsonEncode(<String, dynamic>{
           "message": {
             "token": token,
-            "data": {
-
-            },
-            "notification": {"title": 'Prince', "body": message}
+            "notification": {
+              "title": 'Prince',
+              "body": message
+            }
           }
 
         }),
@@ -107,7 +155,6 @@ class PushNotificationSystem {
     if (response.payload != null && response.input != null) {
       Map<String, dynamic> data = jsonDecode(response.payload!);
       String replyText = response.input!;
-
 
 
 
