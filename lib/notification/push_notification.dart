@@ -107,10 +107,6 @@ class PushNotificationSystem {
     if (response.payload != null && response.input != null) {
       Map<String, dynamic> data = jsonDecode(response.payload!);
       String replyText = response.input!;
-
-
-
-
     }
   }
 
