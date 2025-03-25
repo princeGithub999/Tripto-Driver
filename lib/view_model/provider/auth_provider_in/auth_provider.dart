@@ -28,6 +28,7 @@ class AuthProviderIn extends ChangeNotifier {
 
   TextEditingController inputNumber = TextEditingController();
   bool isLoding = false;
+  bool isGoogleAuthLoading = false;
   AuthService authService = AuthService();
   FromProvider fromProvider = Provider.of(Get.context!, listen: false);
   NotificationService notificationService = NotificationService();
@@ -43,11 +44,7 @@ class AuthProviderIn extends ChangeNotifier {
 
 
   AuthProviderIn(){
-    retriveDriver();
-    retriveVehicle();
-    retriveDriverDocuments();
     supaNumber = supabaseOTP.auth.currentUser?.phone;
-    // Fluttertoast.showToast(msg: '$supaNumber');
     print('Number $supaNumber');
   }
 
@@ -101,7 +98,7 @@ class AuthProviderIn extends ChangeNotifier {
   Future<void> signInWithGoogle()async{
 
     try {
-      isLoding = true;
+      isGoogleAuthLoading = true;
       notifyListeners();
 
       var success = await authService.signInWithGoogle();
@@ -118,7 +115,7 @@ class AuthProviderIn extends ChangeNotifier {
     } catch (error) {
       Fluttertoast.showToast(msg: '$error');
     } finally {
-      isLoding = false;
+      isGoogleAuthLoading = false;
       notifyListeners();
       print('Loading finished...');
     }
@@ -289,12 +286,13 @@ class AuthProviderIn extends ChangeNotifier {
   }
 
   Future<void> retriveDriver() async {
+
     var currentUserId = FirebaseAuth.instance.currentUser?.uid;
     if (currentUserId == null) {
       Fluttertoast.showToast(msg: 'User not logged in.');
       return;
     }
-
+    retriveVehicle();
    var retriveData = await authService.retriveDriver(currentUserId);
     if(retriveData != null){
       driverModels = retriveData;
@@ -306,6 +304,7 @@ class AuthProviderIn extends ChangeNotifier {
 
   void retriveVehicle()async {
 
+    retriveDriverDocuments();
     var currentUserId = FirebaseAuth.instance.currentUser?.uid;
     if (currentUserId == null) {
 

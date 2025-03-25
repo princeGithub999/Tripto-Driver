@@ -27,8 +27,9 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   @override
   void initState() {
     super.initState();
-    Provider.of<MapsProvider>(context,listen: false).getCurrentLocation();
+    // Provider.of<MapsProvider>(context,listen: false).getCurrentLocation();
     Provider.of<MapsProvider>(context,listen: false).fetchOnlineStatus();
+    Provider.of<MapsProvider>(context,listen: false).determinePosition();
 
   }
   @override

@@ -75,7 +75,7 @@ dependencies:
   just_audio: ^0.9.46
   uuid: ^4.5.1
   shared_preferences: ^2.2.2
-
+#  workmanager: ^0.5.1
 
 dev_dependencies:
   flutter_test:
