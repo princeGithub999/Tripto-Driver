@@ -34,4 +34,45 @@ class TextFromPage {
       ),
     );
   }
+
+ static Widget buildCustomTextField(
+      String hint, TextEditingController controller, IconData icon,
+      {String? Function(String?)? validator, TextInputType type = TextInputType.text, bool isDateField = false, required BuildContext context}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: TextFormField(
+        controller: controller,
+        validator: validator,
+        keyboardType: type,
+        readOnly: isDateField, // Date field editable nahi hoga
+        decoration: InputDecoration(
+          prefixIcon: Icon(icon, color: AppColors.blue900),
+          suffixIcon: isDateField
+              ? IconButton(
+            icon: const Icon(Icons.calendar_today, color: Colors.blue),
+            onPressed: () async {
+              DateTime? pickedDate = await showDatePicker(
+                context: context,
+                firstDate: DateTime(1900),
+                lastDate: DateTime.now(),
+                initialDate: DateTime.now(),
+              );
+              if (pickedDate != null) {
+                String formattedDate = "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+                controller.text = formattedDate;
+              }
+            },
+          )
+              : null,
+          hintText: hint,
+          filled: true,
+          fillColor: Colors.grey.shade100,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+    );
+  }
 }

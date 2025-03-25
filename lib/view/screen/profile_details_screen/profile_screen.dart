@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
 import 'package:tripto_driver/utils/validator/validation.dart';
-import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
+import 'package:tripto_driver/view_model/provider/from_provider/from_provider.dart';
 
 
 class ProfileUpdate extends StatefulWidget {
@@ -103,7 +103,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Back',
                               style: TextStyle(color: Colors.black),
                             ),

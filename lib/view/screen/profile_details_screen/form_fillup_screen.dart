@@ -6,7 +6,7 @@ import 'package:tripto_driver/utils/app_sizes/sizes.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
-import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
+import 'package:tripto_driver/view_model/provider/from_provider/from_provider.dart';
 import 'package:tripto_driver/view/screen/profile_details_screen/select_car.dart';
 
 class FormFillupScreen extends StatefulWidget {
@@ -84,7 +84,6 @@ class _FormFillupScreenState extends State<FormFillupScreen> {
                               ),
                               onPressed: () {
 
-                                Fluttertoast.showToast(msg: 'clcik');
 
                                 if (value.isDocumentFormComplete) {
                                   var data = DriverDataModel(
@@ -98,7 +97,8 @@ class _FormFillupScreenState extends State<FormFillupScreen> {
                                       driverIfscCode: value.driverIFSCCode.text,
                                       driverUpiCode: value.driverUPIID.text,
                                       dlNumber: value.dlNumberContro.text,
-                                      carName: fromProvider.selectedCar
+                                      carName: fromProvider.selectedCar,
+                                      vehiclesNumber: fromProvider.vehiclesNumber.text
                                   );
                                   authProvider.saveProfileData(data);
                                 } else {
