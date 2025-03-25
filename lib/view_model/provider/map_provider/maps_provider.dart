@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -17,7 +18,7 @@ import '../../service/auth_service.dart';
 import '../../service/location_service.dart';
 import '../../service/map_service.dart';
 import 'package:geolocator/geolocator.dart' as geo;
-
+import 'package:http/http.dart' as http;
 import '../trip_provider/trip_provider.dart';
 
 
@@ -27,6 +28,8 @@ class MapsProvider extends ChangeNotifier {
     fetchOnlineStatus();
     // determinePosition();
   }
+
+
 
   loc.Location location =  loc.Location();
   final db = FirebaseFirestore.instance;

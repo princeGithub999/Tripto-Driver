@@ -643,6 +643,14 @@
           }
         },
         {
+          "client_id": "792466043013-hk4ova7v7c00scfdqqmak3s16io10vfs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tripto_driver",
+            "certificate_hash": "9b67154dbc8a7e57f5c18933cf827fe5dd2bbcc3"
+          }
+        },
+        {
           "client_id": "792466043013-lp108m6ab43t7c5plcavcvvq1be83p27.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
