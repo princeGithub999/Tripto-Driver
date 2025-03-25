@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -167,16 +168,16 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                         children: [
                                           const Icon(Icons.pin_drop),
                                           const SizedBox(width: 5),
-                                          Text("Pickup: ${latestRide.pickupAddress}", style: TextStyle(fontSize: 16)),
+                                          Text("Pickup: ${latestRide.pickupAddress}", style: const TextStyle(fontSize: 16)),
                                         ],
                                       ),
                                       const SizedBox(height: 10),
 
                                       Row(
                                         children: [
-                                          Icon(Icons.local_fire_department_rounded),
-                                          SizedBox(width: 5),
-                                          Text("Drop: ${latestRide.dropAddress}", style: TextStyle(fontSize: 16)),
+                                          const Icon(Icons.local_fire_department_rounded),
+                                          const SizedBox(width: 5),
+                                          Text("Drop: ${latestRide.dropAddress}", style: const TextStyle(fontSize: 16)),
                                         ],
                                       ),
                                       const SizedBox(height: 20),
@@ -207,7 +208,7 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                                         await rideRequest.acceptRideRequest(latestRide.id!, 'accept');
                                                         LatLng defaultPickup =  LatLng(latestRide.pickupLat!, latestRide.pickupLng!);
                                                         LatLng defaultDrop =  LatLng(latestRide.dropLat!, latestRide.dropLng!);
-                                                        value.setMarkersAndRoute(defaultDrop,defaultPickup);
+                                                        value.setMarkersAndRoute(defaultPickup,defaultDrop);
                                                       },
                                                       style: ElevatedButton.styleFrom(
                                                         padding: const EdgeInsets.symmetric(vertical: 10),
