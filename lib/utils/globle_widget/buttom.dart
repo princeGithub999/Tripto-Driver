@@ -35,7 +35,7 @@ class MyButton {
   }
 
 
-  static Widget googleButton(VoidCallback onPress) {
+  static Widget googleButton(VoidCallback onPress, bool isLoading) {
     return ElevatedButton(
       onPressed: onPress,
       style: ElevatedButton.styleFrom(
@@ -45,7 +45,11 @@ class MyButton {
           borderRadius: BorderRadius.circular(8),
         ),
       ),
-      child: Row(
+      child:
+
+      isLoading ? const SizedBox(height: 25, width: 25, child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.blueGrey,)) :
+
+      Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Image.asset(
@@ -53,11 +57,10 @@ class MyButton {
             height: 24,
             width: 24,
           ),
-           const SizedBox(width: 10), // Icon aur text ke beech gap
-           Text(
-            'Login with Google',
-            style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: AppSizes.buttomTextSize),
-          ),
+           const SizedBox(width: 10),
+
+          const Text('Login with Google',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: AppSizes.buttomTextSize),)
+
         ],
       ),
     );

@@ -36,7 +36,7 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    Provider.of<MapsProvider>(context, listen: false).setMarkersAndRoute(widget.pickUpLatLng, widget.dropLatLng);
+    // Provider.of<MapsProvider>(context, listen: false).setMarkersAndRoute(widget.pickUpLatLng, widget.dropLatLng);
 
     _animationController = AnimationController(
       vsync: this,
@@ -44,8 +44,8 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1), // Start position (bottom se aayega)
-      end: Offset.zero, // End position
+      begin: const Offset(0, 1),
+      end: Offset.zero,
     ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
   }
 
@@ -89,14 +89,12 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
           body: Stack(
             children: [
               GoogleMap(
-                initialCameraPosition: CameraPosition(
-                  target: mapProvider.isOnline
-                      ? (mapProvider.currentLocation ?? LatLng(25.6102, 85.1415))
-                      : const LatLng(25.6102, 85.1415),
-                  zoom: 15,
-                ),
-                onMapCreated: (controller) {
-                  mapProvider.onMapCreated(controller);
+                initialCameraPosition: mapProvider.initialPosition ?? CameraPosition(target: LatLng(0, 0), zoom: 2),
+                mapType: MapType.normal,
+                myLocationEnabled: false,
+                onMapCreated: (GoogleMapController controller) {
+                  mapProvider.googleMapController = controller;
+                  mapProvider.controller.complete(controller);
                 },
                 markers: mapProvider.markers,
                 polylines: mapProvider.polyline,
@@ -107,13 +105,13 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
 
                   return Consumer<AuthProviderIn>(
                     builder: (BuildContext context, authProvider, Widget? child) {
-                      // var type = authProvider.vehiclesModels.type ?? 'E-Rickshaw';
+                      var type = authProvider.vehiclesModels.type ?? '';
                       return Positioned(
                         bottom: 0,
                         left: 0,
                         right: 0,
                         child: StreamBuilder<List<TripModel>>(
-                          stream: rideRequest.getPendingRideRequests('E-Rickshaw'),
+                          stream: rideRequest.getPendingRideRequests(type),
                           builder: (context, snapshot) {
                             if (!snapshot.hasData || snapshot.data!.isEmpty) {
                               hideRideRequests();
@@ -202,23 +200,31 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                           Expanded(
                                             child: Consumer<TripProvider>(
                                               builder: (context, rideRequest, child) {
-                                                return ElevatedButton(
-                                                  onPressed: () async {
-                                                    await rideRequest.acceptRideRequest(latestRide.id!, 'accept');
+                                                return Consumer<MapsProvider>(
+                                                  builder: (BuildContext context, value, Widget? child) {
+                                                    return ElevatedButton(
+                                                      onPressed: () async {
+                                                        await rideRequest.acceptRideRequest(latestRide.id!, 'accept');
+                                                        LatLng defaultPickup =  LatLng(latestRide.pickupLat!, latestRide.pickupLng!);
+                                                        LatLng defaultDrop =  LatLng(latestRide.dropLat!, latestRide.dropLng!);
+                                                        value.setMarkersAndRoute(defaultDrop,defaultPickup);
+                                                      },
+                                                      style: ElevatedButton.styleFrom(
+                                                        padding: const EdgeInsets.symmetric(vertical: 10),
+                                                        backgroundColor: Colors.green,
+                                                      ),
+                                                      child: rideRequest.isLoding
+                                                          ? const SizedBox(
+                                                        height: 21,
+                                                        width: 21,
+                                                        child: CircularProgressIndicator(
+                                                          color: Colors.white,
+                                                        ),
+                                                      )
+                                                          : const Text("Accept", style: TextStyle(fontSize: 18, color: Colors.white)),
+                                                    );
                                                   },
-                                                  style: ElevatedButton.styleFrom(
-                                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                                    backgroundColor: Colors.green,
-                                                  ),
-                                                  child: rideRequest.isLoding
-                                                      ? const SizedBox(
-                                                    height: 21,
-                                                    width: 21,
-                                                    child: CircularProgressIndicator(
-                                                      color: Colors.white,
-                                                    ),
-                                                  )
-                                                      : const Text("Accept", style: TextStyle(fontSize: 18, color: Colors.white)),
+
                                                 );
                                               },
                                             ),
