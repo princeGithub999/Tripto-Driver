@@ -58,9 +58,11 @@
             android:value="AIzaSyCCTyOaZj8d0hzPxVsbgRYW1_qPl-xsNEg"/>
 
 
+
         <receiver
             android:name="androidx.work.impl.background.systemjob.SystemJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
+
 
     </application>
     <!-- Required to query activities that can process text, see:

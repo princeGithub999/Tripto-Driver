@@ -122,6 +122,61 @@ class AuthProviderIn extends ChangeNotifier {
 
   }
 
+
+  // Future<DriverProfileModel?> getData()async{
+  //
+  //   var currentUser =  FirebaseAuth.instance.currentUser;
+  //
+  //   // if(currentUser!.uid.isNotEmpty){
+  //   //   Fluttertoast.showToast(msg: 'Error: Driver ID is empty');
+  //   //   return null;
+  //   // }
+  //
+  //   try{
+  //     DatabaseReference driverRef = realTimeDb.ref('Drivers_Data').child(currentUser!.uid);
+  //     DatabaseEvent event = await driverRef.once();
+  //
+  //     if(event.snapshot.value != null){
+  //       Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
+  //       return DriverProfileModel.fromJson(data);
+  //     }else{
+  //       Fluttertoast.showToast(msg: 'No data found');
+  //       return null;
+  //     }
+  //
+  //   }catch(e){
+  //     Fluttertoast.showToast(msg: 'Error: $e');
+  //     return null;
+  //   }
+  //
+  //   }
+
+
+
+
+  void fetchLiveProfileData(String driverId) {
+
+    DatabaseReference ref = realTimeDb.ref('Drivers_Data').child(driverId);
+
+    ref.onValue.listen((DatabaseEvent event) {
+      if (event.snapshot.exists && event.snapshot.value != null) {
+        Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
+        print("🔥 Live Updated Driver Data: $data");
+
+        driverProfile = DriverModel.fromJson(data);
+        notifyListeners();  //
+      } else {
+        Fluttertoast.showToast(msg: 'No data found in Firebase.');
+      }
+    }, onError: (error) {
+      Fluttertoast.showToast(msg: 'Error: $error');
+    });
+  }
+
+
+  /// **🔥 Update Profile Data in Firebase (Live Reflect in UI)**
+
+
   Future<void> updateProfileData(String driverId, String newName, String newPhone) async {
     DatabaseReference ref = realTimeDb.ref('Drivers_Data').child(driverId);
 
