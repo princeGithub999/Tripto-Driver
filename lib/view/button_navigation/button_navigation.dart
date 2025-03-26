@@ -37,10 +37,6 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
       DriverHomePage(),
       ProfileScreen()
-
-      ProfileScreen(),
-      ProfileScreen(),
-
     ];
 
 
