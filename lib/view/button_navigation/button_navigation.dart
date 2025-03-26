@@ -41,9 +41,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
       const RatingScreen(),
 
       DriverHomePage(),
-      ProfileScreen()
 
-      ProfileScreen(),
       ProfileScreen(),
 
     ];
