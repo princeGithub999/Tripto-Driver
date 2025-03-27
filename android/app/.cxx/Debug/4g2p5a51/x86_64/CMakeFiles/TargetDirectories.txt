@@ -1,2 +1,0 @@
-D:/Flutter/Flutter project/tripto_driver/android/app/.cxx/Debug/4g2p5a51/x86_64/CMakeFiles/edit_cache.dir
-D:/Flutter/Flutter project/tripto_driver/android/app/.cxx/Debug/4g2p5a51/x86_64/CMakeFiles/rebuild_cache.dir

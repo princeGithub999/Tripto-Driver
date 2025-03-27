@@ -1,2 +1,0 @@
-C:/Users/aakas/Tripto-Driver/android/app/.cxx/Debug/104o692u/armeabi-v7a/CMakeFiles/edit_cache.dir
-C:/Users/aakas/Tripto-Driver/android/app/.cxx/Debug/104o692u/armeabi-v7a/CMakeFiles/rebuild_cache.dir
