@@ -13,6 +13,7 @@ class VehiclesModel {
   bool? status;
   String? type;
   String? vehicleNumber;
+  String? vehicleImage;
 
   VehiclesModel({
     this.id,
@@ -23,6 +24,7 @@ class VehiclesModel {
     this.status,
     this.type,
     this.vehicleNumber,
+    this.vehicleImage
   });
 
   factory VehiclesModel.fromJson(Map<String, dynamic> json) => VehiclesModel(
@@ -34,6 +36,7 @@ class VehiclesModel {
     status: json["status"],
     type: json["type"],
     vehicleNumber: json["vehicle_number"],
+    vehicleImage: json['vehicleImage']
   );
 
   Map<String, dynamic> toJson() => {
@@ -45,5 +48,6 @@ class VehiclesModel {
     "status": status,
     "type": type,
     "vehicle_number": vehicleNumber,
+    "vehicleImage" : vehicleImage
   };
 }

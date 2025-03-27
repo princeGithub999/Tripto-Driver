@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
 class LocationServices {
-  static const String _apiKey = "AlzaSye-jhvZNrXcvPX1gWvOgXNlPd0zo6fbZop";
+  static const String _apiKey = "AlzaSyNVx88oOZe1WHDploHFV2ZVcsLkmqRfh1M";
 
   static Future<LatLng> getUserLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -51,6 +52,8 @@ class LocationServices {
           "polyline": decodePolyline(data["routes"][0]["overview_polyline"]["points"]),
         };
       }
+    }else{
+      Fluttertoast.showToast(msg: 'Fell ${response.statusCode}');
     }
     return {};
   }

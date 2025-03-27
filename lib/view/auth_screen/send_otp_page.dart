@@ -61,9 +61,7 @@ class _SendOtpPageState extends State<SendOtpPage> {
                   ),
 
 
-
-
-                   SizedBox(height: sizes.height * 0.1 - 50,),
+                  SizedBox(height: sizes.height * 0.1 - 50,),
                   IntlPhoneField(
 
                     flagsButtonPadding: const EdgeInsets.all(8),
@@ -112,7 +110,7 @@ class _SendOtpPageState extends State<SendOtpPage> {
 
                   MyButton.googleButton(() {
                     authProvider.signInWithGoogle();
-                  },)
+                  },authProvider.isGoogleAuthLoading)
                 ],
               ),
             ),

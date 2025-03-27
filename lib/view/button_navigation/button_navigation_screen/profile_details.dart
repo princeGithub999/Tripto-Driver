@@ -1,19 +1,20 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
-import '../../screen/profile_details_screen/bank_details.dart';
+import 'package:provider/provider.dart';
+import 'package:tripto_driver/utils/constants/colors.dart';
+import '../../../view_model/provider/theme_provider.dart';
+import '../../../view_model/provider/trip_provider/trip_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
   File? _profileImage;
-  String _name = "Unknown";
-  String _phone = "Unknown";
-  bool _isOnline = true;
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -25,292 +26,160 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Widget _buildSection(String title, List<Widget> children) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text(title,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-        ...children,
-        Divider(height: 1),
-      ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Header Section
-            Container(
-              padding: EdgeInsets.only(top: 50, bottom: 16, left: 16, right: 16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blueGrey, Colors.grey],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Profile Header
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: _pickImage,
-                        child: CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.white,
-                          backgroundImage: _profileImage != null
-                              ? FileImage(_profileImage!)
-                              : null,
-                          child: _profileImage == null
-                              ? Icon(Icons.person, size: 40, color: Colors.grey)
-                              : null,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-
-                            Row(
-                              children: [
-                                Text(_name,
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white)),
-                                IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.white),
-                                  onPressed: () async {
-                                    final result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => EditProfileScreen(
-                                          name: _name,
-                                          phone: _phone,
-                                        ),
-                                      ),
-                                    );
-                                    if (result != null) {
-                                      setState(() {
-                                        _name = result['name'] ?? _name;
-                                        _phone = result['phone'] ?? _phone;
-                                      });
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                            Text(_phone,
-                                style: TextStyle(color: Colors.white70)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                ],
-              ),
-            ),
-
-            // Main Content
-            _buildSection("Vehicle Information", [
-              _buildListTile(Icons.directions_car, "Vehicle Details"),
-              _buildListTile(Icons.description, "Documents"),
-            ]),
-
-            _buildSection("Performance", [
-              _buildListTile(Icons.star_rate, "Ratings & Feedback"),
-              _buildListTile(Icons.attach_money, "Earnings Summary"),
-            ]),
-
-            _buildSection("Account & Payments", [
-              _buildListTile(
-                Icons.account_balance_wallet,
-                "Bank Details",
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => BankDetailScreen()),
-                ),
-              ),
-              _buildListTile(Icons.history, "Payment History"),
-            ]),
-
-            _buildSection("Safety", [
-              _buildListTile(Icons.emergency, "Emergency Contacts"),
-              _buildListTile(Icons.location_on, "Live Location Sharing"),
-            ]),
-
-            _buildSection("Preferences", [
-              SwitchListTile(
-                title: Text("Online Status"),
-                value: _isOnline,
-                onChanged: (value) => setState(() => _isOnline = value),
-              ),
-              _buildListTile(Icons.language, "Language Settings"),
-            ]),
-
-            _buildSection("Support", [
-              _buildListTile(Icons.help, "Help Center"),
-              _buildListTile(Icons.report_problem, "Report Issue"),
-            ]),
-
-            Padding(
-              padding: EdgeInsets.all(15.0),
-              child: GestureDetector(
-                onTap: () {
-                },
-                child: Container(
-                  width: double.infinity,
-                  height: 50,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.exit_to_app, color: Colors.redAccent),
-                      SizedBox(width: 8),
-                      Text(
-                        "Logout",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-          ],
-        ),
-      ),
-    );
-  }
-
-
-  Widget _buildListTile(IconData icon, String title, {VoidCallback? onTap}) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.grey[600]),
-      title: Text(title),
-      trailing: Icon(Icons.chevron_right, color: Colors.green),
-      onTap: onTap ?? () {
-        switch(title) {
-          case "Vehicle Details":
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => VehicleDetailsScreen()));
-            break;
-          case "Documents":
-            break;
-        }
-      },
-    );
-  }
-}
-class EditProfileScreen extends StatefulWidget {
-  final String name;
-  final String phone;
-
-  const EditProfileScreen({Key? key, required this.name, required this.phone})
-      : super(key: key);
-
-  @override
-  _EditProfileScreenState createState() => _EditProfileScreenState();
-}
-
-class _EditProfileScreenState extends State<EditProfileScreen> {
-  late TextEditingController _nameController;
-  late TextEditingController _phoneController;
-
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.name);
-    _phoneController = TextEditingController(text: widget.phone);
+    Provider.of<TripProvider>(context, listen: false).getActiveDriverOnce();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Profile'),
-        backgroundColor: Colors.teal,
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
+      backgroundColor: Colors.grey[200],
+      body: SingleChildScrollView(
         child: Column(
           children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Name',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: _phoneController,
-              keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
-                labelText: 'Phone Number',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context, {
-                  'name': _nameController.text,
-                  'phone': _phoneController.text,
-                });
-              },
-              child: Text('Save Changes'),
-            ),
+            _buildProfileHeader(),
+            const SizedBox(height: 30),
+            _buildProfileOption(Icons.directions_car, "My Rides"),
+            _buildProfileOption(Icons.wallet, "Earnings"),
+            _buildProfileOption(Icons.history, "Ride History"),
+            _buildProfileOption(Icons.notifications, "Notifications"),
+            _buildProfileOption(Icons.support, "Support"),
+            _buildSettingsOption(),  // ✅ Yaha Settings Option Add Kiya
+            const SizedBox(height: 20),
+            _buildLogoutButton(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileHeader() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
+      color: AppColors.blue900,
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: _pickImage,
+            child: CircleAvatar(
+              radius: 40,
+              backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
+              backgroundColor: Colors.white,
+              child: _profileImage == null
+                  ? const Icon(Icons.camera_alt, size: 30, color: Colors.grey)
+                  : null,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Driver Name",
+                  style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Not Available",
+                  style: const TextStyle(color: Colors.white70, fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileOption(IconData icon, String title) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      child: ListTile(
+        leading: Icown(icon, size: 30, color: AppColors.blue900),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
+        onTap: () {},
+      ),
+    );
+  }
+
+  Widget _buildSettingsOption() {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      child: ListTile(
+        leading: Icon(Icons.settings, size: 30, color: AppColors.blue900),
+        title: Text(
+          "Settings",
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
+        onTap: () {
+          _showThemeSettings();
+        },
+      ),
+    );
+  }
+
+  void _showThemeSettings() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => ThemeSettings(),
+    );
+  }
+
+  Widget _buildLogoutButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.blue900,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          minimumSize: const Size(double.infinity, 50),
+        ),
+        onPressed: () {},
+        child: const Text(
+          "Logout",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
         ),
       ),
     );
   }
 }
 
-class VehicleDetailsScreen extends StatelessWidget {
+class ThemeSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Vehicle Details"),
-        ),
-        body: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                TextField(
-                  decoration: InputDecoration(
-                      labelText: "Vehicle Number",
-                      border: OutlineInputBorder()),
-                ),
-                SizedBox(height: 20),
-                TextField(
-                  decoration: InputDecoration(
-                      labelText: "Vehicle Model",
-                      border: OutlineInputBorder()),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                    onPressed: () {},
-                    child: Text("Save Vehicle Details")),
-              ],
-            ),
-            ),
-        );
-    }
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    return Container(
+      padding: EdgeInsets.all(16),
+      height: 150,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("Dark Mode", style: TextStyle(fontSize: 18)),
+          Switch(
+            value: themeProvider.isDarkMode,
+            onChanged: (value) {
+              themeProvider.toggleTheme();
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }

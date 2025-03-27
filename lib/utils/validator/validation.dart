@@ -152,7 +152,7 @@ class Validation {
     if (!ifscRegex.hasMatch(value)) {
       return 'Enter a valid IFSC code (e.g., SBIN0123456)';
     }
-    return null; // ✅ Valid IFSC code
+    return null;
   }
 
   static String? validateUPI(String? value) {
@@ -167,5 +167,17 @@ class Validation {
     return null; // ✅ Valid UPI ID
   }
 
+
+  static String? vehiclesNumber(String? value){
+    if(value == null || value.trim().isEmpty){
+      return 'Vehicles number is required';
+    }
+    
+    final RegExp vehiclesRex = RegExp(r'^[A-Z]{2}\d{2}[A-Z]{2}\d{4}$');
+    if (!vehiclesRex.hasMatch(value)) {
+      return "Enter a valid vehicle number (e.g., MH12AB1234)";
+    }
+    return null;
+  }
 
 }
