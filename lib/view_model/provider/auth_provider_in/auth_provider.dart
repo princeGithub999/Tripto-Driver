@@ -163,7 +163,7 @@ class AuthProviderIn extends ChangeNotifier {
         Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
         print("🔥 Live Updated Driver Data: $data");
 
-        driverProfile = DriverModel.fromJson(data);
+        // driverProfile = DriverModel.fromJson(data);
         notifyListeners();  //
       } else {
         Fluttertoast.showToast(msg: 'No data found in Firebase.');

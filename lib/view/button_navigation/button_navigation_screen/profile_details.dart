@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
+import '../../../view_model/provider/trip_provider/trip_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -26,137 +27,118 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    Provider.of<TripProvider>(context, listen: false).getActiveDriverOnce();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade200,
-      body: Column(
-        children: [
-          _buildHeader(),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  _buildProfileInfo(),
-                  const SizedBox(height: 20),
-                  _buildMenuItems(),
-                ],
-              ),
-            ),
-          ),
-        ],
+      backgroundColor: Colors.grey[200],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildProfileHeader(),
+            const SizedBox(height: 30),
+            _buildProfileOption(Icons.directions_car, "My Rides"),
+            _buildProfileOption(Icons.wallet, "Earnings"),
+            _buildProfileOption(Icons.history, "Ride History"),
+            _buildProfileOption(Icons.notifications, "Notifications"),
+            _buildProfileOption(Icons.support, "Support"),
+            _buildProfileOption(Icons.settings, "Settings"),
+            const SizedBox(height: 20),
+            _buildLogoutButton(),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(
-          height: 180,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blueAccent, Colors.teal],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(40),
-              bottomRight: Radius.circular(40),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 40,
-          left: 20,
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ),
-        Positioned(
-          top: 100,
-          child: GestureDetector(
-            onTap: _pickImage,
-            child: CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.white,
-              backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
-              child: _profileImage == null
-                  ? const Icon(Icons.person, size: 50, color: Colors.grey)
-                  : null,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildProfileInfo() {
+  Widget _buildProfileHeader() {
     return Consumer<AuthProviderIn>(
-      builder: (context, authProvider, child) {
-        return Column(
-          children: [
-            Text(
-              authProvider.driverModels.driverFirstName ?? "Unknown",
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+      builder: (BuildContext context, authProvider, Widget? child) {
+        return Container(
+          decoration: BoxDecoration(
+              color: AppColors.blue900,
+              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20),bottomRight: Radius.circular(20))),
+          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
+                    backgroundColor: Colors.white,
+                    child: _profileImage == null
+                        ? const Icon(Icons.camera_alt, size: 30, color: Colors.grey)
+                        : null,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                 Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        authProvider.driverModels.driverFirstName ?? '',
+                        style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        authProvider.vehiclesModels.type ?? '',
+                        style: TextStyle(color: Colors.white70, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            Text(
-              authProvider.driverModels.address?.vill ?? "No Address",
-              style: const TextStyle(color: Colors.grey),
-            ),
-            Text(
-              authProvider.vehiclesModels.type ?? "No Vehicle Type",
-              style: const TextStyle(color: Colors.grey),
-            ),
-          ],
+          ),
         );
       },
     );
   }
 
-  Widget _buildMenuItems() {
-    return Column(
-      children: [
-        _buildListTile("Home", Icons.home),
-        _buildListTile("Your Trips", Icons.directions_car),
-        _buildListTile("Wallet", Icons.account_balance_wallet),
-        _buildListTile("Payment", Icons.payment),
-        _buildListTile("Notifications", Icons.notifications_active),
-        _buildListTile("Settings", Icons.settings),
-        _buildListTile("Logout", Icons.logout, color: Colors.red),
-      ],
+  Widget _buildProfileOption(IconData icon, String title) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      child: ListTile(
+        leading: Icon(icon, size: 30, color: AppColors.blue900),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
+        onTap: () {},
+      ),
     );
   }
 
-  Widget _buildListTile(String title, IconData icon, {Color? color}) {
-    return ListTile(
-      leading: Icon(icon, color: color ?? Colors.blueAccent, size: 28),
-      title: Text(
-        title,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-      ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
-      onTap: () {},
-    );
-  }
+  Widget _buildLogoutButton() {
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.blue900,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              minimumSize: const Size(double.infinity, 50),
+            ),
+            onPressed: () {},
+            child: const Text(
+              "Logout",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
+            ),
+            ),
+        );
+    }
 }
