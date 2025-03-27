@@ -1,10 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
-import '../../../model/ride_request_model/active_driver_model.dart';
+import 'package:tripto_driver/utils/constants/colors.dart';
 import '../../../view_model/provider/trip_provider/trip_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -33,101 +31,102 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Provider.of<TripProvider>(context, listen: false).getActiveDriverOnce();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[200],
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.only(top: 50, bottom: 16, left: 16, right: 16),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blueAccent, Colors.teal],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              child: Consumer2<AuthProviderIn, TripProvider>(
-                builder: (context, authProvider, tripProvider, child) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: _pickImage,
-                            child: CircleAvatar(
-                              radius: 40,
-                              backgroundColor: Colors.white,
-                              backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
-                              child: _profileImage == null
-                                  ? const Icon(Icons.person, size: 40, color: Colors.grey)
-                                   : null,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  authProvider.driverModels.driverFirstName ?? "Unknown",
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                Text(
-                                  authProvider.driverModels.address?.vill ?? "No Address",
-                                  style: const TextStyle(color: Colors.white70),
-                                ),
-                                Text(
-                                  authProvider.vehiclesModels.type ?? "No Vehicle Type",
-                                  style: const TextStyle(color: Colors.white70),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Active Trips",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
-                      const SizedBox(height: 10),
-
-                      Consumer<TripProvider>(
-                        builder: (BuildContext context, value, Widget? child) {
-                          return ElevatedButton(
-                            onPressed: () async {
-                              List<ActiveModel> drivers = await tripProvider.getActiveDriverOnce();
-
-                              if (drivers.isEmpty) {
-                                Fluttertoast.showToast(msg: 'No active drivers found');
-                                return;
-                              }
-
-                              for (var driver in drivers) {
-                                Fluttertoast.showToast(msg: 'Driver: ${driver.driver?.fullName}');
-                                await Future.delayed(Duration(seconds: 1)); // Thoda delay taaki Toast properly show ho
-                              }
-                            },
-                            child: Text('Click'),
-                          );
-                        },
-                      )
-
-                    ],
-                  );
-                },
-              ),
-            ),
+            _buildProfileHeader(),
+            const SizedBox(height: 30),
+            _buildProfileOption(Icons.directions_car, "My Rides"),
+            _buildProfileOption(Icons.wallet, "Earnings"),
+            _buildProfileOption(Icons.history, "Ride History"),
+            _buildProfileOption(Icons.notifications, "Notifications"),
+            _buildProfileOption(Icons.support, "Support"),
+            _buildProfileOption(Icons.settings, "Settings"),
+            const SizedBox(height: 20),
+            _buildLogoutButton(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileHeader() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
+      color: AppColors.blue900,
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: _pickImage,
+            child: CircleAvatar(
+              radius: 40,
+              backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
+              backgroundColor: Colors.white,
+              child: _profileImage == null
+                  ? const Icon(Icons.camera_alt, size: 30, color: Colors.grey)
+                  : null,
+            ),
+          ),
+          const SizedBox(width: 16),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Driver Name",
+                  style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  "Not Available",
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileOption(IconData icon, String title) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      child: ListTile(
+        leading: Icon(icon, size: 30, color: AppColors.blue900),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
+        onTap: () {},
+      ),
+    );
+  }
+
+  Widget _buildLogoutButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.blue900,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          minimumSize: const Size(double.infinity, 50),
+        ),
+        onPressed: () {},
+        child: const Text(
+          "Logout",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
         ),
       ),
     );

@@ -1,8 +1,11 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
+import '../../notification/push_notification.dart';
 import '../../view_model/provider/map_provider/maps_provider.dart';
+import '../../view_model/service/notifaction_service.dart';
 import 'button_navigation_screen/earning_acc_details.dart';
 import 'button_navigation_screen/maps_screen.dart';
 import 'button_navigation_screen/profile_details.dart';
@@ -20,6 +23,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
   LatLng defaultPickup = const LatLng(25.5941, 85.1376);
   LatLng defaultDrop = const LatLng(25.6102, 85.1415);
+  PushNotificationSystem notificationService = PushNotificationSystem();
+
 
   late final List<Widget> listPage;
 
@@ -30,17 +35,29 @@ class _BottomNavigationState extends State<BottomNavigation> {
     Provider.of<AuthProviderIn>(context,listen: false).retriveDriver();
 
     // Provider.of<MapsProvider>(context,listen: false).getCurrentLocation();
-     Provider.of<MapsProvider>(context,listen: false).determinePosition();
+     Provider.of<MapsProvider>(context,listen: false).determinePosition(context);
     listPage = [
       MapsScreen(pickUpLatLng: defaultPickup, dropLatLng: defaultDrop, driverId: '', ),
       const RatingScreen(),
+
+      DriverHomePage(),
+
       ProfileScreen(),
-      ProfileScreen(),
+
     ];
 
-
+    notificationHandler();
 
   }
+
+  void notificationHandler() {
+    notificationService.initialize();
+    FirebaseMessaging.onMessage.listen((message) {
+      notificationService.showNotification(message);
+    });
+    notificationService.requestNotificationPermission();
+  }
+
 
   @override
   Widget build(BuildContext context) {

@@ -13,6 +13,8 @@ import 'package:tripto_driver/view_model/provider/from_provider/from_provider.da
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import 'package:tripto_driver/view_model/provider/permission_handler/permission_provider.dart';
 import 'package:tripto_driver/view_model/provider/trip_provider/trip_provider.dart';
+
+import 'notification/push_notification.dart';
 // import 'package:workmanager/workmanager.dart';
 
 
@@ -83,7 +85,10 @@ void main() async {
         ChangeNotifierProvider(create: (context) => PermissionProvider()),
         ChangeNotifierProvider(create: (context) => FromProvider()),
         ChangeNotifierProvider(create: (context) => MapsProvider()),
+
         ChangeNotifierProvider(create: (context) => TripProvider()),
+
+
       ],
       child: const MyApp(),
     ),

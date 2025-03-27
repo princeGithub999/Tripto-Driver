@@ -238,6 +238,7 @@ class AuthService {
    }
 
 
+
    Future<DriverDocumentModel?> retriveDoc(String currentUserId)async{
     DocumentSnapshot doc = await db.collection('driverDocuments').doc(currentUserId).get();
     if(doc.exists && doc.data() != null){
@@ -248,4 +249,5 @@ class AuthService {
     }
     return null;
    }
+
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:tripto_driver/model/ride_request_model/trip_model.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
+import 'package:uuid/uuid.dart';
+import '../../../model/ride_request_model/trip_tracker_model.dart';
 import '../../../notification/push_notification.dart';
 import '../../../utils/constants/colors.dart';
 import '../../../view_model/provider/trip_provider/trip_provider.dart';
@@ -32,11 +36,15 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
   PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
+  var tripId = Uuid().v4();
+  var auth = FirebaseAuth.instance.currentUser?.uid;
+  Timer? trackingTimer;
+
 
   @override
   void initState() {
     super.initState();
-    // Provider.of<MapsProvider>(context, listen: false).setMarkersAndRoute(widget.pickUpLatLng, widget.dropLatLng);
+   var  p = Provider.of<MapsProvider>(context, listen: false).determinePosition(context);
 
     _animationController = AnimationController(
       vsync: this,
@@ -47,6 +55,8 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
       begin: const Offset(0, 1),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
+
+
   }
 
   @override
@@ -62,6 +72,7 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
   void hideRideRequests() {
     _animationController.reverse();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -167,16 +178,16 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                         children: [
                                           const Icon(Icons.pin_drop),
                                           const SizedBox(width: 5),
-                                          Text("Pickup: ${latestRide.pickupAddress}", style: TextStyle(fontSize: 16)),
+                                          Text("Pickup: ${latestRide.pickupAddress}", style: const TextStyle(fontSize: 16)),
                                         ],
                                       ),
                                       const SizedBox(height: 10),
 
                                       Row(
                                         children: [
-                                          Icon(Icons.local_fire_department_rounded),
-                                          SizedBox(width: 5),
-                                          Text("Drop: ${latestRide.dropAddress}", style: TextStyle(fontSize: 16)),
+                                          const Icon(Icons.local_fire_department_rounded),
+                                          const SizedBox(width: 5),
+                                          Text("Drop: ${latestRide.dropAddress}", style: const TextStyle(fontSize: 16)),
                                         ],
                                       ),
                                       const SizedBox(height: 20),
@@ -200,6 +211,11 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                           Expanded(
                                             child: Consumer<TripProvider>(
                                               builder: (context, rideRequest, child) {
+
+                                                  trackingTimer = Timer.periodic(Duration(seconds: 1), (timer)async {
+                                                    mapProvider.updateTripTracker(mapProvider.currentLocation!.latitude, mapProvider.currentLocation!.longitude, latestRide.id!);
+                                                  },);
+
                                                 return Consumer<MapsProvider>(
                                                   builder: (BuildContext context, value, Widget? child) {
                                                     return ElevatedButton(
@@ -207,7 +223,22 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                                         await rideRequest.acceptRideRequest(latestRide.id!, 'accept');
                                                         LatLng defaultPickup =  LatLng(latestRide.pickupLat!, latestRide.pickupLng!);
                                                         LatLng defaultDrop =  LatLng(latestRide.dropLat!, latestRide.dropLng!);
-                                                        value.setMarkersAndRoute(defaultDrop,defaultPickup);
+                                                        value.setMarkersAndRoute(defaultPickup,defaultDrop);
+
+                                                        var tripData = TripTrackerModel(
+                                                            tripId: latestRide.id,
+                                                            driverName: authProvider.driverModels.driverFirstName,
+                                                            startLocationLang: latestRide.pickupLat,
+                                                            startLocationLat: latestRide.pickupLng,
+                                                            endLocationLang: latestRide.dropLng,
+                                                            endLocationLat: latestRide.dropLat,
+                                                            currentLocationLang: value.currentLocation?.longitude,
+                                                            currentLocationLat: value.currentLocation?.latitude,
+                                                            status: 'accepted'
+
+                                                        );
+
+                                                        value.tripTracker(tripData);
                                                       },
                                                       style: ElevatedButton.styleFrom(
                                                         padding: const EdgeInsets.symmetric(vertical: 10),
