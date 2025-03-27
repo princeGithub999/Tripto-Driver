@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,32 +6,55 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tripto_driver/model/ride_request_model/trip_model.dart';
+import 'package:tripto_driver/model/ride_request_model/trip_tracker_model.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 
 import '../../../model/ride_request_model/active_driver_model.dart';
 
 class TripProvider extends ChangeNotifier{
-
+TripTrackerModel? trackerModel;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   FirebaseDatabase realTimeDb = FirebaseDatabase.instance;
   bool isLoding = false;
   List<ActiveModel>  tripM = [];
+  TripModel tripData = TripModel();
+  StreamSubscription<List<TripModel>>? subscription;
 
-
-  TripProvider(){
+  TripProvider() {
     getActiveDriverOnce();
   }
 
   Stream<List<TripModel>> getPendingRideRequests(String vehiclesType) {
-    return firestore
+    var stream = firestore
         .collection('trip')
         .where('status', isEqualTo: 'pending')
         .where('type', isEqualTo: vehiclesType)
         .snapshots()
         .map((snapshot) =>
         snapshot.docs.map((doc) => TripModel.fromMap(doc.data())).toList());
+
+    // Stream ko listen karke latest tripData update karna
+
+    // subscription = stream.listen((rideList) {
+    //   if (rideList.isNotEmpty) {
+    //     tripData = rideList.last;
+    //     Fluttertoast.showToast(msg: 'yes');
+    //
+    //   } else {
+    //
+    //     Fluttertoast.showToast(msg: 'no');
+    //   }
+    //   notifyListeners();
+    // });
+
+    return stream;
   }
 
+  @override
+  void dispose() {
+    subscription?.cancel();
+    super.dispose();
+  }
 
   Future<void> acceptRideRequest(String userId, String status)async{
 
