@@ -1,25 +1,41 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
+import 'package:location/location.dart' as loc;
+import 'package:provider/provider.dart';
+import 'package:tripto_driver/model/ride_request_model/active_driver_model.dart';
+import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
+import 'package:uuid/uuid.dart';
+import '../../../utils/globle_widget/marker_icon.dart';
 import '../../service/auth_service.dart';
 import '../../service/location_service.dart';
 import '../../service/map_service.dart';
 import 'package:geolocator/geolocator.dart' as geo;
+import 'package:http/http.dart' as http;
+import '../trip_provider/trip_provider.dart';
 
 
 class MapsProvider extends ChangeNotifier {
 
   MapsProvider() {
     fetchOnlineStatus();
+    // determinePosition();
   }
 
-  Location location = Location();
+
+
+  loc.Location location =  loc.Location();
+  final db = FirebaseFirestore.instance;
   final FirebaseDatabase realTimeDb = FirebaseDatabase.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  var currentUserId = FirebaseAuth.instance.currentUser?.uid;
   final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
   BitmapDescriptor? liveLocationMarker;
   AuthService authService = AuthService();
@@ -27,6 +43,8 @@ class MapsProvider extends ChangeNotifier {
   GoogleMapController? mapController;
   LatLng? currentLocation;
   // var auth = FirebaseAuth.instance.currentUser!.uid;
+  late GoogleMapController? googleMapController;
+
   Set<Marker> markers = {};
   Set<Polyline> polyline = {};
 
@@ -42,45 +60,79 @@ class MapsProvider extends ChangeNotifier {
   StreamSubscription<Position>? _positionStream;
   bool isOnline = false;
   String na = '';
-
   String name = '';
 
+  var uuid =  Uuid().v4();
+
   Future<void> fetchOnlineStatus() async {
-    DatabaseReference ref = realTimeDb.ref('Vehicle').child(authService.crruntUserId!);
-    DatabaseEvent event = await ref.once();
+    DocumentSnapshot ref = await db.collection('vehicle').doc(authService.crruntUserId!).get();
 
-    if (event.snapshot.exists && event.snapshot.value != null) {
-      Map<dynamic, dynamic> data = event.snapshot.value as Map<dynamic, dynamic>;
+    if (ref.data() != null) {
+     var data = ref.data() as Map<dynamic, dynamic>;
       bool status = data['status'] ?? false;
-      // String name = data['driverName'];
-     
-      // na = name;
-
-      String na = data['driverName'] ?? false;
       isOnline = status;
       notifyListeners();
+    }else{
+      Fluttertoast.showToast(msg: 'not get status');
     }
   }
 
-  Future<void> toggleOnlineStatus(bool status) async {
-
+  Future<void> toggleOnlineStatus(bool status, BuildContext context) async {
+    var authProvider = Provider.of<AuthProviderIn>(context,listen: false);
+    var rideProvider = Provider.of<TripProvider>(context,listen: false);
     var currentUserId = FirebaseAuth.instance.currentUser?.uid;
     isOnline = status;
     notifyListeners();
 
     await authService.updateToggleBS(status,currentUserId!);
+    var ad = await getAddressFromLatLng(currentLocation!.latitude, currentLocation!.longitude);
+
+    var activeVehicle = ActiveVehicleModel(
+      id: authProvider.vehiclesModels.id,
+      type: authProvider.vehiclesModels.type,
+      name: '',
+      color: '',
+      imageUrl: '',
+      price: '250',
+      isOnline: isOnline
+    );
+
+    var activeDrivers = ActiveDriverModel(
+      id: authProvider.driverModels.driverID,
+      fullName: authProvider.driverModels.driverFirstName,
+      location: ad,
+      vehicle: activeVehicle,
+      fcmToken: authProvider.driverModels.fcmToken,
+      lat: currentLocation?.latitude,
+      lang: currentLocation?.longitude,
+
+    );
+    var data = ActiveModel(
+      id: authProvider.driverModels.driverID,
+      city: 'chhapra',
+      driver: activeDrivers,
+
+    );
 
     if (isOnline) {
-      await getCurrentLocation();
-      trackLiveLocation();
+      // await getCurrentLocation();
+      // trackLiveLocation();
+      determinePosition();
 
-      if (currentLocation != null && mapController != null) {
-        mapController!.animateCamera(
-          CameraUpdate.newLatLngZoom(currentLocation!, 17),
-        );
-      }
+      rideProvider.activeDriver(data);
+      // if (currentLocation != null && mapController != null) {
+      //   mapController!.animateCamera(
+      //     CameraUpdate.newLatLngZoom(currentLocation!, 17),
+      //   );
+      // }
+      notifyListeners();
+    }else{
+
+     rideProvider.diActiveDriver(data);
+      notifyListeners();
     }
   }
+
 
   Future<bool> checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -99,6 +151,66 @@ class MapsProvider extends ChangeNotifier {
     return permission == LocationPermission.whileInUse || permission == LocationPermission.always;
   }
 
+
+
+  Future<void> determinePosition() async {
+    try {
+      bool serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        throw Exception('Location services are disabled.');
+      }
+
+      LocationPermission permission = await _geolocatorPlatform.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await _geolocatorPlatform.requestPermission();
+        if (permission == LocationPermission.denied) {
+          throw Exception('Location permissions are denied.');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        throw Exception('Location permissions are permanently denied.');
+      }
+
+      Position position = await _geolocatorPlatform.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+      );
+
+      currentLocation = LatLng(position.latitude, position.longitude);
+      initialPosition = CameraPosition(target: currentLocation!, zoom: 15);
+
+      //  Ensure custom marker is loaded
+      if (liveLocationMarker == null || liveLocationMarker == BitmapDescriptor.defaultMarker) {
+        liveLocationMarker = await getByFromAsset('assets/images/img_1.png', 100);
+      }
+
+      //  Remove old marker & add new marker
+      markers.removeWhere((m) => m.markerId.value == 'currentLocation');
+
+      markers.add(
+        Marker(
+          markerId: const MarkerId('currentLocation'),
+          position: currentLocation!,
+          icon: liveLocationMarker ?? BitmapDescriptor.defaultMarker,
+          rotation: position.heading,
+        ),
+      );
+
+      if (controller.isCompleted) {
+        mapController = await controller.future;
+        mapController!.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: currentLocation!, zoom: 15),
+          ),
+        );
+      }
+      trackLiveLocation();
+      notifyListeners();
+    } catch (e) {
+      Fluttertoast.showToast(msg: 'Error: $e');
+    }
+  }
+
   Future<void> trackLiveLocation() async {
     bool hasPermission = await checkLocationPermission();
     if (!hasPermission) return;
@@ -106,31 +218,45 @@ class MapsProvider extends ChangeNotifier {
     await _positionStream?.cancel();
 
     _positionStream = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(accuracy: geo.LocationAccuracy.high),
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
     ).listen((Position position) async {
-      _currentPosition = LatLng(position.latitude, position.longitude);
+      currentLocation = LatLng(position.latitude, position.longitude);
+
+      markers.removeWhere((m) => m.markerId.value == 'currentLocation');
+
+      markers.add(
+        Marker(
+          markerId: const MarkerId('currentLocation'),
+          position: currentLocation!,
+          icon: liveLocationMarker!,
+          rotation: position.heading,
+        ),
+      );
+
+      //  Move camera with FULL ZOOM (max 20)
+      // if (controller.isCompleted) {
+      //   mapController = await controller.future;
+      //   mapController!.animateCamera(
+      //     CameraUpdate.newCameraPosition(
+      //       CameraPosition(target: currentLocation!, zoom: 18), // 🔥 FULL ZOOM
+      //     ),
+      //   );
+      // }
+      updateLatLong(position.latitude, position.longitude);
       notifyListeners();
-
-      if (controller.isCompleted) {
-        mapController = await controller.future;
-        if (_currentPosition != null && mapController != null) {
-          mapController!.animateCamera(
-            CameraUpdate.newCameraPosition(
-              CameraPosition(target: _currentPosition!, zoom: 17),
-            ),
-          );
-
-          notifyListeners();
-        }
-      }
     });
   }
 
-  void onMapCreated(GoogleMapController controllerInstance) {
-    if (!controller.isCompleted) {
-      controller.complete(controllerInstance);
-    }
-    mapController = controllerInstance;
+
+  Future<void> updateLatLong(double lat, double long)async{
+    await firestore.collection('drivers').doc(currentUserId).update(
+      {
+        'address':{
+          'lang':long,
+          'lat': lat
+        }
+      }
+    );
   }
 
   Future<void> setMarkersAndRoute(LatLng pickUpLatLng, LatLng dropLatLng) async {
@@ -194,31 +320,24 @@ class MapsProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getCurrentLocation() async {
-    var locationData = await location.getLocation();
+  Future<String?> getAddressFromLatLng(double lat, double lang)async{
 
-    if (locationData.latitude != null && locationData.longitude != null) {
-      currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
+    try{
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lang);
 
-      markers.add(Marker(
-        markerId: const MarkerId("current_location"),
-        position: currentLocation!,
-        infoWindow: const InfoWindow(title: "Your Current Location"),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-      ));
+      if(placemarks.isNotEmpty){
+        Placemark place = placemarks[0];
 
-      notifyListeners();
-
-      if (controller.isCompleted) {
-        mapController = await controller.future;
-        if (mapController != null) {
-          mapController!.animateCamera(
-            CameraUpdate.newLatLngZoom(currentLocation!, 17),
-          );
-        }
+        return "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+      }else{
+        Fluttertoast.showToast(msg: 'address is null');
       }
+    }catch(e){
+      Fluttertoast.showToast(msg: 'Error');
     }
+    return null;
   }
+
 
   @override
   void dispose() {

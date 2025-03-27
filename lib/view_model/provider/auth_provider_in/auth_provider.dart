@@ -13,7 +13,7 @@ import 'package:tripto_driver/model/driver_data_model/vehicles_model.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view/auth_screen/verify_otp_page.dart';
 import 'package:tripto_driver/view/home_page.dart';
-import 'package:tripto_driver/view_model/provider/from_provider/licence_provider.dart';
+import 'package:tripto_driver/view_model/provider/from_provider/from_provider.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import 'package:tripto_driver/view_model/service/auth_service.dart';
 import '../../../model/driver_data_model/driver_profile_model.dart';
@@ -28,6 +28,7 @@ class AuthProviderIn extends ChangeNotifier {
 
   TextEditingController inputNumber = TextEditingController();
   bool isLoding = false;
+  bool isGoogleAuthLoading = false;
   AuthService authService = AuthService();
   FromProvider fromProvider = Provider.of(Get.context!, listen: false);
   NotificationService notificationService = NotificationService();
@@ -36,12 +37,14 @@ class AuthProviderIn extends ChangeNotifier {
   var mapProvider = Provider.of<MapsProvider>(Get.context!, listen: false);
   final supabaseOTP = Supabase.instance.client;
   dynamic supaNumber;
-  DriverModel? driverProfile;
+  DriverModel driverModels = DriverModel();
+  VehiclesModel vehiclesModels = VehiclesModel();
+  DriverDocumentModel driverDocumentModels = DriverDocumentModel();
+
 
 
   AuthProviderIn(){
     supaNumber = supabaseOTP.auth.currentUser?.phone;
-    Fluttertoast.showToast(msg: '$supaNumber');
     print('Number $supaNumber');
   }
 
@@ -72,57 +75,30 @@ class AuthProviderIn extends ChangeNotifier {
     isLoding = true;
     notifyListeners();
     try{
-      final response = await supabaseOTP.auth.verifyOTP(
-          phone: '+91$phoneNumber',
-          token: otp,
-          type: OtpType.sms
-      );
+        final response = await supabaseOTP.auth.verifyOTP(
+            phone: '+91$phoneNumber',
+            token: otp,
+            type: OtpType.sms
+        );
 
-      if(response.session != null){
-        Fluttertoast.showToast(msg: 'v sucess');
+        if(response.session != null){
+          Fluttertoast.showToast(msg: 'v success');
         authService.checkStatus(phoneNumber,);
-      }else{
-        AppHelperFunctions.showSnackBar('Invalid OTP!');
-      }
+        }else{
+          AppHelperFunctions.showSnackBar('Invalid OTP!');
+        }
     }catch(e){
-      AppHelperFunctions.showSnackBar('Failed to verify OTP: $e');
+        AppHelperFunctions.showSnackBar('Failed to verify OTP: $e');
     }finally{
       isLoding = false;
       notifyListeners();
     }
   }
 
-
-  // Future<void> requestOTP(String phoneNumber)async{
-  //
-  //   try{  b0.0
-  //
-  //     isLoding = true;
-  //     notifyListeners();
-  //     if(phoneNumber.isNotEmpty){
-  //       authService.requestOTP(phoneNumber).then((value) {
-  //         if(value == true){
-  //           AppHelperFunctions.navigateToScreen(Get.context!, const VerifyOtpPage());
-  //         }
-  //       },);
-  //     }else{
-  //       Fluttertoast.showToast(msg: 'please enter phone number');
-  //     }
-  //   }catch(error){
-  //     Fluttertoast.showToast(msg: '$error');
-  //
-  //   }finally{
-  //
-  //     isLoding = false;
-  //     notifyListeners();
-  //   }
-  // }
-
-
   Future<void> signInWithGoogle()async{
 
     try {
-      isLoding = true;
+      isGoogleAuthLoading = true;
       notifyListeners();
 
       var success = await authService.signInWithGoogle();
@@ -139,12 +115,13 @@ class AuthProviderIn extends ChangeNotifier {
     } catch (error) {
       Fluttertoast.showToast(msg: '$error');
     } finally {
-      isLoding = false;
+      isGoogleAuthLoading = false;
       notifyListeners();
       print('Loading finished...');
     }
 
   }
+
 
   // Future<DriverProfileModel?> getData()async{
   //
@@ -177,27 +154,29 @@ class AuthProviderIn extends ChangeNotifier {
 
 
 
-  void fetchLiveProfileData(String driverId) {
+  // void fetchLiveProfileData(String driverId) {
+  //
+  //   DatabaseReference ref = realTimeDb.ref('Drivers_Data').child(driverId);
+  //
+  //   ref.onValue.listen((DatabaseEvent event) {
+  //     if (event.snapshot.exists && event.snapshot.value != null) {
+  //       Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
+  //       print("🔥 Live Updated Driver Data: $data");
+  //
+  //       driverProfile = DriverModel.fromJson(data);
+  //       notifyListeners();  //
+  //     } else {
+  //       Fluttertoast.showToast(msg: 'No data found in Firebase.');
+  //     }
+  //   }, onError: (error) {
+  //     Fluttertoast.showToast(msg: 'Error: $error');
+  //   });
+  // }
 
-    DatabaseReference ref = realTimeDb.ref('Drivers_Data').child(driverId);
 
-    ref.onValue.listen((DatabaseEvent event) {
-      if (event.snapshot.exists && event.snapshot.value != null) {
-        Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
-        print("🔥 Live Updated Driver Data: $data");
-
-        driverProfile = DriverModel.fromJson(data);
-        notifyListeners();  // *🔥 UI को Auto-Refresh करें*
-      } else {
-        Fluttertoast.showToast(msg: 'No data found in Firebase.');
-      }
-    }, onError: (error) {
-      Fluttertoast.showToast(msg: 'Error: $error');
-    });
-  }
+  /// **🔥 Update Profile Data in Firebase (Live Reflect in UI)**
 
 
-  /// *🔥 Update Profile Data in Firebase (Live Reflect in UI)*
   Future<void> updateProfileData(String driverId, String newName, String newPhone) async {
     DatabaseReference ref = realTimeDb.ref('Drivers_Data').child(driverId);
 
@@ -213,15 +192,11 @@ class AuthProviderIn extends ChangeNotifier {
     }
   }
 
-
-
-
   Future<void> saveProfileData(DriverDataModel driverData) async {
 
     var driverId = FirebaseAuth.instance.currentUser?.uid;
-    // var supaId = supabaseOTP.auth.currentUser?.id;
 
-    if (driverId == null) {
+     if (driverId == null) {
       AppHelperFunctions.showSnackBar("User not logged in!");
       return;
     }
@@ -265,6 +240,10 @@ class AuthProviderIn extends ChangeNotifier {
           ? await authService.uploadImageToFirebase(fromProvider.driverImage!, "driver_image_$driverId.jpg")
           : null;
 
+      String? carImage = fromProvider.carImage != null
+            ? await authService.uploadImageToFirebase(fromProvider.carImage!, "car_image_$driverId.jpg")
+            :null;
+
       var lat = mapProvider.currentLocation?.latitude;
       var lang = mapProvider.currentLocation?.longitude;
       // Assign data to DriverDataModel
@@ -293,38 +272,40 @@ class AuthProviderIn extends ChangeNotifier {
       );
 
       var address = DriverAddressModel(
-          vill: driverData.driverAddress,
-          district: 'hello',
-          pinCode: 841218,
-          policeStation: 'beheld',
-          post: 'paiga',
-          state: 'bihar',
-          lat:  lat,
-          lang: lang
+        vill: driverData.driverAddress,
+        district: 'hello',
+        pinCode: 841218,
+        policeStation: 'beheld',
+        post: 'paiga',
+        state: 'bihar',
+        lat:  lat,
+        lang: lang
       );
 
       var driver = DriverModel(
-          driverID: driverId,
-          documentId: driverId,
-          vehiclesId: driverId,
-          driverFirstName: driverData.driverName,
-          driverLastName: 'kumar',
-          driverEmail: driverData.driverEmail,
-          driverImage: driverImgUrl,
-          driverGender: 'male',
-          driverPhoneNumber: driverData.driverPhoneNumber,
-          fcmToken: token,
-          address: address
+        driverID: driverId,
+        documentId: driverId,
+        vehiclesId: driverId,
+        driverFirstName: driverData.driverName,
+        driverLastName: 'kumar',
+        driverEmail: driverData.driverEmail,
+        driverImage: driverImgUrl,
+        driverGender: 'male',
+        driverPhoneNumber: driverData.driverPhoneNumber,
+        fcmToken: token,
+        address: address
       );
+
       var vehiclesData = VehiclesModel(
-          driverId: driverId,
-          driverToken: token,
-          id: driverId,
-          rcImageFront: frontRcUrl,
-          rcImageBack: backRcUrl,
-          type: driverData.carName,
-          status: false,
-          vehicleNumber: ''
+        driverId: driverId,
+        driverToken: token,
+        id: driverId,
+        rcImageFront: frontRcUrl,
+        rcImageBack: backRcUrl,
+        type: driverData.carName,
+        status: false,
+        vehicleNumber: driverData.vehiclesNumber,
+          vehicleImage: carImage
 
       );
       var documentData = DriverDocumentModel(
@@ -340,10 +321,13 @@ class AuthProviderIn extends ChangeNotifier {
 
       );
 
-      await authService.saveDriverData(driverId, data);
-      await authService.saveDriverDataInRealTime(driverId, driver);
+       // await authService.saveDriverData(driverId, data);
+      await authService.saveDriver(driverId, driver);
       await authService.saveDriverVehiclesData(driverId, vehiclesData);
       await authService.saveDriverDocumentData(driverId, documentData);
+
+
+      notifyListeners();
       AppHelperFunctions.navigateToScreenBeforeEndPage(Get.context!, const BottomNavigation());
 
       fromProvider.clearFeald();
@@ -353,6 +337,59 @@ class AuthProviderIn extends ChangeNotifier {
     } finally {
       isLoding = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> retriveDriver() async {
+
+    var currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) {
+      Fluttertoast.showToast(msg: 'User not logged in.');
+      return;
+    }
+    retriveVehicle();
+   var retriveData = await authService.retriveDriver(currentUserId);
+    if(retriveData != null){
+      driverModels = retriveData;
+      notifyListeners();
+    }else{
+      Fluttertoast.showToast(msg: 'dont retrive driver');
+    }
+  }
+
+  void retriveVehicle()async {
+
+    retriveDriverDocuments();
+    var currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) {
+
+      Fluttertoast.showToast(msg: 'User not logged in.');
+      return;
+    }
+    var data = await authService.retriveVehicle(currentUserId);
+    if(data != null){
+      vehiclesModels = data;
+      notifyListeners();
+    }else{
+      Fluttertoast.showToast(msg: "don't retrive vehicle");
+    }
+  }
+
+  void retriveDriverDocuments() async{
+
+    var currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) {
+
+      Fluttertoast.showToast(msg: 'User not logged in.');
+      return;
+    }
+
+   var data = await authService.retriveDoc(currentUserId);
+    if(data != null){
+      driverDocumentModels = data;
+      notifyListeners();
+    }else{
+      Fluttertoast.showToast(msg: "don't retrive driver doc");
     }
   }
 
@@ -368,32 +405,31 @@ class AuthProviderIn extends ChangeNotifier {
     }
   }
 
+    Future<DriverModel?> getData()async{
 
-  Future<DriverModel?> getData()async{
+      var currentUser =  FirebaseAuth.instance.currentUser;
 
-    var currentUser =  FirebaseAuth.instance.currentUser;
+      // if(currentUser!.uid.isNotEmpty){
+      //   Fluttertoast.showToast(msg: 'Error: Driver ID is empty');
+      //   return null;
+      // }
 
-    // if(currentUser!.uid.isNotEmpty){
-    //   Fluttertoast.showToast(msg: 'Error: Driver ID is empty');
-    //   return null;
-    // }
+      try{
+          DatabaseReference driverRef = realTimeDb.ref('Drivers_Data').child('Otc5g5d4PiWdiRa5MAaiqMhJrot1');
+          DatabaseEvent event = await driverRef.once();
 
-    try{
-      DatabaseReference driverRef = realTimeDb.ref('Drivers_Data').child('Otc5g5d4PiWdiRa5MAaiqMhJrot1');
-      DatabaseEvent event = await driverRef.once();
+          if(event.snapshot.value != null){
+            Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
+            return DriverModel.fromJson(data);
+          }else{
+            Fluttertoast.showToast(msg: 'No data found');
+            return null;
+          }
 
-      if(event.snapshot.value != null){
-        Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
-        return DriverModel.fromJson(data);
-      }else{
-        Fluttertoast.showToast(msg: 'No data found');
+      }catch(e){
+        Fluttertoast.showToast(msg: 'Error: $e');
         return null;
       }
-
-    }catch(e){
-      Fluttertoast.showToast(msg: 'Error: $e');
-      return null;
-    }
 
     }
 

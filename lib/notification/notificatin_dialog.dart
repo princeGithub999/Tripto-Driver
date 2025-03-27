@@ -54,7 +54,7 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Ride Request Image
-            Image.asset('assets/icons/ride_request.png', height: 100, width: 100),
+            Image.asset('assets/icons/trip_provider.png', height: 100, width: 100),
             const SizedBox(height: 10),
 
             // Title

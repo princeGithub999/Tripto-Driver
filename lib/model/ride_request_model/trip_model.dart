@@ -1,30 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class RideRequestModel {
-  String id;
-  String userId;
-  String userName;
-  double pickupLat;
-  double pickupLng;
-  double dropLat;
-  double dropLng;
-  String status;
-  Timestamp createdAt;
-  String vehicleType;
+class TripModel {
+  String? id;
+  String? userId;
+  String? userName;
+  double? pickupLat;
+  double? pickupLng;
+  double? dropLat;
+  double? dropLng;
+  String? dropAddress;
+  String? pickupAddress;
+  String? status;
+  Timestamp? createdAt;
+  String? vehicleType;
   String? driverId;
   String? fcmToken;
 
-  RideRequestModel({
-    required this.id,
-    required this.userId,
-    required this.userName,
-    required this.pickupLat,
-    required this.pickupLng,
-    required this.dropLat,
-    required this.dropLng,
-    required this.status,
-    required this.createdAt,
-    required this.vehicleType,
+  TripModel({
+     this.id,
+     this.userId,
+     this.userName,
+     this.pickupLat,
+     this.pickupLng,
+     this.dropLat,
+     this.dropLng,
+     this.dropAddress,
+     this.pickupAddress,
+     this.status,
+     this.createdAt,
+     this.vehicleType,
     this.driverId,
     this.fcmToken
   });
@@ -38,6 +42,8 @@ class RideRequestModel {
       'pickupLng': pickupLng,
       'dropLat': dropLat,
       'dropLng': dropLng,
+      'dropAddress' : dropAddress,
+      'pickUpAddress' : pickupAddress,
       'status': status,
       'createdAt': createdAt,
       'type': vehicleType,
@@ -46,8 +52,8 @@ class RideRequestModel {
     };
   }
 
-  factory RideRequestModel.fromMap(Map<String, dynamic> map,) {
-    return RideRequestModel(
+  factory TripModel.fromMap(Map<String, dynamic> map,) {
+    return TripModel(
         id: map['id'],
         userId: map['userId'],
         userName: map['userName'],
@@ -55,6 +61,8 @@ class RideRequestModel {
         pickupLng: map['pickupLng'],
         dropLat: map['dropLat'],
         dropLng: map['dropLng'],
+        dropAddress: map['dropAddress'],
+        pickupAddress: map['pickUpAddress'],
         status: map['status'],
         createdAt: map['createdAt'],
         vehicleType: map['type'],
