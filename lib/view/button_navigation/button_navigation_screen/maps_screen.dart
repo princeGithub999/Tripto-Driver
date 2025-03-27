@@ -235,7 +235,6 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                   ),
                                 )
                             );
-
                           },
                         ),
                       );
