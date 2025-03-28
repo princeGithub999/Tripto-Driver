@@ -85,7 +85,9 @@ void main() async {
         ChangeNotifierProvider(create: (context) => PermissionProvider()),
         ChangeNotifierProvider(create: (context) => FromProvider()),
         ChangeNotifierProvider(create: (context) => MapsProvider()),
+
         ChangeNotifierProvider(create: (context) => TripProvider()),
+
 
       ],
       child: const MyApp(),

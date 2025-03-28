@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
-import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 import '../../../view_model/provider/trip_provider/trip_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -56,53 +55,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildProfileHeader() {
-    return Consumer<AuthProviderIn>(
-      builder: (BuildContext context, authProvider, Widget? child) {
-        return Container(
-          decoration: BoxDecoration(
-              color: AppColors.blue900,
-              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20),bottomRight: Radius.circular(20))),
-          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: Row(
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
+      color: AppColors.blue900,
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: _pickImage,
+            child: CircleAvatar(
+              radius: 40,
+              backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
+              backgroundColor: Colors.white,
+              child: _profileImage == null
+                  ? const Icon(Icons.camera_alt, size: 30, color: Colors.grey)
+                  : null,
+            ),
+          ),
+          const SizedBox(width: 16),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
-                  onTap: _pickImage,
-                  child: CircleAvatar(
-                    radius: 40,
-                    backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
-                    backgroundColor: Colors.white,
-                    child: _profileImage == null
-                        ? const Icon(Icons.camera_alt, size: 30, color: Colors.grey)
-                        : null,
-                  ),
+                Text(
+                  "Driver Name",
+                  style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
-                const SizedBox(width: 16),
-                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        authProvider.driverModels.driverFirstName ?? '',
-                        style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        authProvider.vehiclesModels.type ?? '',
-                        style: TextStyle(color: Colors.white70, fontSize: 16),
-                      ),
-                    ],
-                  ),
+                SizedBox(height: 4),
+                Text(
+                  "Not Available",
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
                 ),
               ],
             ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
@@ -125,20 +115,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildLogoutButton() {
     return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.blue900,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              minimumSize: const Size(double.infinity, 50),
-            ),
-            onPressed: () {},
-            child: const Text(
-              "Logout",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
-            ),
-            ),
-        );
-    }
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.blue900,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          minimumSize: const Size(double.infinity, 50),
+        ),
+        onPressed: () {},
+        child: const Text(
+          "Logout",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
+        ),
+      ),
+    );
+  }
 }
