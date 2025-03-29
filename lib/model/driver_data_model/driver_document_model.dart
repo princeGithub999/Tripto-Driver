@@ -14,6 +14,10 @@ class DriverDocumentModel {
   bool? isAdharVerifide;
   bool? isPanVerifide;
   bool? isDriverLicenceVerifide;
+  String? driverBankName;
+  String? driverAccountNumber;
+  String? driverIfscCode;
+  String? driverUpiCode;
 
   DriverDocumentModel({
     this.id,
@@ -25,6 +29,10 @@ class DriverDocumentModel {
     this.isAdharVerifide,
     this.isPanVerifide,
     this.isDriverLicenceVerifide,
+    this.driverAccountNumber,
+    this.driverBankName,
+    this.driverIfscCode,
+    this.driverUpiCode
   });
 
   factory DriverDocumentModel.fromJson(Map<String, dynamic> json) => DriverDocumentModel(
@@ -37,6 +45,10 @@ class DriverDocumentModel {
     isAdharVerifide: json["is_adhar_verifide"],
     isPanVerifide: json["is_pan_verifide"],
     isDriverLicenceVerifide: json["is_driver_licence_verifide"],
+    driverAccountNumber: json["driverAccountNumber"],
+    driverBankName: json["driverBankName"],
+    driverIfscCode: json["driverIfscCode"],
+    driverUpiCode: json["driverUpiCode"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -49,5 +61,9 @@ class DriverDocumentModel {
     "is_adhar_verifide": isAdharVerifide,
     "is_pan_verifide": isPanVerifide,
     "is_driver_licence_verifide": isDriverLicenceVerifide,
+    "driverAccountNumber" : driverAccountNumber,
+    "driverBankName" : driverBankName,
+    "driverIfscCode" : driverIfscCode,
+    "driverUpiCode" : driverUpiCode,
   };
 }

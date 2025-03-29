@@ -1,24 +1,35 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:tripto_driver/model/ride_request_model/trip_model.dart';
 import 'package:tripto_driver/model/ride_request_model/trip_tracker_model.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
-
+import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import '../../../model/ride_request_model/active_driver_model.dart';
+import '../../../notification/push_notification.dart';
+
 
 class TripProvider extends ChangeNotifier{
-TripTrackerModel? trackerModel;
+
+  TripTrackerModel? trackerModel;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   FirebaseDatabase realTimeDb = FirebaseDatabase.instance;
   bool isLoding = false;
   List<ActiveModel>  tripM = [];
   TripModel tripData = TripModel();
   StreamSubscription<List<TripModel>>? subscription;
+  PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
+  final ValueNotifier<int> countdown = ValueNotifier(30);
+  String? currentRideId;
+  Timer? _timer;
+
 
   TripProvider() {
     getActiveDriverOnce();
@@ -33,40 +44,39 @@ TripTrackerModel? trackerModel;
         .map((snapshot) =>
         snapshot.docs.map((doc) => TripModel.fromMap(doc.data())).toList());
 
-    // Stream ko listen karke latest tripData update karna
-
-    // subscription = stream.listen((rideList) {
-    //   if (rideList.isNotEmpty) {
-    //     tripData = rideList.last;
-    //     Fluttertoast.showToast(msg: 'yes');
-    //
-    //   } else {
-    //
-    //     Fluttertoast.showToast(msg: 'no');
-    //   }
-    //   notifyListeners();
-    // });
 
     return stream;
   }
 
-  @override
-  void dispose() {
-    subscription?.cancel();
-    super.dispose();
+  Future<void> isTripValid()async{
+
   }
 
-  Future<void> acceptRideRequest(String userId, String status)async{
+
+
+
+  Future<void> acceptRideRequest(
+      BuildContext context, String userId,
+      String status,
+      LatLng pickUpLatLng,
+      LatLng dropLatLng,
+      TripTrackerModel tripData,
+      )async{
 
     try{
       isLoding = true;
       notifyListeners();
 
-    await  firestore.collection('trip').doc(userId).update({'status':status});
+      await  firestore.collection('trip').doc(userId).update({'status':status});
 
       var doc = await firestore.collection('trip').doc(userId).get();
       if (doc.exists && doc.data()?['status'] == status) {
-        AppHelperFunctions.showSnackBar('Ride request accepted successfully');
+
+       await tripTracker(tripData, pickUpLatLng, dropLatLng);
+       AppHelperFunctions.showSnackBar('Ride request accepted successfully');
+       // pushNotificationSystem.sendOrderNotification(tripData.fcmToken!);
+
+
       } else {
         AppHelperFunctions.showSnackBar('Failed to accept ride request');
       }
@@ -80,15 +90,42 @@ TripTrackerModel? trackerModel;
   }
 
 
+  void startCountdown() {
+    _timer?.cancel();
+    countdown.value = 30;
+
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (countdown.value > 0) {
+        countdown.value--;
+      } else {
+        timer.cancel();
+        Fluttertoast.showToast(msg: 'Your ride request has expired.');
+      }
+    });
+  }
+
   Future<void> activeDriver(ActiveModel ride)async{
     await realTimeDb.ref('activeDriver').child(ride.id!).set(ride.toJson());
 
   }
-  Future<void> diActiveDriver(ActiveModel ride)async{
 
+  Future<void> diActiveDriver(ActiveModel ride)async{
     await realTimeDb.ref('activeDriver').child(ride.id!).remove();
   }
 
+
+  Future<void> tripTracker(TripTrackerModel data, LatLng pickUpLatLng, LatLng dropLatLng)async{
+
+  try{
+    await realTimeDb.ref('tripTracker').child(data.tripId!).set(data.toJson());
+
+    await Provider.of<MapsProvider>(Get.context!,listen: false).setMarkersAndRoute(pickUpLatLng, dropLatLng);
+
+  }catch(error){
+    AppHelperFunctions.showSnackBar('Error tripTracker :-$error');
+    print('Error tripTracker :-$error');
+  }
+}
 
 
   Future<List<ActiveModel>> getActiveDriverOnce() async {
@@ -123,5 +160,11 @@ TripTrackerModel? trackerModel;
     return drivers; // Saare drivers return karna
   }
 
+  @override
+  void dispose() {
+    _timer?.cancel();
+    countdown.dispose();
+    super.dispose();
+  }
 
 }

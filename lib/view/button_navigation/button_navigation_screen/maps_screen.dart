@@ -41,6 +41,7 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
   Timer? trackingTimer;
 
 
+
   @override
   void initState() {
     super.initState();
@@ -59,11 +60,7 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
 
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
+
 
   void showRideRequests() {
     _animationController.forward();
@@ -71,6 +68,15 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
 
   void hideRideRequests() {
     _animationController.reverse();
+  }
+
+
+
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
 
@@ -132,6 +138,15 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                             var latestRide = snapshot.data!.last;
                             showRideRequests();
 
+                            if(rideRequest.currentRideId != latestRide.id){
+                              rideRequest.currentRideId = latestRide.id;
+                              rideRequest.startCountdown();
+                            }
+
+                            var startLocationFormat = mapProvider.getAddressFromLatLng(latestRide.pickupLat!, latestRide.pickupLng!);
+                            var endLocationFormat = mapProvider.getAddressFromLatLng(latestRide.dropLat!, latestRide.dropLng!);
+
+
                             return SlideTransition(
                                 position: _slideAnimation,
                                 child: Container(
@@ -146,9 +161,32 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       SizedBox(height: sizes.height * 0.1 - 70),
-                                      Text(
-                                        "New Ride Request",
-                                        style: GoogleFonts.aBeeZee(fontSize: 18, fontWeight: FontWeight.bold),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "New Ride Request",
+                                            style: GoogleFonts.aBeeZee(fontSize: 18, fontWeight: FontWeight.bold),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.timer, color: Colors.red),
+                                              SizedBox(width: 5),
+                                              ValueListenableBuilder<int>(
+                                                valueListenable: rideRequest.countdown,
+                                                builder: (context, value, child) {
+                                                  return Text(
+                                                    "Expires in: $value sec",
+                                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.red),
+                                                  );
+                                                },
+                                              ),
+                                            ],
+                                          ),
+
+                                        ],
                                       ),
                                       const SizedBox(height: 5),
                                       const Divider(),
@@ -198,7 +236,6 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                           Expanded(
                                             child: ElevatedButton(
                                               onPressed: () {
-
                                               },
                                               style: ElevatedButton.styleFrom(
                                                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -212,7 +249,7 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                             child: Consumer<TripProvider>(
                                               builder: (context, rideRequest, child) {
 
-                                                  trackingTimer = Timer.periodic(Duration(seconds: 1), (timer)async {
+                                                  trackingTimer = Timer.periodic(Duration(seconds: 60), (timer)async {
                                                     mapProvider.updateTripTracker(mapProvider.currentLocation!.latitude, mapProvider.currentLocation!.longitude, latestRide.id!);
                                                   },);
 
@@ -220,25 +257,34 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                                   builder: (BuildContext context, value, Widget? child) {
                                                     return ElevatedButton(
                                                       onPressed: () async {
-                                                        await rideRequest.acceptRideRequest(latestRide.id!, 'accept');
-                                                        LatLng defaultPickup =  LatLng(latestRide.pickupLat!, latestRide.pickupLng!);
-                                                        LatLng defaultDrop =  LatLng(latestRide.dropLat!, latestRide.dropLng!);
-                                                        value.setMarkersAndRoute(defaultPickup,defaultDrop);
+
 
                                                         var tripData = TripTrackerModel(
                                                             tripId: latestRide.id,
                                                             driverName: authProvider.driverModels.driverFirstName,
                                                             startLocationLang: latestRide.pickupLat,
                                                             startLocationLat: latestRide.pickupLng,
+                                                            startLocationFormat: await startLocationFormat,
+                                                            endLocationFormat: await endLocationFormat,
                                                             endLocationLang: latestRide.dropLng,
                                                             endLocationLat: latestRide.dropLat,
                                                             currentLocationLang: value.currentLocation?.longitude,
                                                             currentLocationLat: value.currentLocation?.latitude,
-                                                            status: 'accepted'
+                                                            status: 'accepted',
+                                                            fcmToken: latestRide.fcmToken
 
                                                         );
+                                                        LatLng defaultPickup =  LatLng(latestRide.pickupLat!, latestRide.pickupLng!);
+                                                        LatLng defaultDrop =  LatLng(latestRide.dropLat!, latestRide.dropLng!);
+                                                        await rideRequest.acceptRideRequest(
+                                                            context,
+                                                            latestRide.id!,
+                                                            'accept',
+                                                            defaultPickup,
+                                                            defaultDrop,
+                                                            tripData
+                                                        );
 
-                                                        value.tripTracker(tripData);
                                                       },
                                                       style: ElevatedButton.styleFrom(
                                                         padding: const EdgeInsets.symmetric(vertical: 10),

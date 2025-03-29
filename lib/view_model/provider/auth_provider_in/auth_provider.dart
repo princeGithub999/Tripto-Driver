@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +42,7 @@ class AuthProviderIn extends ChangeNotifier {
   DriverModel driverModels = DriverModel();
   VehiclesModel vehiclesModels = VehiclesModel();
   DriverDocumentModel driverDocumentModels = DriverDocumentModel();
-
+  final _auth= FirebaseAuth.instance;
 
 
   AuthProviderIn(){
@@ -318,6 +320,10 @@ class AuthProviderIn extends ChangeNotifier {
         isDriverLicenceVerifide: false,
         isPanVerifide: false,
         pen: penUrl,
+        driverUpiCode: driverData.driverUpiCode,
+        driverIfscCode: driverData.driverIfscCode,
+        driverBankName: driverData.driverBankName,
+        driverAccountNumber: driverData.driverAccountNumber
 
       );
 
@@ -432,5 +438,15 @@ class AuthProviderIn extends ChangeNotifier {
       }
 
     }
+
+
+  Future<void> signOut() async{
+    try{
+      await _auth.signOut();
+    }
+    catch(e){
+      log("Something went wrong:");
+    }
+  }
 
 }
