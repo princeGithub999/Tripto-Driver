@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -15,18 +16,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tripto_driver/model/ride_request_model/active_driver_model.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import '../../../model/ride_request_model/trip_tracker_model.dart';
 import '../../../utils/globle_widget/marker_icon.dart';
 import '../../service/auth_service.dart';
 import '../../service/location_service.dart';
 import '../../service/map_service.dart';
+import 'package:geolocator/geolocator.dart' as geo;
+import 'package:http/http.dart' as http;
 import '../trip_provider/trip_provider.dart';
 
 
 class MapsProvider extends ChangeNotifier {
-TripTrackerModel? trackerModel;
+  TripTrackerModel? trackerModel;
   MapsProvider() {
     fetchOnlineStatus();
     // determinePosition();
@@ -73,7 +75,7 @@ TripTrackerModel? trackerModel;
     DocumentSnapshot ref = await db.collection('vehicle').doc(authService.crruntUserId!).get();
 
     if (ref.data() != null) {
-     var data = ref.data() as Map<dynamic, dynamic>;
+      var data = ref.data() as Map<dynamic, dynamic>;
       bool status = data['status'] ?? false;
       isOnline = status;
       notifyListeners();
@@ -93,13 +95,13 @@ TripTrackerModel? trackerModel;
     var ad = await getAddressFromLatLng(currentLocation!.latitude, currentLocation!.longitude);
 
     var activeVehicle = ActiveVehicleModel(
-      id: authProvider.vehiclesModels.id,
-      type: authProvider.vehiclesModels.type,
-      name: '',
-      color: '',
-      imageUrl: '',
-      price: '250',
-      isOnline: isOnline
+        id: authProvider.vehiclesModels.id,
+        type: authProvider.vehiclesModels.type,
+        name: '',
+        color: '',
+        imageUrl: '',
+        price: '250',
+        isOnline: isOnline
     );
 
     var activeDrivers = ActiveDriverModel(
@@ -133,7 +135,7 @@ TripTrackerModel? trackerModel;
       notifyListeners();
     }else{
 
-     rideProvider.diActiveDriver(data);
+      rideProvider.diActiveDriver(data);
       notifyListeners();
     }
   }
@@ -168,18 +170,6 @@ TripTrackerModel? trackerModel;
 //     AppHelperFunctions.showSnackBar('Error tripTracker$error');
 //   }
 // }
-
-
-  trackerModel=data;
-
-  try{
-    await realTimeDb.ref('tripTracker').child(data.tripId!).set(data.toJson());
-
-  }catch(error){
-    AppHelperFunctions.showSnackBar('Error tripTracker$error');
-  }
-}
-
 
   Future<void> determinePosition(BuildContext context) async {
     try {
@@ -279,12 +269,12 @@ TripTrackerModel? trackerModel;
 
   Future<void> updateLatLong(double lat, double long,BuildContext context)async{
     await firestore.collection('drivers').doc(currentUserId).update(
-      {
-        'address':{
-          'lang':long,
-          'lat': lat
+        {
+          'address':{
+            'lang':long,
+            'lat': lat
+          }
         }
-      }
     );
 
 
@@ -293,20 +283,20 @@ TripTrackerModel? trackerModel;
 
   Future<void> updateTripTracker(double lat, double long, String id)async{
 
-      DatabaseReference tripRef = realTimeDb.ref('tripTracker').child(id);
+    DatabaseReference tripRef = realTimeDb.ref('tripTracker').child(id);
 
-      DatabaseEvent event = await tripRef.once();
-      if (event.snapshot.exists) {
-        await tripRef.update({
-          'currentLocationLang': long,
-          'currentLocationLat': lat,
-        });
+    DatabaseEvent event = await tripRef.once();
+    if (event.snapshot.exists) {
+      await tripRef.update({
+        'currentLocationLang': long,
+        'currentLocationLat': lat,
+      });
 
-        // Fluttertoast.showToast(msg: 'update');
-      } else {
-        // Fluttertoast.showToast(msg: 'no update data');
-      }
+      // Fluttertoast.showToast(msg: 'update');
+    } else {
+      // Fluttertoast.showToast(msg: 'no update data');
     }
+  }
 
   Future<void> setMarkersAndRoute(LatLng pickUpLatLng, LatLng dropLatLng) async {
     markers.add(Marker(
@@ -388,14 +378,8 @@ TripTrackerModel? trackerModel;
   }
 
 
-  Future<void> openGoogleMapsApp(double pickupLat, double pickupLng)async{
-      String googleUrl = "https://www.google.com/maps/dir/?api=1&destination=$pickupLat,$pickupLng&travelmode=driving";
+  Future<void> openGoogleMapsApp(double pickup, double d)async{
 
-      if (await canLaunchUrl(Uri.parse(googleUrl))) {
-        await launchUrl(Uri.parse(googleUrl), mode: LaunchMode.externalApplication);
-      } else {
-        throw 'Could not open Google Maps';
-      }
   }
 
   @override

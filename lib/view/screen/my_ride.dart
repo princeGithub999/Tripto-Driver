@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
-
-
-
 import '../../view_model/provider/history_provider/my_ride_history_provider.dart';
 
 class RideHistoryScreen extends StatelessWidget {
@@ -60,7 +56,7 @@ class RideHistoryScreen extends StatelessWidget {
                       createdAt = DateTime.now();
                     }
 
-                    String formattedDate = DateFormat('dd MMM yyyy, hh:mm a').format(createdAt);
+                    // String formattedDate = DateFormat('dd MMM yyyy, hh:mm a').format(createdAt);
 
                     // return Card(
                     //    color:trip['status'] == "accept" ? AppColors.blue900 : AppColors.blue900 ,
@@ -108,7 +104,7 @@ class RideHistoryScreen extends StatelessWidget {
                           children: [
                             Text("From: ${trip['pickUpAddress']}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white)),
                             Text("To: ${trip['dropAddress']}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white)),
-                            Text("Date: $formattedDate", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white,)),
+                            // Text("Date: $formattedDate", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white,)),
                           ],
                         ),
                         trailing: Chip(
