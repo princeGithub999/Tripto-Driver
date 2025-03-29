@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tripto_driver/model/ride_request_model/active_driver_model.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import '../../../model/ride_request_model/trip_tracker_model.dart';
 import '../../../utils/globle_widget/marker_icon.dart';
@@ -377,6 +378,16 @@ TripTrackerModel? trackerModel;
     return null;
   }
 
+
+  Future<void> openGoogleMapsApp(double pickupLat, double pickupLng)async{
+      String googleUrl = "https://www.google.com/maps/dir/?api=1&destination=$pickupLat,$pickupLng&travelmode=driving";
+
+      if (await canLaunchUrl(Uri.parse(googleUrl))) {
+        await launchUrl(Uri.parse(googleUrl), mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not open Google Maps';
+      }
+  }
 
   @override
   void dispose() {
