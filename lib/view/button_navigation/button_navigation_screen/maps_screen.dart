@@ -236,6 +236,8 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                           Expanded(
                                             child: ElevatedButton(
                                               onPressed: () {
+
+                                                mapProvider.openGoogleMapsApp(latestRide.pickupLat!, latestRide.pickupLng!);
                                               },
                                               style: ElevatedButton.styleFrom(
                                                   padding: const EdgeInsets.symmetric(vertical: 10),
