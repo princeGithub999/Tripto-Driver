@@ -99,6 +99,7 @@ class _FormFillupScreenState extends State<FormFillupScreen> {
                                       dlNumber: value.dlNumberContro.text,
                                       carName: fromProvider.selectedCar,
                                       vehiclesNumber: fromProvider.vehiclesNumber.text
+
                                   );
                                   authProvider.saveProfileData(data);
                                 } else {
