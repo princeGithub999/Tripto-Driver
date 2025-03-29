@@ -170,6 +170,7 @@ Future<void> tripTracker(TripTrackerModel data)async{
     AppHelperFunctions.showSnackBar('Error tripTracker$error');
   }
 }
+
   Future<void> determinePosition(BuildContext context) async {
     try {
       bool serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();

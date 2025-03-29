@@ -42,7 +42,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 30),
             _buildProfileOption(Icons.directions_car, "My Rides"),
             _buildProfileOption(Icons.wallet, "Earnings"),
-            _buildProfileOption(Icons.history, "Ride History"),
             _buildProfileOption(Icons.notifications, "Notifications"),
             _buildProfileOption(Icons.support, "Support"),
             _buildProfileOption(Icons.settings, "Settings"),
@@ -108,7 +107,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
         ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
-        onTap: () {},
+        onTap: () {
+
+        },
       ),
     );
   }
