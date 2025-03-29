@@ -171,6 +171,18 @@ TripTrackerModel? trackerModel;
 //   }
 // }
 
+
+  trackerModel=data;
+
+  try{
+    await realTimeDb.ref('tripTracker').child(data.tripId!).set(data.toJson());
+
+  }catch(error){
+    AppHelperFunctions.showSnackBar('Error tripTracker$error');
+  }
+}
+
+
   Future<void> determinePosition(BuildContext context) async {
     try {
       bool serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();
