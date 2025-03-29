@@ -159,17 +159,18 @@ TripTrackerModel? trackerModel;
   }
 
 
-Future<void> tripTracker(TripTrackerModel data)async{
+// Future<void> tripTracker(TripTrackerModel data, LatLng pickUpLatLng, LatLng dropLatLng)async{
+//
+//   trackerModel=data;
+//
+//   try{
+//     await realTimeDb.ref('tripTracker').child(data.tripId!).set(data.toJson());
+//     await setMarkersAndRoute(pickUpLatLng, dropLatLng);
+//   }catch(error){
+//     AppHelperFunctions.showSnackBar('Error tripTracker$error');
+//   }
+// }
 
-  trackerModel=data;
-
-  try{
-    await realTimeDb.ref('tripTracker').child(data.tripId!).set(data.toJson());
-
-  }catch(error){
-    AppHelperFunctions.showSnackBar('Error tripTracker$error');
-  }
-}
   Future<void> determinePosition(BuildContext context) async {
     try {
       bool serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();

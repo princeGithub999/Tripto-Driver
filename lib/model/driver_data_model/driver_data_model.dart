@@ -12,10 +12,12 @@ class DriverDataModel {
   String? driverEmail;
   String? driverAddress;
   String? driverDateOfBirth;
+
   String? driverBankName;
   String? driverAccountNumber;
   String? driverIfscCode;
   String? driverUpiCode;
+
   String? driverImage;
   String? frontDlImage;
   String? backDlImage;
