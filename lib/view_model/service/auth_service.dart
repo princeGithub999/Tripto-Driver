@@ -242,6 +242,7 @@ class AuthService {
    Future<DriverDocumentModel?> retriveDoc(String currentUserId)async{
     DocumentSnapshot doc = await db.collection('driverDocuments').doc(currentUserId).get();
     if(doc.exists && doc.data() != null){
+
       return DriverDocumentModel.fromJson(doc.data() as Map<String, dynamic>);
     }else{
       Fluttertoast.showToast(msg: 'driverDocuments data not found!');

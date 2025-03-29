@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +29,9 @@ class AuthProviderIn extends ChangeNotifier {
 
 
   TextEditingController inputNumber = TextEditingController();
+
+
+
   bool isLoding = false;
   bool isGoogleAuthLoading = false;
   AuthService authService = AuthService();
@@ -121,6 +126,7 @@ class AuthProviderIn extends ChangeNotifier {
     }
 
   }
+  
 
 
   // Future<DriverProfileModel?> getData()async{
@@ -432,5 +438,9 @@ class AuthProviderIn extends ChangeNotifier {
       }
 
     }
+
+
+
+
 
 }
