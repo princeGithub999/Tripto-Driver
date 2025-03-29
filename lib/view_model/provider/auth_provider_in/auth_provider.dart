@@ -29,6 +29,9 @@ class AuthProviderIn extends ChangeNotifier {
 
 
   TextEditingController inputNumber = TextEditingController();
+
+
+
   bool isLoding = false;
   bool isGoogleAuthLoading = false;
   AuthService authService = AuthService();
@@ -123,6 +126,7 @@ class AuthProviderIn extends ChangeNotifier {
     }
 
   }
+  
 
 
   // Future<DriverProfileModel?> getData()async{
@@ -440,6 +444,9 @@ class AuthProviderIn extends ChangeNotifier {
     }
 
 
+
+
+
   Future<void> signOut() async{
     try{
       await _auth.signOut();
@@ -448,5 +455,6 @@ class AuthProviderIn extends ChangeNotifier {
       log("Something went wrong:");
     }
   }
+
 
 }

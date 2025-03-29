@@ -8,6 +8,7 @@ import 'package:tripto_driver/utils/app_theme/app_theme.dart';
 import 'package:tripto_driver/view/screen/splace_screen.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/from_provider.dart';
+import 'package:tripto_driver/view_model/provider/history_provider/my_ride_history_provider.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import 'package:tripto_driver/view_model/provider/permission_handler/permission_provider.dart';
 import 'package:tripto_driver/view_model/provider/trip_provider/trip_provider.dart';
@@ -34,6 +35,11 @@ void main() async {
         ChangeNotifierProvider(create: (context) => MapsProvider()),
         ChangeNotifierProvider(create: (context) => TripProvider()),
         // ChangeNotifierProvider(create: (context) => RideHistoryProvider()),
+
+
+
+
+
       ],
       child: const MyApp(),
     ),
