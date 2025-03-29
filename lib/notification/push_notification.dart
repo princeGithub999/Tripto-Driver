@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import '../utils/google_secret/google_secret.dart';
 
 
@@ -111,12 +110,13 @@ class PushNotificationSystem {
 
 
 
-  void sendOrderNotification(
-      {required String message,}) async {
+  void sendOrderNotification(String fcmToken) async {
     String? token = await FirebaseMessaging.instance.getToken();
-    print('Token :- $token');
+    print('Token :- $fcmToken');
     final serverKey = await GoogleSecret.getServerKey();
     print('ServerKey:$serverKey');
+    // print('Fcm Token :- $fcmToken');
+
     try {
       final response = await http.post(
         Uri.parse('https://fcm.googleapis.com/v1/projects/fir-apptest-c3e4e/messages:send'),
@@ -126,10 +126,10 @@ class PushNotificationSystem {
         },
         body: jsonEncode(<String, dynamic>{
           "message": {
-            "token": token,
+            "token": fcmToken,
             "notification": {
               "title": 'Prince',
-              "body": message
+              "body": 'confrom your ride'
             }
           }
 
@@ -138,6 +138,7 @@ class PushNotificationSystem {
 
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: 'send notification');
+
       } else {
         print(
             'Failed to send notification. Status Code: ${response.statusCode}');

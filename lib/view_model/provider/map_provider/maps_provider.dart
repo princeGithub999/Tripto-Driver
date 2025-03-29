@@ -6,12 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as loc;
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tripto_driver/model/ride_request_model/active_driver_model.dart';
+import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 import 'package:uuid/uuid.dart';
+import '../../../model/ride_request_model/trip_tracker_model.dart';
 import '../../../utils/globle_widget/marker_icon.dart';
 import '../../service/auth_service.dart';
 import '../../service/location_service.dart';
@@ -20,7 +25,7 @@ import '../trip_provider/trip_provider.dart';
 
 
 class MapsProvider extends ChangeNotifier {
-
+TripTrackerModel? trackerModel;
   MapsProvider() {
     fetchOnlineStatus();
     // determinePosition();
@@ -58,8 +63,10 @@ class MapsProvider extends ChangeNotifier {
   bool isOnline = false;
   String na = '';
   String name = '';
-
+  String tripIds = '';
   var uuid =  Uuid().v4();
+
+
 
   Future<void> fetchOnlineStatus() async {
     DocumentSnapshot ref = await db.collection('vehicle').doc(authService.crruntUserId!).get();
@@ -114,7 +121,7 @@ class MapsProvider extends ChangeNotifier {
     if (isOnline) {
       // await getCurrentLocation();
       // trackLiveLocation();
-      determinePosition();
+      determinePosition(context);
 
       rideProvider.activeDriver(data);
       // if (currentLocation != null && mapController != null) {
@@ -149,8 +156,31 @@ class MapsProvider extends ChangeNotifier {
   }
 
 
+// Future<void> tripTracker(TripTrackerModel data, LatLng pickUpLatLng, LatLng dropLatLng)async{
+//
+//   trackerModel=data;
+//
+//   try{
+//     await realTimeDb.ref('tripTracker').child(data.tripId!).set(data.toJson());
+//     await setMarkersAndRoute(pickUpLatLng, dropLatLng);
+//   }catch(error){
+//     AppHelperFunctions.showSnackBar('Error tripTracker$error');
+//   }
+// }
 
-  Future<void> determinePosition() async {
+
+  trackerModel=data;
+
+  try{
+    await realTimeDb.ref('tripTracker').child(data.tripId!).set(data.toJson());
+
+  }catch(error){
+    AppHelperFunctions.showSnackBar('Error tripTracker$error');
+  }
+}
+
+
+  Future<void> determinePosition(BuildContext context) async {
     try {
       bool serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();
       if (!serviceEnabled) {
@@ -201,14 +231,14 @@ class MapsProvider extends ChangeNotifier {
           ),
         );
       }
-      trackLiveLocation();
+      trackLiveLocation(context);
       notifyListeners();
     } catch (e) {
       Fluttertoast.showToast(msg: 'Error: $e');
     }
   }
 
-  Future<void> trackLiveLocation() async {
+  Future<void> trackLiveLocation(BuildContext context) async {
     bool hasPermission = await checkLocationPermission();
     if (!hasPermission) return;
 
@@ -239,13 +269,14 @@ class MapsProvider extends ChangeNotifier {
       //     ),
       //   );
       // }
-      updateLatLong(position.latitude, position.longitude);
+      String tripId;
+      updateLatLong(position.latitude, position.longitude,context);
       notifyListeners();
     });
   }
 
 
-  Future<void> updateLatLong(double lat, double long)async{
+  Future<void> updateLatLong(double lat, double long,BuildContext context)async{
     await firestore.collection('drivers').doc(currentUserId).update(
       {
         'address':{
@@ -254,7 +285,27 @@ class MapsProvider extends ChangeNotifier {
         }
       }
     );
+
+
   }
+
+
+  Future<void> updateTripTracker(double lat, double long, String id)async{
+
+      DatabaseReference tripRef = realTimeDb.ref('tripTracker').child(id);
+
+      DatabaseEvent event = await tripRef.once();
+      if (event.snapshot.exists) {
+        await tripRef.update({
+          'currentLocationLang': long,
+          'currentLocationLat': lat,
+        });
+
+        // Fluttertoast.showToast(msg: 'update');
+      } else {
+        // Fluttertoast.showToast(msg: 'no update data');
+      }
+    }
 
   Future<void> setMarkersAndRoute(LatLng pickUpLatLng, LatLng dropLatLng) async {
     markers.add(Marker(

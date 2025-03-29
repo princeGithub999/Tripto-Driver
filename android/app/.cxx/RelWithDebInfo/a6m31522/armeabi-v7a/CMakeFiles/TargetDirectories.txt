@@ -1,0 +1,2 @@
+D:/Flutter/Flutter project/tripto_driver/android/app/.cxx/RelWithDebInfo/a6m31522/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/Flutter/Flutter project/tripto_driver/android/app/.cxx/RelWithDebInfo/a6m31522/armeabi-v7a/CMakeFiles/rebuild_cache.dir

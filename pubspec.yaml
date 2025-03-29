@@ -75,7 +75,13 @@ dependencies:
   just_audio: ^0.9.46
   uuid: ^4.5.1
   shared_preferences: ^2.2.2
+
   intl: ^0.20.2
+
+
+  url_launcher: ^6.3.1
+
+
   razorpay_flutter: ^1.4.0
 #  workmanager: ^0.5.1
 

@@ -1,10 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:tripto_driver/view/auth_screen/send_otp_page.dart';
-
-import '../../../view/home_page.dart';
-
 
 class OnboardingController extends GetxController {
   static OnboardingController get instance => Get.find();

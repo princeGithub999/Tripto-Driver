@@ -45,7 +45,7 @@ class AuthProviderIn extends ChangeNotifier {
   DriverModel driverModels = DriverModel();
   VehiclesModel vehiclesModels = VehiclesModel();
   DriverDocumentModel driverDocumentModels = DriverDocumentModel();
-
+  final _auth= FirebaseAuth.instance;
 
 
   AuthProviderIn(){
@@ -160,24 +160,24 @@ class AuthProviderIn extends ChangeNotifier {
 
 
 
-  void fetchLiveProfileData(String driverId) {
-
-    DatabaseReference ref = realTimeDb.ref('Drivers_Data').child(driverId);
-
-    ref.onValue.listen((DatabaseEvent event) {
-      if (event.snapshot.exists && event.snapshot.value != null) {
-        Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
-        print("🔥 Live Updated Driver Data: $data");
-
-        // driverProfile = DriverModel.fromJson(data);
-        notifyListeners();  //
-      } else {
-        Fluttertoast.showToast(msg: 'No data found in Firebase.');
-      }
-    }, onError: (error) {
-      Fluttertoast.showToast(msg: 'Error: $error');
-    });
-  }
+  // void fetchLiveProfileData(String driverId) {
+  //
+  //   DatabaseReference ref = realTimeDb.ref('Drivers_Data').child(driverId);
+  //
+  //   ref.onValue.listen((DatabaseEvent event) {
+  //     if (event.snapshot.exists && event.snapshot.value != null) {
+  //       Map<String, dynamic> data = Map<String, dynamic>.from(event.snapshot.value as Map);
+  //       print("🔥 Live Updated Driver Data: $data");
+  //
+  //       driverProfile = DriverModel.fromJson(data);
+  //       notifyListeners();  //
+  //     } else {
+  //       Fluttertoast.showToast(msg: 'No data found in Firebase.');
+  //     }
+  //   }, onError: (error) {
+  //     Fluttertoast.showToast(msg: 'Error: $error');
+  //   });
+  // }
 
 
   /// **🔥 Update Profile Data in Firebase (Live Reflect in UI)**
@@ -324,6 +324,10 @@ class AuthProviderIn extends ChangeNotifier {
         isDriverLicenceVerifide: false,
         isPanVerifide: false,
         pen: penUrl,
+        driverUpiCode: driverData.driverUpiCode,
+        driverIfscCode: driverData.driverIfscCode,
+        driverBankName: driverData.driverBankName,
+        driverAccountNumber: driverData.driverAccountNumber
 
       );
 
@@ -441,6 +445,16 @@ class AuthProviderIn extends ChangeNotifier {
 
 
 
+
+
+  Future<void> signOut() async{
+    try{
+      await _auth.signOut();
+    }
+    catch(e){
+      log("Something went wrong:");
+    }
+  }
 
 
 }
