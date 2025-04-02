@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tripto_driver/utils/app_theme/app_theme.dart';
 import 'package:tripto_driver/view/screen/splace_screen.dart';
+import 'package:tripto_driver/view/screen/user_get_otp.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/from_provider.dart';
 import 'package:tripto_driver/view_model/provider/history_provider/my_ride_history_provider.dart';
@@ -35,10 +36,6 @@ void main() async {
         ChangeNotifierProvider(create: (context) => MapsProvider()),
         ChangeNotifierProvider(create: (context) => TripProvider()),
         // ChangeNotifierProvider(create: (context) => RideHistoryProvider()),
-
-
-
-
 
       ],
       child: const MyApp(),

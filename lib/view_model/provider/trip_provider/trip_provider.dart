@@ -44,15 +44,12 @@ class TripProvider extends ChangeNotifier{
         .map((snapshot) =>
         snapshot.docs.map((doc) => TripModel.fromMap(doc.data())).toList());
 
-
     return stream;
   }
 
   Future<void> isTripValid()async{
 
   }
-
-
 
 
   Future<void> acceptRideRequest(
