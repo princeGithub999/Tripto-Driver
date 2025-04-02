@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import 'package:tripto_driver/model/driver_data_model/vehicles_model.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view/auth_screen/verify_otp_page.dart';
 import 'package:tripto_driver/view/home_page.dart';
+import 'package:tripto_driver/view/screen/user_get_otp.dart';
 import 'package:tripto_driver/view_model/provider/from_provider/from_provider.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import 'package:tripto_driver/view_model/service/auth_service.dart';
@@ -27,6 +30,9 @@ class AuthProviderIn extends ChangeNotifier {
 
 
   TextEditingController inputNumber = TextEditingController();
+
+
+
   bool isLoding = false;
   bool isGoogleAuthLoading = false;
   AuthService authService = AuthService();
@@ -40,7 +46,7 @@ class AuthProviderIn extends ChangeNotifier {
   DriverModel driverModels = DriverModel();
   VehiclesModel vehiclesModels = VehiclesModel();
   DriverDocumentModel driverDocumentModels = DriverDocumentModel();
-
+  final _auth= FirebaseAuth.instance;
 
 
   AuthProviderIn(){
@@ -48,7 +54,7 @@ class AuthProviderIn extends ChangeNotifier {
     print('Number $supaNumber');
   }
 
-  Future<void> supaOtp(String phoneNumber) async {
+  Future<void> supaOtp(String phoneNumber, bool isUser) async {
 
     isLoding = true;
     notifyListeners();
@@ -57,7 +63,7 @@ class AuthProviderIn extends ChangeNotifier {
       await supabaseOTP.auth.signInWithOtp(
         phone: '+91$phoneNumber',
       );
-      AppHelperFunctions.navigateToScreen(Get.context!,const VerifyOtpPage());
+      AppHelperFunctions.navigateToScreen(Get.context!,isUser ? VerifyOtpPage() : UserGetOtp());
       AppHelperFunctions.showSnackBar('OTP sent successfully!');
     } catch (e, stackTrace) {
       print('OTP Error: $e');
@@ -121,6 +127,7 @@ class AuthProviderIn extends ChangeNotifier {
     }
 
   }
+  
 
 
   // Future<DriverProfileModel?> getData()async{
@@ -318,7 +325,10 @@ class AuthProviderIn extends ChangeNotifier {
         isDriverLicenceVerifide: false,
         isPanVerifide: false,
         pen: penUrl,
-
+        driverUpiCode: driverData.driverUpiCode,
+        driverIfscCode: driverData.driverIfscCode,
+        driverBankName: driverData.driverBankName,
+        driverAccountNumber: driverData.driverAccountNumber
       );
 
        // await authService.saveDriverData(driverId, data);
@@ -339,6 +349,7 @@ class AuthProviderIn extends ChangeNotifier {
       notifyListeners();
     }
   }
+
 
   Future<void> retriveDriver() async {
 
@@ -432,5 +443,18 @@ class AuthProviderIn extends ChangeNotifier {
       }
 
     }
+
+
+
+
+  Future<void> signOut() async{
+    try{
+      await _auth.signOut();
+    }
+    catch(e){
+      log("Something went wrong:");
+    }
+  }
+
 
 }

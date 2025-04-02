@@ -7,12 +7,18 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as loc;
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tripto_driver/model/ride_request_model/active_driver_model.dart';
+import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
+import '../../../model/ride_request_model/trip_tracker_model.dart';
 import '../../../utils/globle_widget/marker_icon.dart';
 import '../../service/auth_service.dart';
 import '../../service/location_service.dart';
@@ -23,7 +29,7 @@ import '../trip_provider/trip_provider.dart';
 
 
 class MapsProvider extends ChangeNotifier {
-
+  TripTrackerModel? trackerModel;
   MapsProvider() {
     fetchOnlineStatus();
     // determinePosition();
@@ -61,14 +67,17 @@ class MapsProvider extends ChangeNotifier {
   bool isOnline = false;
   String na = '';
   String name = '';
-
+  String tripIds = '';
   var uuid =  Uuid().v4();
+  bool isArivePickup = false;
+
+
 
   Future<void> fetchOnlineStatus() async {
     DocumentSnapshot ref = await db.collection('vehicle').doc(authService.crruntUserId!).get();
 
     if (ref.data() != null) {
-     var data = ref.data() as Map<dynamic, dynamic>;
+      var data = ref.data() as Map<dynamic, dynamic>;
       bool status = data['status'] ?? false;
       isOnline = status;
       notifyListeners();
@@ -88,13 +97,13 @@ class MapsProvider extends ChangeNotifier {
     var ad = await getAddressFromLatLng(currentLocation!.latitude, currentLocation!.longitude);
 
     var activeVehicle = ActiveVehicleModel(
-      id: authProvider.vehiclesModels.id,
-      type: authProvider.vehiclesModels.type,
-      name: '',
-      color: '',
-      imageUrl: '',
-      price: '250',
-      isOnline: isOnline
+        id: authProvider.vehiclesModels.id,
+        type: authProvider.vehiclesModels.type,
+        name: '',
+        color: '',
+        imageUrl: '',
+        price: '250',
+        isOnline: isOnline
     );
 
     var activeDrivers = ActiveDriverModel(
@@ -117,7 +126,7 @@ class MapsProvider extends ChangeNotifier {
     if (isOnline) {
       // await getCurrentLocation();
       // trackLiveLocation();
-      determinePosition();
+      determinePosition(context);
 
       rideProvider.activeDriver(data);
       // if (currentLocation != null && mapController != null) {
@@ -128,7 +137,7 @@ class MapsProvider extends ChangeNotifier {
       notifyListeners();
     }else{
 
-     rideProvider.diActiveDriver(data);
+      rideProvider.diActiveDriver(data);
       notifyListeners();
     }
   }
@@ -153,7 +162,8 @@ class MapsProvider extends ChangeNotifier {
 
 
 
-  Future<void> determinePosition() async {
+
+  Future<void> determinePosition(BuildContext context) async {
     try {
       bool serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();
       if (!serviceEnabled) {
@@ -204,14 +214,14 @@ class MapsProvider extends ChangeNotifier {
           ),
         );
       }
-      trackLiveLocation();
+      trackLiveLocation(context);
       notifyListeners();
     } catch (e) {
       Fluttertoast.showToast(msg: 'Error: $e');
     }
   }
 
-  Future<void> trackLiveLocation() async {
+  Future<void> trackLiveLocation(BuildContext context) async {
     bool hasPermission = await checkLocationPermission();
     if (!hasPermission) return;
 
@@ -242,21 +252,38 @@ class MapsProvider extends ChangeNotifier {
       //     ),
       //   );
       // }
-      updateLatLong(position.latitude, position.longitude);
+
+      String tripId;
+      updateLatLong(position.latitude, position.longitude,context);
       notifyListeners();
     });
   }
 
 
-  Future<void> updateLatLong(double lat, double long)async{
-    await firestore.collection('drivers').doc(currentUserId).update(
-      {
-        'address':{
-          'lang':long,
-          'lat': lat
-        }
-      }
-    );
+  Future<void> updateLatLong(double lat, double long, BuildContext context) async {
+    await firestore.collection('drivers').doc(currentUserId).update({
+      'address.lat': lat,
+      'address.lang': long,
+    });
+  }
+
+
+
+  Future<void> updateTripTracker(double lat, double long, String id)async{
+
+    DatabaseReference tripRef = realTimeDb.ref('tripTracker').child(id);
+
+    DatabaseEvent event = await tripRef.once();
+    if (event.snapshot.exists) {
+      await tripRef.update({
+        'currentLocationLang': long,
+        'currentLocationLat': lat,
+      });
+
+      // Fluttertoast.showToast(msg: 'update');
+    } else {
+      // Fluttertoast.showToast(msg: 'no update data');
+    }
   }
 
   Future<void> setMarkersAndRoute(LatLng pickUpLatLng, LatLng dropLatLng) async {
@@ -338,6 +365,80 @@ class MapsProvider extends ChangeNotifier {
     return null;
   }
 
+
+  Future<void> openGoogleMapsApp(double pickupLat, double pickupLng) async {
+    String googleUrl = "https://www.google.com/maps/dir/?api=1&destination=$pickupLat,$pickupLng&travelmode=driving&dir_action=navigate";
+
+    try {
+      if (await canLaunchUrl(Uri.parse(googleUrl))) {
+        await launchUrl(Uri.parse(googleUrl), mode: LaunchMode.externalApplication);
+
+        // Check location every 10 seconds
+        Timer? timer;
+        timer = Timer.periodic(Duration(seconds: 10), (timer) async {
+          try {
+            // Check location permission first
+            bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+            LocationPermission permission = await Geolocator.checkPermission();
+            if (permission == LocationPermission.denied) {
+              permission = await Geolocator.requestPermission();
+              if (permission != LocationPermission.whileInUse &&
+                  permission != LocationPermission.always) {
+                timer.cancel();
+                return;
+              }
+            }
+
+            Position position = await Geolocator.getCurrentPosition();
+            double distance = Geolocator.distanceBetween(
+                position.latitude,
+                position.longitude,
+                pickupLat,
+                pickupLng
+            );
+
+            if (distance < 20) {
+              isArivePickup = true;
+              await openMyApp();
+              timer.cancel();
+              Fluttertoast.showToast(msg: 'open App',);
+              notifyListeners();
+            }
+          } catch (e) {
+            print("Error checking location: $e");
+            timer.cancel();
+          }
+        });
+
+        // Don't forget to cancel the timer when it's no longer needed
+        // You should store this timer reference and cancel it in your widget's dispose()
+      } else {
+        throw 'Could not open Google Maps';
+      }
+    } catch (e) {
+      print("Error opening Google Maps: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> openMyApp() async {
+    String appUrl = "https://tripto.page.link/Sohr";
+    if (await canLaunchUrl(Uri.parse(appUrl))) {
+      await launchUrl(Uri.parse(appUrl));
+    } else {
+      throw 'Could not open the app';
+    }
+  }
+
+  Future<void> takeCall(String phoneNumber)async{
+    final Uri url = Uri.parse("tel:$phoneNumber");
+    if(await canLaunchUrl(url)){
+      await launchUrl(url);
+    }else{
+      print("Could not launch $url");
+
+    }
+  }
 
   @override
   void dispose() {
