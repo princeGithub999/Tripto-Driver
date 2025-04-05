@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_swipe_button/flutter_swipe_button.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -236,6 +237,20 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                           Expanded(
                                             child: ElevatedButton(
                                               onPressed: () {
+
+                                                rideRequest.getAllDriverTrip("${latestRide.id}", "${latestRide.driverId}");
+                                                // var getAllDriversRide =
+                                                // for (int i = 0; i < snapshot.data!.length; i++) {
+                                                //   if(i == snapshot.data?.length){
+                                                //
+                                                //     Fluttertoast.showToast(msg: 'Reject');
+                                                //   }else{
+                                                //     Fluttertoast.showToast(msg: ' ride rejected from your side');
+                                                //
+                                                //   }
+                                                //   print("Index: $i, Trip ID: ${snapshot.data![i].id}");
+                                                // }
+
                                               },
                                               style: ElevatedButton.styleFrom(
                                                   padding: const EdgeInsets.symmetric(vertical: 10),

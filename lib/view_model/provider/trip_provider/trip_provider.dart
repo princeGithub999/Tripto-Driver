@@ -158,6 +158,19 @@ class TripProvider extends ChangeNotifier{
     return drivers; // Saare drivers return karna
   }
 
+  void getAllDriverTrip(String tripId, String driverID)async{
+    var db =await firestore.collection("drivers_trip").where("tripId",isEqualTo: tripId).where("driverID",isEqualTo: driverID).where("status", isEqualTo: "pending").get();
+    print("driver doc ${db.docs.length}");
+    var data = db.docs.map((e) => TripModel.fromMap(e.data())).toList();
+    var id = data[0].id;
+    if(data.length==1){
+      firestore.collection("trip").doc("$tripId").update({"status": "rejected"});
+    }
+
+    firestore.collection("drivers_trip").doc("$id").update({"status": "rejected"});
+
+
+  }
 
   @override
   void dispose() {
