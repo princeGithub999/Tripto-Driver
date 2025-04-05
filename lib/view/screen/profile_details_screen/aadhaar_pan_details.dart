@@ -13,14 +13,14 @@ class AdharPanPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Aadhar & PAN Upload'),
+        title:  Text('Aadhar & PAN Upload'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon:  Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding:  EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
