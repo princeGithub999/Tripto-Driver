@@ -162,6 +162,17 @@ class MapsProvider extends ChangeNotifier {
 
 
 
+// Future<void> tripTracker(TripTrackerModel data, LatLng pickUpLatLng, LatLng dropLatLng)async{
+//
+//   trackerModel=data;
+//
+//   try{
+//     await realTimeDb.ref('tripTracker').child(data.tripId!).set(data.toJson());
+//     await setMarkersAndRoute(pickUpLatLng, dropLatLng);
+//   }catch(error){
+//     AppHelperFunctions.showSnackBar('Error tripTracker$error');
+//   }
+// }
 
   Future<void> determinePosition(BuildContext context) async {
     try {
@@ -260,11 +271,25 @@ class MapsProvider extends ChangeNotifier {
   }
 
 
+
+  Future<void> updateLatLong(double lat, double long,BuildContext context)async{
+    await firestore.collection('drivers').doc(currentUserId).update(
+        {
+          'address':{
+            'lang':long,
+            'lat': lat
+          }
+        }
+    );
+
+
+
   Future<void> updateLatLong(double lat, double long, BuildContext context) async {
     await firestore.collection('drivers').doc(currentUserId).update({
       'address.lat': lat,
       'address.lang': long,
     });
+
   }
 
 
@@ -366,6 +391,8 @@ class MapsProvider extends ChangeNotifier {
   }
 
 
+  Future<void> openGoogleMapsApp(double pickup, double d)async{
+
   Future<void> openGoogleMapsApp(double pickupLat, double pickupLng) async {
     String googleUrl = "https://www.google.com/maps/dir/?api=1&destination=$pickupLat,$pickupLng&travelmode=driving&dir_action=navigate";
 
@@ -438,11 +465,12 @@ class MapsProvider extends ChangeNotifier {
       print("Could not launch $url");
 
     }
+
   }
 
   @override
   void dispose() {
     _positionStream?.cancel();
     super.dispose();
-  }
+    }
 }
