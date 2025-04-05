@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,8 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:tripto_driver/model/ride_request_model/trip_model.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
-import 'package:uuid/uuid.dart';
-import '../../../model/ride_request_model/trip_tracker_model.dart';
 import '../../../notification/push_notification.dart';
 import '../../../utils/constants/colors.dart';
 import '../../../view_model/provider/trip_provider/trip_provider.dart';
@@ -36,16 +32,11 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
   PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
-  var tripId = Uuid().v4();
-  var auth = FirebaseAuth.instance.currentUser?.uid;
-  Timer? trackingTimer;
-
-
 
   @override
   void initState() {
     super.initState();
-   var  p = Provider.of<MapsProvider>(context, listen: false).determinePosition(context);
+    // Provider.of<MapsProvider>(context, listen: false).setMarkersAndRoute(widget.pickUpLatLng, widget.dropLatLng);
 
     _animationController = AnimationController(
       vsync: this,
@@ -56,11 +47,13 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
       begin: const Offset(0, 1),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
-
-
   }
 
-
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   void showRideRequests() {
     _animationController.forward();
@@ -69,16 +62,6 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
   void hideRideRequests() {
     _animationController.reverse();
   }
-
-
-
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -138,15 +121,6 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                             var latestRide = snapshot.data!.last;
                             showRideRequests();
 
-                            if(rideRequest.currentRideId != latestRide.id){
-                              rideRequest.currentRideId = latestRide.id;
-                              rideRequest.startCountdown();
-                            }
-
-                            var startLocationFormat = mapProvider.getAddressFromLatLng(latestRide.pickupLat!, latestRide.pickupLng!);
-                            var endLocationFormat = mapProvider.getAddressFromLatLng(latestRide.dropLat!, latestRide.dropLng!);
-
-
                             return SlideTransition(
                                 position: _slideAnimation,
                                 child: Container(
@@ -161,32 +135,9 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       SizedBox(height: sizes.height * 0.1 - 70),
-                                      Row(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            "New Ride Request",
-                                            style: GoogleFonts.aBeeZee(fontSize: 18, fontWeight: FontWeight.bold),
-                                          ),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Icon(Icons.timer, color: Colors.red),
-                                              SizedBox(width: 5),
-                                              ValueListenableBuilder<int>(
-                                                valueListenable: rideRequest.countdown,
-                                                builder: (context, value, child) {
-                                                  return Text(
-                                                    "Expires in: $value sec",
-                                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.red),
-                                                  );
-                                                },
-                                              ),
-                                            ],
-                                          ),
-
-                                        ],
+                                      Text(
+                                        "New Ride Request",
+                                        style: GoogleFonts.aBeeZee(fontSize: 18, fontWeight: FontWeight.bold),
                                       ),
                                       const SizedBox(height: 5),
                                       const Divider(),
@@ -216,16 +167,16 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                         children: [
                                           const Icon(Icons.pin_drop),
                                           const SizedBox(width: 5),
-                                          Text("Pickup: ${latestRide.pickupAddress}", style: const TextStyle(fontSize: 16)),
+                                          Text("Pickup: ${latestRide.pickupAddress}", style: TextStyle(fontSize: 16)),
                                         ],
                                       ),
                                       const SizedBox(height: 10),
 
                                       Row(
                                         children: [
-                                          const Icon(Icons.local_fire_department_rounded),
-                                          const SizedBox(width: 5),
-                                          Text("Drop: ${latestRide.dropAddress}", style: const TextStyle(fontSize: 16)),
+                                          Icon(Icons.local_fire_department_rounded),
+                                          SizedBox(width: 5),
+                                          Text("Drop: ${latestRide.dropAddress}", style: TextStyle(fontSize: 16)),
                                         ],
                                       ),
                                       const SizedBox(height: 20),
@@ -236,6 +187,7 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                           Expanded(
                                             child: ElevatedButton(
                                               onPressed: () {
+
                                               },
                                               style: ElevatedButton.styleFrom(
                                                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -248,43 +200,14 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                           Expanded(
                                             child: Consumer<TripProvider>(
                                               builder: (context, rideRequest, child) {
-
-                                                  trackingTimer = Timer.periodic(Duration(seconds: 60), (timer)async {
-                                                    mapProvider.updateTripTracker(mapProvider.currentLocation!.latitude, mapProvider.currentLocation!.longitude, latestRide.id!);
-                                                  },);
-
                                                 return Consumer<MapsProvider>(
                                                   builder: (BuildContext context, value, Widget? child) {
                                                     return ElevatedButton(
                                                       onPressed: () async {
-
-
-                                                        var tripData = TripTrackerModel(
-                                                            tripId: latestRide.id,
-                                                            driverName: authProvider.driverModels.driverFirstName,
-                                                            startLocationLang: latestRide.pickupLat,
-                                                            startLocationLat: latestRide.pickupLng,
-                                                            startLocationFormat: await startLocationFormat,
-                                                            endLocationFormat: await endLocationFormat,
-                                                            endLocationLang: latestRide.dropLng,
-                                                            endLocationLat: latestRide.dropLat,
-                                                            currentLocationLang: value.currentLocation?.longitude,
-                                                            currentLocationLat: value.currentLocation?.latitude,
-                                                            status: 'accepted',
-                                                            fcmToken: latestRide.fcmToken
-
-                                                        );
+                                                        await rideRequest.acceptRideRequest(latestRide.id!, 'accept');
                                                         LatLng defaultPickup =  LatLng(latestRide.pickupLat!, latestRide.pickupLng!);
                                                         LatLng defaultDrop =  LatLng(latestRide.dropLat!, latestRide.dropLng!);
-                                                        await rideRequest.acceptRideRequest(
-                                                            context,
-                                                            latestRide.id!,
-                                                            'accept',
-                                                            defaultPickup,
-                                                            defaultDrop,
-                                                            tripData
-                                                        );
-
+                                                        value.setMarkersAndRoute(defaultDrop,defaultPickup);
                                                       },
                                                       style: ElevatedButton.styleFrom(
                                                         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -312,6 +235,7 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                   ),
                                 )
                             );
+
                           },
                         ),
                       );
