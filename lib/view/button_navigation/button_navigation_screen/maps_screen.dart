@@ -45,7 +45,7 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-   var  p = Provider.of<MapsProvider>(context, listen: false).determinePosition(context);
+    var  p = Provider.of<MapsProvider>(context, listen: false).determinePosition(context);
 
     _animationController = AnimationController(
       vsync: this,
@@ -249,9 +249,9 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                             child: Consumer<TripProvider>(
                                               builder: (context, rideRequest, child) {
 
-                                                  trackingTimer = Timer.periodic(Duration(seconds: 60), (timer)async {
-                                                    mapProvider.updateTripTracker(mapProvider.currentLocation!.latitude, mapProvider.currentLocation!.longitude, latestRide.id!);
-                                                  },);
+                                                trackingTimer = Timer.periodic(Duration(seconds: 60), (timer)async {
+                                                  mapProvider.updateTripTracker(mapProvider.currentLocation!.latitude, mapProvider.currentLocation!.longitude, latestRide.id!);
+                                                },);
 
                                                 return Consumer<MapsProvider>(
                                                   builder: (BuildContext context, value, Widget? child) {
