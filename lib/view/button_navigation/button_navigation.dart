@@ -35,15 +35,13 @@ class _BottomNavigationState extends State<BottomNavigation> {
     Provider.of<AuthProviderIn>(context,listen: false).retriveDriver();
 
     // Provider.of<MapsProvider>(context,listen: false).getCurrentLocation();
-     Provider.of<MapsProvider>(context,listen: false).determinePosition(context);
+    Provider.of<MapsProvider>(context,listen: false).determinePosition(context);
     listPage = [
       MapsScreen(pickUpLatLng: defaultPickup, dropLatLng: defaultDrop, driverId: '', ),
       const RatingScreen(),
 
       DriverHomePage(),
-
-      ProfileScreen(),
-
+      ProfileScreen()
     ];
 
     notificationHandler();
