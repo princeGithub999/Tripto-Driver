@@ -43,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           SliverList(
             delegate: SliverChildListDelegate([
               const SizedBox(height: 16),
-              _buildProfileSection(),
+
               const SizedBox(height: 24),
               _buildLogoutButton(),
               const SizedBox(height: 30),
@@ -165,50 +165,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildProfileSection() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        children: [
-          _buildProfileOption(
-            icon: Icons.directions_car_filled,
-            title: "My Rides",
-            color: Colors.blueAccent,
-          ),
-          _buildProfileOption(
-            icon: Icons.attach_money_rounded,
-            title: "Earnings",
-            color: Colors.green,
-          ),
-          _buildProfileOption(
-            icon: Icons.account_balance,
-            title: "Update Bank Account",
-            color: Colors.purple,
-          ),
-          _buildProfileOption(
-            icon: Icons.account_balance_wallet,
-            title: "Wallet",
-            color: Colors.orange,
-          ),
-          _buildProfileOption(
-            icon: Icons.notifications_active,
-            title: "Notifications",
-            color: Colors.red,
-          ),
-          _buildProfileOption(
-            icon: Icons.support_agent,
-            title: "Support",
-            color: Colors.teal,
-          ),
-          _buildProfileOption(
-            icon: Icons.settings,
-            title: "Settings",
-            color: Colors.indigo,
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildProfileOption({
     required IconData icon,
