@@ -4,16 +4,12 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
-
 import 'package:tripto_driver/view/button_navigation/button_navigation_screen/support_screen.dart';
 import 'package:tripto_driver/view/button_navigation/button_navigation_screen/wallet_cash.dart';
 
 import '../../screen/my_ride.dart';
 import 'change_bank_account.dart';
 import 'driver_setting_screen.dart';
-
-import '../../../view_model/provider/trip_provider/trip_provider.dart';
-
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -38,7 +34,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       backgroundColor: Colors.grey[50],
       body: CustomScrollView(
         slivers: [
@@ -61,31 +56,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ]),
           ),
         ],
-
-      backgroundColor: Colors.grey[200],
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildProfileHeader(),
-            const SizedBox(height: 30),
-            _buildProfileOption(Icons.directions_car, "My Rides"),
-            _buildProfileOption(Icons.wallet, "Earnings"),
-            _buildProfileOption(Icons.history, "Ride History"),
-            _buildProfileOption(Icons.notifications, "Notifications"),
-            _buildProfileOption(Icons.support, "Support"),
-            _buildProfileOption(Icons.settings, "Settings"),
-            const SizedBox(height: 20),
-            _buildLogoutButton(),
-          ],
-        ),
-
       ),
     );
   }
 
   Widget _buildProfileHeader() {
     return Container(
-
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -318,115 +294,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
         ),
-
-      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
-      color: AppColors.blue900,
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: _pickImage,
-            child: CircleAvatar(
-              radius: 40,
-              backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
-              backgroundColor: Colors.white,
-              child: _profileImage == null
-                  ? const Icon(Icons.camera_alt, size: 30, color: Colors.grey)
-                  : null,
-            ),
-          ),
-          const SizedBox(width: 16),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Driver Name",
-                  style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  "Not Available",
-                  style: TextStyle(color: Colors.white70, fontSize: 16),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileOption(IconData icon, String title) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      child: ListTile(
-        leading: Icon(icon, size: 30, color: AppColors.blue900),
-        title: Text(
-          title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
-        onTap: () {},
-
       ),
     );
   }
 
   Widget _buildLogoutButton() {
     return Padding(
-
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.red,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: Colors.red.withOpacity(0.3), width: 1),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              minimumSize: const Size(double.infinity, 50),
-            ),
-            onPressed: () {},
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.logout, size: 20),
-                const SizedBox(width: 10),
-                Text(
-                  "Logout",
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            ),
-        );
-    }
-
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.blue900,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.red,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: Colors.red.withOpacity(0.3), width: 1),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 16),
           minimumSize: const Size(double.infinity, 50),
         ),
         onPressed: () {},
-        child: const Text(
-          "Logout",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.logout, size: 20),
+            const SizedBox(width: 10),
+            Text(
+              "Logout",
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
-
 }
