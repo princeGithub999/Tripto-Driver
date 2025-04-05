@@ -3,12 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_swipe_button/flutter_swipe_button.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/model/ride_request_model/trip_model.dart';
-import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import 'package:uuid/uuid.dart';
@@ -16,7 +14,6 @@ import '../../../model/ride_request_model/trip_tracker_model.dart';
 import '../../../notification/push_notification.dart';
 import '../../../utils/constants/colors.dart';
 import '../../../view_model/provider/trip_provider/trip_provider.dart';
-import '../../screen/user_get_otp.dart';
 
 class MapsScreen extends StatefulWidget {
   final LatLng pickUpLatLng;
@@ -158,16 +155,6 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                             var startLocationFormat = mapProvider.getAddressFromLatLng(latestRide.pickupLat!, latestRide.pickupLng!);
                             var endLocationFormat = mapProvider.getAddressFromLatLng(latestRide.dropLat!, latestRide.dropLng!);
 
-                            for (int i = 0; i < snapshot.data!.length; i++) {
-                              if(i == snapshot.data?.length){
-
-                                Fluttertoast.showToast(msg: 'Reject');
-                              }else{
-                                Fluttertoast.showToast(msg: ' ride rejected from your side');
-
-                              }
-                              print("Index: $i, Trip ID: ${snapshot.data![i].id}");
-                            }
 
                             return SlideTransition(
                                 position: _slideAnimation,
@@ -258,6 +245,19 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                           Expanded(
                                             child: ElevatedButton(
                                               onPressed: () {
+
+                                                rideRequest.getAllDriverTrip("${latestRide.id}", "${latestRide.driverId}");
+                                                // var getAllDriversRide =
+                                                // for (int i = 0; i < snapshot.data!.length; i++) {
+                                                //   if(i == snapshot.data?.length){
+                                                //
+                                                //     Fluttertoast.showToast(msg: 'Reject');
+                                                //   }else{
+                                                //     Fluttertoast.showToast(msg: ' ride rejected from your side');
+                                                //
+                                                //   }
+                                                //   print("Index: $i, Trip ID: ${snapshot.data![i].id}");
+                                                // }
 
                                               },
                                               style: ElevatedButton.styleFrom(
