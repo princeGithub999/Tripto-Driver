@@ -1,0 +1,2 @@
+C:/Users/aakas/Tripto-Driver/android/app/.cxx/Debug/26x1t134/x86/CMakeFiles/edit_cache.dir
+C:/Users/aakas/Tripto-Driver/android/app/.cxx/Debug/26x1t134/x86/CMakeFiles/rebuild_cache.dir
