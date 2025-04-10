@@ -103,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 3,
       child: ListTile(
-        leading: Icown(icon, size: 30, color: AppColors.blue900),
+        leading: Icon(icon, size: 30, color: AppColors.blue900),
         title: Text(
           title,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
@@ -159,6 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+
 
 class ThemeSettings extends StatelessWidget {
   @override
