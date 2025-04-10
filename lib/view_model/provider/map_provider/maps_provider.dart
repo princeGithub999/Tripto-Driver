@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tripto_driver/model/ride_request_model/active_driver_model.dart';
 import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import '../../../model/ride_request_model/trip_tracker_model.dart';
 import '../../../utils/globle_widget/marker_icon.dart';
@@ -68,6 +69,7 @@ class MapsProvider extends ChangeNotifier {
   String name = '';
   String tripIds = '';
   var uuid =  Uuid().v4();
+  bool isArivePickup = false;
 
 
 
@@ -159,17 +161,7 @@ class MapsProvider extends ChangeNotifier {
   }
 
 
-// Future<void> tripTracker(TripTrackerModel data, LatLng pickUpLatLng, LatLng dropLatLng)async{
-//
-//   trackerModel=data;
-//
-//   try{
-//     await realTimeDb.ref('tripTracker').child(data.tripId!).set(data.toJson());
-//     await setMarkersAndRoute(pickUpLatLng, dropLatLng);
-//   }catch(error){
-//     AppHelperFunctions.showSnackBar('Error tripTracker$error');
-//   }
-// }
+
 
   Future<void> determinePosition(BuildContext context) async {
     try {
@@ -260,6 +252,7 @@ class MapsProvider extends ChangeNotifier {
       //     ),
       //   );
       // }
+
       String tripId;
       updateLatLong(position.latitude, position.longitude,context);
       notifyListeners();
@@ -267,18 +260,13 @@ class MapsProvider extends ChangeNotifier {
   }
 
 
-  Future<void> updateLatLong(double lat, double long,BuildContext context)async{
-    await firestore.collection('drivers').doc(currentUserId).update(
-        {
-          'address':{
-            'lang':long,
-            'lat': lat
-          }
-        }
-    );
-
-
+  Future<void> updateLatLong(double lat, double long, BuildContext context) async {
+    await firestore.collection('drivers').doc(currentUserId).update({
+      'address.lat': lat,
+      'address.lang': long,
+    });
   }
+
 
 
   Future<void> updateTripTracker(double lat, double long, String id)async{
@@ -378,8 +366,78 @@ class MapsProvider extends ChangeNotifier {
   }
 
 
-  Future<void> openGoogleMapsApp(double pickup, double d)async{
+  Future<void> openGoogleMapsApp(double pickupLat, double pickupLng) async {
+    String googleUrl = "https://www.google.com/maps/dir/?api=1&destination=$pickupLat,$pickupLng&travelmode=driving&dir_action=navigate";
 
+    try {
+      if (await canLaunchUrl(Uri.parse(googleUrl))) {
+        await launchUrl(Uri.parse(googleUrl), mode: LaunchMode.externalApplication);
+
+        // Check location every 10 seconds
+        Timer? timer;
+        timer = Timer.periodic(Duration(seconds: 10), (timer) async {
+          try {
+            // Check location permission first
+            bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+            LocationPermission permission = await Geolocator.checkPermission();
+            if (permission == LocationPermission.denied) {
+              permission = await Geolocator.requestPermission();
+              if (permission != LocationPermission.whileInUse &&
+                  permission != LocationPermission.always) {
+                timer.cancel();
+                return;
+              }
+            }
+
+            Position position = await Geolocator.getCurrentPosition();
+            double distance = Geolocator.distanceBetween(
+                position.latitude,
+                position.longitude,
+                pickupLat,
+                pickupLng
+            );
+
+            if (distance < 20) {
+              isArivePickup = true;
+              await openMyApp();
+              timer.cancel();
+              Fluttertoast.showToast(msg: 'open App',);
+              notifyListeners();
+            }
+          } catch (e) {
+            print("Error checking location: $e");
+            timer.cancel();
+          }
+        });
+
+        // Don't forget to cancel the timer when it's no longer needed
+        // You should store this timer reference and cancel it in your widget's dispose()
+      } else {
+        throw 'Could not open Google Maps';
+      }
+    } catch (e) {
+      print("Error opening Google Maps: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> openMyApp() async {
+    String appUrl = "https://tripto.page.link/Sohr";
+    if (await canLaunchUrl(Uri.parse(appUrl))) {
+      await launchUrl(Uri.parse(appUrl));
+    } else {
+      throw 'Could not open the app';
+    }
+  }
+
+  Future<void> takeCall(String phoneNumber)async{
+    final Uri url = Uri.parse("tel:$phoneNumber");
+    if(await canLaunchUrl(url)){
+      await launchUrl(url);
+    }else{
+      print("Could not launch $url");
+
+    }
   }
 
   @override
