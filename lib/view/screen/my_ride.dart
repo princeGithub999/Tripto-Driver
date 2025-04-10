@@ -10,7 +10,7 @@ class RideHistoryScreen extends StatelessWidget {
         create: (_) => RideHistoryProvider(),
         child: Scaffold(
             appBar: AppBar(
-              title: Text(
+              title: const Text(
                 "Ride History",
                 style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
               ),

@@ -14,6 +14,7 @@ import 'package:tripto_driver/utils/helpers/helper_functions.dart';
 import 'package:tripto_driver/view_model/provider/map_provider/maps_provider.dart';
 import '../../../model/ride_request_model/active_driver_model.dart';
 import '../../../notification/push_notification.dart';
+import '../map_provider/maps_provider.dart';
 
 
 class TripProvider extends ChangeNotifier{
