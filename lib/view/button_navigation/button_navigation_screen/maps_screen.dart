@@ -446,7 +446,7 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                         ),
 
                                         onSwipe: () {
-                                          authProvider.supaOtp('9798677908',false);
+                                          authProvider.supaOtp('9798677908', );
                                         },
                                       ) :
                                       Row(
