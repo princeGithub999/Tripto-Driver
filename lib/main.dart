@@ -19,7 +19,7 @@ import 'notification/push_notification.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  
   await Supabase.initialize(
       url: 'https://etisnndumecqmopuvome.supabase.co',
       anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0aXNubmR1bWVjcW1vcHV2b21lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE0MDg4NDMsImV4cCI6MjA1Njk4NDg0M30.l6gu1jZCRBJHZNBgjgftlR3QIAqlUXoRMJIiMBD-o2I'

@@ -13,6 +13,7 @@ class NotificationDialogBox extends StatefulWidget {
 
   NotificationDialogBox({this.userRideRequestDetails});
 
+
   @override
   State<NotificationDialogBox> createState() => _NotificationDialogBoxState();
 }

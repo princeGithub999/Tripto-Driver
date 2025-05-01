@@ -99,7 +99,7 @@ class _SendOtpPageState extends State<SendOtpPage> {
                   SizedBox(height: sizes.height * 0.3,),
 
                   MyButton.sendOtpButton(() {
-                    authProvider.supaOtp(authProvider.inputNumber.text, true);
+                    authProvider.supaOtp(authProvider.inputNumber.text);
                   },'Send OTP',authProvider.isLoding),
                   SizedBox(height: sizes.height * 0.1 - 70,),
 
