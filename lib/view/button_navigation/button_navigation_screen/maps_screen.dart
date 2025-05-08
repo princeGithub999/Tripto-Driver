@@ -245,15 +245,16 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                                           Expanded(
                                             child: ElevatedButton(
                                               onPressed: () {
-
-                                                rideRequest.getAllDriverTrip("${latestRide.id}", "${latestRide.driverId}");
-
+                                                rideRequest.rejectTrip(latestRide.id!,context);
                                               },
                                               style: ElevatedButton.styleFrom(
-                                                  padding: const EdgeInsets.symmetric(vertical: 10),
-                                                  backgroundColor: Colors.red
+                                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                                backgroundColor: Colors.red,
                                               ),
-                                              child: const Text("Cancel", style: TextStyle(fontSize: 18, color: Colors.white)),
+                                              child: const Text(
+                                                "Cancel",
+                                                style: TextStyle(fontSize: 18, color: Colors.white),
+                                              ),
                                             ),
                                           ),
                                           const SizedBox(width: 10),
@@ -510,7 +511,6 @@ class _MapsScreenState extends State<MapsScreen> with SingleTickerProviderStateM
                 ],
               ):
               SizedBox()
-
             ],
           ),
         );
