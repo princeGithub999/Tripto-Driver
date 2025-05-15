@@ -5,11 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:tripto_driver/utils/constants/colors.dart';
+import 'package:tripto_driver/view/auth_screen/send_otp_page.dart';
 import 'package:tripto_driver/view/button_navigation/button_navigation_screen/support_screen.dart';
 import 'package:tripto_driver/view/button_navigation/button_navigation_screen/wallet_cash.dart';
 import 'package:tripto_driver/view_model/provider/auth_provider_in/auth_provider.dart';
 
 import '../../screen/my_ride.dart';
+import '../../screen/splace_screen.dart';
 import 'change_bank_account.dart';
 import 'driver_setting_screen.dart';
 
@@ -122,7 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            authProvider.driverModels.driverFirstName ?? "Driver Name",
+                            "${authProvider.driverModels.driverFirstName} ${authProvider.driverModels.driverLastName}" ?? "Driver Name",
                             style: GoogleFonts.poppins(
                               fontSize: 22,
                               fontWeight: FontWeight.w600,
@@ -131,35 +133,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            "${ authProvider.vehiclesModels.status} " ?? "Not Available",
+                            "Vehicle : ${authProvider.vehiclesModels.type} " ?? "Not Available",
                             style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 20,
+                              color: Colors.white,
                             ),
                           ),
                           const SizedBox(height: 10),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.star, color: Colors.amber, size: 18),
-                                const SizedBox(width: 6),
-                                Text(
-                                  "4.8 (120 rides)",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          // Container(
+                          //   padding: const EdgeInsets.symmetric(
+                          //       horizontal: 12, vertical: 6),
+                          //   decoration: BoxDecoration(
+                          //     color: Colors.white.withOpacity(0.2),
+                          //     borderRadius: BorderRadius.circular(20),
+                          //   ),
+                          //   // child: Row(
+                          //   //   mainAxisSize: MainAxisSize.min,
+                          //   //   children: [
+                          //   //     Icon(Icons.star, color: Colors.amber, size: 18),
+                          //   //     const SizedBox(width: 6),
+                          //   //     Text(
+                          //   //       "4.8 (120 rides)",
+                          //   //       style: GoogleFonts.poppins(
+                          //   //         fontSize: 14,
+                          //   //         color: Colors.white,
+                          //   //       ),
+                          //   //     ),
+                          //   //   ],
+                          //   // ),
+                          // ),
                         ],
                       ),
                     ),
@@ -315,7 +317,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.symmetric(vertical: 16),
               minimumSize: const Size(double.infinity, 50),
             ),
-            onPressed: () {},
+            onPressed: () {
+              Provider.of<AuthProviderIn>(context, listen: false).signOut();
+              Navigator.push(context, MaterialPageRoute(builder: (context) => SendOtpPage(),));
+            },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -330,7 +335,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
-            ),
+
+         ),
         );
     }
 }
