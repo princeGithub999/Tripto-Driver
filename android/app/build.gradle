@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.tripto_driver"
+    namespace = "com.trip.cab"
     compileSdk = 35  // Recommended: Use 34 instead of 35 for better compatibility
 
     ndkVersion = "27.0.12077973"
@@ -25,7 +25,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.tripto_driver"
+        applicationId = "com.trip.cab"
         minSdk = 23
         targetSdk = 33
         versionCode = flutter.versionCode
