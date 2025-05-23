@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id "com.android.application"
     // START: FlutterFire Configuration
@@ -8,10 +11,16 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
-android {
-    namespace = "com.example.tripto_driver"
-    compileSdk = 35  // Recommended: Use 34 instead of 35 for better compatibility
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
 
+
+android {
+    namespace = "com.trip.cab"
+    compileSdk = 35
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -25,20 +34,28 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.tripto_driver"
+        applicationId = "com.trip.cab"
         minSdk = 23
         targetSdk = 33
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+            shrinkResources false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            }
         }
-    }
     dependencies {
         coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 //        implementation 'androidx.core:core-ktx:1.15.0'

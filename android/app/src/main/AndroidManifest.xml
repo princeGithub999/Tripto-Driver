@@ -19,7 +19,6 @@
 
 
 
-
     <application
         android:label="TripTo-Driver"
         android:name="${applicationName}"

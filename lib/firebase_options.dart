@@ -44,19 +44,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyC94pP6Zfid7mGjoXxQZp4QiiGk3c-sK9o',
-    appId: '1:792466043013:web:49ceeec382703d065339ec',
+    apiKey: 'AIzaSyDSPXJffSt1RTJOQ2BM93GdIYPp-cn5DVU',
+    appId: '1:792466043013:web:244c3ba4d5d51d615339ec',
     messagingSenderId: '792466043013',
     projectId: 'fir-apptest-c3e4e',
     authDomain: 'fir-apptest-c3e4e.firebaseapp.com',
     databaseURL: 'https://fir-apptest-c3e4e-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'fir-apptest-c3e4e.appspot.com',
-    measurementId: 'G-P16VRNW8KV',
+    measurementId: 'G-3DX6775K8G',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAy_bPzS8OFzkC_VxVEej9EJVNEXCFdTOY',
-    appId: '1:792466043013:android:c89ea0da3a690a465339ec',
+    apiKey: 'AIzaSyAZOGcSYysxq3goKm5Fo_9oTaMBGa1NcRM',
+    appId: '1:792466043013:android:744877c7bed11c8c5339ec',
     messagingSenderId: '792466043013',
     projectId: 'fir-apptest-c3e4e',
     databaseURL: 'https://fir-apptest-c3e4e-default-rtdb.asia-southeast1.firebasedatabase.app',
@@ -64,15 +64,15 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDZTtuj88qDGa_CxvVnhwDJJdBID9lSWpw',
-    appId: '1:792466043013:ios:725b38ea299bd06c5339ec',
+    apiKey: 'AIzaSyDr8kr0wqxHg8PI3kpqwFSiPs6GRw7sHiA',
+    appId: '1:792466043013:ios:e1fe6cb59e3cc9525339ec',
     messagingSenderId: '792466043013',
     projectId: 'fir-apptest-c3e4e',
     databaseURL: 'https://fir-apptest-c3e4e-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'fir-apptest-c3e4e.appspot.com',
     androidClientId: '792466043013-0fgnsalsb4po7n490n9ovq46abqb9080.apps.googleusercontent.com',
-    iosClientId: '792466043013-5op1kocfcaes4m38fnk1jd0dcho7d43d.apps.googleusercontent.com',
-    iosBundleId: 'com.example.triptoDriver',
+    iosClientId: '792466043013-fcc3muou2nknl2fov4o8qr8kfk8vio4j.apps.googleusercontent.com',
+    iosBundleId: 'com.trip.cab',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
